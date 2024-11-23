@@ -76,4 +76,4 @@ COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-interaction --no-ansi
 COPY ./app /acc2/app
 
-ENTRYPOINT ["python3", "app/main.py"]
+ENTRYPOINT ["fastapi", "run", "app/main.py", "--workers", "4", "--host", "0.0.0.0", "--port", "8000"]

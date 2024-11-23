@@ -36,7 +36,22 @@ $ poetry install
 Application can now be started just by running the main file:
 
 ```bash
-$ poetry run python app/main.py
+# development
+$ poetry run fastapi dev app/main.py
+
+# production
+$ poetry run fastapi run app/main.py
 ```
 
 Application runs by default on `localhost:8000`. Documentation (Swagger) is available on `localhost:8000/docs`.
+
+## Docker
+A quicker way of running ACC II is to use docker.
+
+```bash 
+# build image with name acc2
+$ docker build -t acc2 .
+
+# run container with name acc2-container
+$ docker run --name acc2-container -p 8000:8000 acc2
+```
