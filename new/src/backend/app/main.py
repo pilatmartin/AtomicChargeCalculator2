@@ -5,8 +5,10 @@ from api.v1.routes.protonation import protonation_router
 from api.v1.routes.user import user_router
 from api.v1.middleware.logging import LoggingMiddleware
 from core.dependency_injection.container import Container
+from dotenv import load_dotenv
 
 PREFIX = "/api/v1"
+load_dotenv()
 
 
 def create_app() -> FastAPI:
@@ -32,3 +34,8 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, workers=4)
