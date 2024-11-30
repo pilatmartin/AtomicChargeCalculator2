@@ -30,23 +30,23 @@ class ChargeFW2Service:
         self, files: list[UploadFile], method_name: str, parameters_name: str | None = None
     ) -> list[dict[str, Charges]]:
         workdir = self.io.create_tmp_dir("calculations")
-        results: list[dict[str, Charges]] = []
 
-        # TODO: parallelize
-        for file in files:
+        async def process_file(file: UploadFile):
             new_file_path = await self.io.store_upload_file(file, workdir)
-
             try:
+                self.logger.info(f"Calculating charges for file {file.filename}.")
                 loop = asyncio.get_event_loop()
 
                 molecules = await loop.run_in_executor(self.executor, self.read_molecules, new_file_path)
                 charges = await loop.run_in_executor(
                     self.executor, self.chargefw2.calculate_charges, molecules, method_name, parameters_name
                 )
-                results.append({"file": file.filename, "charges": charges})
                 self.logger.info(f"Successfully calculated charges for file {file.filename}.")
+                return {"file": file.filename, "charges": charges}
             except Exception as e:
                 self.logger.error(f"Error calculating charges for file {file.filename}: {e}")
-                results.append({"file": file.filename, "error": e})  # TODO: add proper type and err handling
+                return {"file": file.filename, "error": str(e)}
 
+        # Process all files concurrently
+        results = await asyncio.gather(*[process_file(file) for file in files])
         return results
