@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 from core.integrations.chargefw2.base import ChargeFW2Base
 from core.dependency_injection.container import Container
 from dependency_injector.wiring import inject, Provide
-from api.v1.schemas.response import ResponseMultiple
+from api.v1.schemas.response import ResponseMultiple, ResponseSingle
 from services.chargefw2 import ChargeFW2Service
 
 charges_router = APIRouter(prefix="/charges", tags=["charges"])
@@ -31,6 +31,14 @@ async def available_parameters(method_name: str, chargefw2: ChargeFW2Base = Depe
     parameters: list[str] = chargefw2.get_available_parameters(method_name)
     return ResponseMultiple(data=parameters, total_count=len(parameters), page_size=len(parameters))
 
+
+@charges_router.post("/info", tags=["charges", "info"])
+@inject
+async def info(file: UploadFile, chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service])):
+    info = await chargefw2.info(file)
+    return ResponseSingle(data=info)
+
+
 @charges_router.post(
     "/calculate",
     tags=["charges", "calculate"],
@@ -43,4 +51,5 @@ async def calculate_charges(
     parameters_name: str | None = None,
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ):
-    return await chargefw2.calculate_charges(files, method_name, parameters_name)
+    charges = await chargefw2.calculate_charges(files, method_name, parameters_name)
+    return ResponseMultiple(data=charges, total_count=len(charges), page_size=len(charges))
