@@ -104,8 +104,6 @@ class ChargeFW2Service:
                 except Exception as e:
                     self.logger.error(f"Error calculating charges for file {file.filename}: {e}, {e.__class__}")
                     return ChargeCalculationResult(file=file.filename, error=str(e))
-                finally:
-                    self.io.remove_tmp_dir(workdir)
 
         # Process all files concurrently and cleanup
         try:
