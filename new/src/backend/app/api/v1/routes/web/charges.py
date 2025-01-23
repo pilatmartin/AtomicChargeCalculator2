@@ -1,9 +1,15 @@
 from typing import Annotated
-from fastapi import Depends, File, HTTPException, Path, Query, UploadFile
+from fastapi import Depends, File, HTTPException, Path, Query, UploadFile, status
 from fastapi.routing import APIRouter
-from core.dependency_injection.container import Container
 from dependency_injector.wiring import inject, Provide
+
 from api.v1.schemas.response import ResponseMultiple, Response
+
+from core.dependency_injection.container import Container
+from core.models.calculation import ChargeCalculationConfig
+
+from db.repositories.calculations_repository import CalculationDto
+
 from services.chargefw2 import ChargeFW2Service
 
 
@@ -22,7 +28,7 @@ async def available_methods(chargefw2: ChargeFW2Service = Depends(Provide[Contai
         methods = await chargefw2.get_available_methods()
         return ResponseMultiple(data=methods, total_count=len(methods), page_size=len(methods))
     except Exception:
-        raise HTTPException(status_code=400, detail="Error getting available methods.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available methods.")
 
 
 @charges_router.post("/methods", tags=["methods"])
@@ -39,7 +45,7 @@ async def suitable_methods(
         methods = await chargefw2.get_suitable_methods(file)
         return ResponseMultiple(data=methods, total_count=len(methods), page_size=len(methods))
     except Exception:
-        raise HTTPException(status_code=400, detail="Error getting suitable methods.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting suitable methods.")
 
 
 @charges_router.get("/parameters/{method_name}", tags=["parameters"])
@@ -59,7 +65,7 @@ async def available_parameters(
         parameters = await chargefw2.get_available_parameters(method_name)
         return ResponseMultiple(data=parameters, total_count=len(parameters), page_size=len(parameters))
     except Exception:
-        raise HTTPException(status_code=400, detail="Error getting available parameters.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available parameters.")
 
 
 @charges_router.post("/info", tags=["info"])
@@ -74,7 +80,7 @@ async def info(
         info = await chargefw2.info(file)
         return Response(data=info)
     except Exception:
-        raise HTTPException(status_code=400, detail="Error getting file information.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting file information.")
 
 
 @charges_router.post(
@@ -96,7 +102,29 @@ async def calculate_charges(
     """Calculates partial atomic charges for the provided files. Returns a list of dictionaries with charges (decimal numbers)."""
 
     try:
-        charges = await chargefw2.calculate_charges(files, method_name, parameters_name, read_hetatm, ignore_water)
-        return ResponseMultiple(data=charges, total_count=len(charges), page_size=len(charges))
-    except Exception:
-        raise HTTPException(status_code=400, detail="Error calculating charges.")
+        config = ChargeCalculationConfig(
+            method=method_name, parameters=parameters_name, read_hetatm=read_hetatm, ignore_water=ignore_water
+        )
+        calculations = await chargefw2.calculate_charges(files, config)
+        return ResponseMultiple(data=calculations, total_count=len(calculations), page_size=len(calculations))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error calculating charges. {str(e)}")
+
+
+# TODO: add pagination
+@charges_router.get("/calculations", tags=["calculations"])
+@inject
+async def get_calculations(
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+):
+    """Returns all calculations stored in the database."""
+
+    try:
+        calculations = chargefw2.get_calculations()
+        return ResponseMultiple[list[CalculationDto]](
+            data=calculations, total_count=len(calculations), page_size=len(calculations)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"[get_calculation]: Error getting calculations. {str(e)}"
+        )

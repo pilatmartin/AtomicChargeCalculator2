@@ -1,5 +1,5 @@
+import hashlib
 import os
-
 import aiofiles
 from fastapi import UploadFile
 
@@ -36,17 +36,20 @@ class IOService:
 
         return path
 
-    async def store_upload_file(self, file: UploadFile, dir: str) -> str:
+    async def store_upload_file(self, file: UploadFile, dir: str) -> tuple[str, str]:
         os.makedirs(dir, exist_ok=True)
         path: str = os.path.join(dir, IOService.get_unique_filename(file.filename))
+        hasher = hashlib.sha256()
         chunk_size = 64 * 1024  # 64 KB
+
         try:
+            self.logger.info(f"Storing file {file.filename}.")
             async with aiofiles.open(path, "wb") as out_file:
                 while content := await file.read(chunk_size):
                     await out_file.write(content)
+                    hasher.update(content)
 
-            self.logger.info(f"Successfully stored file {file.filename}.")
-            return path
+            return path, hasher.hexdigest()
         except Exception as e:
             self.logger.error(f"Error storing file {file.filename}: {e}")
             raise e

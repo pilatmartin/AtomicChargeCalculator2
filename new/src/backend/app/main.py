@@ -18,6 +18,10 @@ def create_apps() -> Tuple[FastAPI, FastAPI]:
     # Create DI container
     container = Container()
 
+    # Create database
+    db = container.db()
+    db.create_database()
+
     # Create FastAPI app
     web_app = FastAPI()
     internal_app = FastAPI()
