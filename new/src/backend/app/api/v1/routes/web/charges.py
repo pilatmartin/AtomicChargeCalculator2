@@ -1,17 +1,17 @@
 from typing import Annotated
-from fastapi import Depends, File, HTTPException, Path, Query, UploadFile, status
+from fastapi import Depends, File, Path, Query, UploadFile, status
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
 
-from api.v1.schemas.response import ResponseMultiple, Response
+from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
 from core.models.calculation import ChargeCalculationConfig
+from core.models.paging import PagingFilters
+from core.exceptions.http import BadRequestError
 
-from db.repositories.calculations_repository import CalculationDto
 
 from services.chargefw2 import ChargeFW2Service
-
 
 charges_router = APIRouter(prefix="/charges", tags=["charges"])
 
@@ -26,9 +26,9 @@ async def available_methods(chargefw2: ChargeFW2Service = Depends(Provide[Contai
 
     try:
         methods = await chargefw2.get_available_methods()
-        return ResponseMultiple(data=methods, total_count=len(methods), page_size=len(methods))
+        return Response[list[str]](data=methods)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available methods.")
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available methods.")
 
 
 @charges_router.post("/methods", tags=["methods"])
@@ -43,9 +43,9 @@ async def suitable_methods(
 
     try:
         methods = await chargefw2.get_suitable_methods(file)
-        return ResponseMultiple(data=methods, total_count=len(methods), page_size=len(methods))
+        return Response[list[str]](data=methods)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting suitable methods.")
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting suitable methods.")
 
 
 @charges_router.get("/parameters/{method_name}", tags=["parameters"])
@@ -63,9 +63,9 @@ async def available_parameters(
 
     try:
         parameters = await chargefw2.get_available_parameters(method_name)
-        return ResponseMultiple(data=parameters, total_count=len(parameters), page_size=len(parameters))
+        return Response[list[str]](data=parameters)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available parameters.")
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting available parameters.")
 
 
 @charges_router.post("/info", tags=["info"])
@@ -80,7 +80,7 @@ async def info(
         info = await chargefw2.info(file)
         return Response(data=info)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting file information.")
+        raise BadRequestError(status_status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting file information.")
 
 
 @charges_router.post(
@@ -106,25 +106,23 @@ async def calculate_charges(
             method=method_name, parameters=parameters_name, read_hetatm=read_hetatm, ignore_water=ignore_water
         )
         calculations = await chargefw2.calculate_charges(files, config)
-        return ResponseMultiple(data=calculations, total_count=len(calculations), page_size=len(calculations))
+        return Response(data=calculations, total_count=len(calculations), page_size=len(calculations))
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error calculating charges. {str(e)}")
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error calculating charges. {str(e)}")
 
 
-# TODO: add pagination
 @charges_router.get("/calculations", tags=["calculations"])
 @inject
 async def get_calculations(
+    page: Annotated[int, Query(description="Page number.")],
+    page_size: Annotated[int, Query(description="Number of items per page.")],
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ):
     """Returns all calculations stored in the database."""
 
     try:
-        calculations = chargefw2.get_calculations()
-        return ResponseMultiple[list[CalculationDto]](
-            data=calculations, total_count=len(calculations), page_size=len(calculations)
-        )
+        filters = PagingFilters(page=page, page_size=page_size)
+        calculations = chargefw2.get_calculations(filters)
+        return calculations  # use Response here
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"[get_calculation]: Error getting calculations. {str(e)}"
-        )
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error getting calculations. {str(e)}")

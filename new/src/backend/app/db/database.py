@@ -10,7 +10,7 @@ class Database:
     def __init__(self, db_url: str):
         self._engine = create_engine(db_url)
         self._session_factory = orm.scoped_session(
-            orm.sessionmaker(bind=self._engine, autoflush=False, autocommit=False)
+            orm.sessionmaker(bind=self._engine, autoflush=False, autocommit=False, expire_on_commit=False)
         )
 
     def create_database(self):

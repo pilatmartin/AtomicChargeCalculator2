@@ -7,8 +7,16 @@ from chargefw2 import Molecules
 
 from core.integrations.chargefw2.base import ChargeFW2Base
 from core.logging.base import LoggerBase
-from core.models.calculation import CalculationsFilters, ChargeCalculationConfig, ChargeCalculationResult
+from core.models.calculation import (
+    CalculationDto,
+    CalculationsFilters,
+    ChargeCalculationConfig,
+    ChargeCalculationResult,
+)
+from core.models.paging import PagingFilters
+
 from db.repositories.calculations_repository import CalculationsRepository
+from db.paged_list import PagedList
 from services.io import IOService
 
 
@@ -141,10 +149,10 @@ class ChargeFW2Service:
         finally:
             self.io.remove_tmp_dir(workdir)
 
-    def get_calculations(self) -> list[dict]:
+    def get_calculations(self, filters: PagingFilters) -> PagedList[CalculationDto]:
         try:
             self.logger.info("Getting all calculations.")
-            calculations = self.calculations_repository.get_all()
+            calculations = self.calculations_repository.get_all(filters=filters)
 
             return calculations
         except Exception as e:

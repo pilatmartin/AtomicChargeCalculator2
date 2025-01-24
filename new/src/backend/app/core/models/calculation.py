@@ -1,8 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from core.integrations.chargefw2.base import Charges
 from pydantic import UUID4, BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+
+from core.integrations.chargefw2.base import Charges
+from core.models.paging import PagingFilters
 
 
 @dataclass
@@ -12,6 +14,7 @@ class CalculationsFilters:
     parameters: str | None = None
     read_hetatm: bool = True
     ignore_water: bool = False
+    paging: PagingFilters = field(default_factory=lambda: PagingFilters(1, 10))
 
 
 @dataclass
@@ -32,7 +35,6 @@ class ChargeCalculationResult:
 
 class CalculationDto(BaseModel):
     id: UUID4
-    file_hash: str
     method: str
     parameters: str | None
     read_hetatm: bool

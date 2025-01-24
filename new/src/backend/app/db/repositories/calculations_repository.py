@@ -4,22 +4,27 @@ from sqlalchemy.sql.expression import and_
 from sqlalchemy.orm.session import Session
 
 from db.models.calculation import Calculation
+from db.paged_list import PagedList
 from core.models.calculation import (
     ChargeCalculationConfig,
     CalculationDto,
     CalculationsFilters,
     ChargeCalculationResult,
 )
+from core.models.paging import PagingFilters
 
 
 class CalculationsRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]):
         self.session_factory = session_factory
 
-    def get_all(self) -> list[CalculationDto]:
+    def get_all(self, filters: PagingFilters) -> PagedList[CalculationDto]:
         with self.session_factory() as session:
-            calculations: list[Calculation] = session.query(Calculation).all()
-            return [CalculationDto.model_validate(calculation) for calculation in calculations]
+            calculations_query = session.query(Calculation)
+            calculations = PagedList(query=calculations_query, page=filters.page, page_size=filters.page_size)
+            calculations.data = [CalculationDto.model_validate(calculation) for calculation in calculations.data]
+
+            return calculations
 
     def get(self, filters: CalculationsFilters) -> CalculationDto | None:
         with self.session_factory() as session:
@@ -79,8 +84,7 @@ class CalculationsRepository:
             calculation: Calculation = session.query(Calculation).filter(Calculation.id == calculation_id).first()
 
             if not calculation:
-                # TODO: Use custom exception
-                raise Exception(f"Calculation with id {calculation_id} not found.")
+                return
 
             session.delete(calculation)
             session.commit()
