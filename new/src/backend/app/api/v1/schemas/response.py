@@ -1,3 +1,5 @@
+"""Response schemas for API endpoints."""
+
 from api.v1.schemas.base_response import BaseResponseSchema
 
 

@@ -1,3 +1,5 @@
+"""Dependency injection container."""
+
 import os
 
 from dependency_injector import containers, providers
@@ -18,6 +20,8 @@ load_dotenv(find_dotenv())
 
 
 class Container(containers.DeclarativeContainer):
+    """IoC container for the application."""
+
     wiring_config = containers.WiringConfiguration(packages=["api", "core", "services"])
 
     # integrations
@@ -28,7 +32,9 @@ class Container(containers.DeclarativeContainer):
     db = providers.Singleton(Database, db_url=os.environ.get("DB_URL"))
 
     # repositories
-    calculations_repository = providers.Factory(CalculationsRepository, session_factory=db.provided.session)
+    calculations_repository = providers.Factory(
+        CalculationsRepository, session_factory=db.provided.session
+    )
 
     # services
     logger_service = providers.Singleton(FileLogger)

@@ -1,9 +1,13 @@
+"""Service for logging to file."""
+
 import logging
 import os
 from core.logging.base import LoggerBase
 
 
 class FileLogger(LoggerBase):
+    """Service for logging to file."""
+
     logdir = "/tmp/acc2/logs"
 
     def __init__(self, file_name: str = "logs.log") -> None:

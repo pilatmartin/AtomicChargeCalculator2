@@ -1,3 +1,5 @@
+"""Calculation database models."""
+
 import uuid
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped
@@ -6,6 +8,8 @@ from db.database import Base
 
 
 class Calculation(Base):
+    """Calculation database model."""
+
     __tablename__ = "calculations"
 
     id: Mapped[str] = sa.Column(sa.Uuid, primary_key=True, default=uuid.uuid4)
@@ -18,11 +22,11 @@ class Calculation(Base):
     sa.UniqueConstraint(file_hash, method, parameters, read_hetatm, ignore_water)
 
     def __repr__(self):
-        return f"""<Calculation 
-        id={self.id} 
-        hash={self.file_hash} 
-        method={self.method} 
-        parameters={self.parameters} 
-        read_hetatm={self.read_hetatm} 
-        ignore_water={self.ignore_water} 
+        return f"""<Calculation
+        id={self.id}
+        hash={self.file_hash}
+        method={self.method}
+        parameters={self.parameters}
+        read_hetatm={self.read_hetatm}
+        ignore_water={self.ignore_water}
         charges={self.charges}>"""
