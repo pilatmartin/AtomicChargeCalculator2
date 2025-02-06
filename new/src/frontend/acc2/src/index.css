@@ -4,6 +4,19 @@
 
 /* ... */
 
+body, #root {
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
 @font-face {
   font-family: "Muni";
   src:
