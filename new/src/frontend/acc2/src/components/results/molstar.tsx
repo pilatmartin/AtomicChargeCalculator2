@@ -13,7 +13,7 @@ export const MolStarWrapper = ({ className, ...props }: MolstarProps) => {
 
     try {
       await molstar.load(
-        "http://localhost:5173/propofol.fw2.cif",
+        `${location.origin}/propofol.fw2.cif`,
         "mmcif",
         "ACC2"
       );
@@ -22,7 +22,6 @@ export const MolStarWrapper = ({ className, ...props }: MolstarProps) => {
     }
     await molstar.color.relative();
     await molstar.type.ballAndStick();
-    console.log("loaded", molstar);
   };
 
   useEffect(() => {

@@ -8,7 +8,7 @@ export const Compute = () => {
   const navigate = useNavigate();
 
   return (
-    <Card className="w-4/5 rounded-none shadow-xl mx-auto p-4 max-w-content mb-12">
+    <Card className="w-4/5 rounded-none shadow-xl mx-auto p-4 max-w-content mb-12 mt-0 xs:mt-8 md:mt-0">
       <h2 className="text-5xl text-primary font-bold">Compute</h2>
       <form action={() => navigate("/results")}>
         <div className="my-4 flex flex-col gap-2">
@@ -18,7 +18,7 @@ export const Compute = () => {
             type="file"
             accept=".sdf,.mol2,.pdb,.mmcif"
             multiple
-            className="w-fit border-2 border-primary cursor-pointer"
+            className="border-2 border-primary cursor-pointer xs:w-fit"
           />
           <p className="text-sm text-black text-opacity-40">
             Supported filetypes are <span className="font-bold">sdf</span>,
@@ -29,7 +29,7 @@ export const Compute = () => {
             <span className="font-bold"> 250MB</span>.
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-col xs:flex-row">
           <Button type="submit">Compute</Button>
           <Button
             type="button"

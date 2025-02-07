@@ -8,10 +8,10 @@ export type CalculationsProps = HTMLAttributes<HTMLElement>;
 
 export const Calculations = ({ className, ...props }: CalculationsProps) => {
   const calculations: { method: string; parameters: string }[] = [
-    { method: "eem", parameters: "parameters1" },
+    { method: "eem", parameters: "EEM_00_NEEMP_ccd2016_npa" },
     { method: "veem", parameters: "" },
     { method: "eqeq", parameters: "" },
-    { method: "idk", parameters: "parameters2" },
+    { method: "sqeq0", parameters: "SQEq0_00_Schindler2021_PUB_pept" },
   ];
 
   return (
