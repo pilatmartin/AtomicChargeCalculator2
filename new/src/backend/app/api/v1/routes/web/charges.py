@@ -1,6 +1,8 @@
 """Charge calculation routes."""
 
+import asyncio
 from typing import Annotated
+import uuid
 from fastapi import Depends, File, Path, Query, UploadFile, status
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
@@ -13,6 +15,7 @@ from core.models.paging import PagingFilters
 from core.exceptions.http import BadRequestError
 
 
+from services.io import IOService
 from services.chargefw2 import ChargeFW2Service
 
 charges_router = APIRouter(prefix="/charges", tags=["charges"])
@@ -40,16 +43,17 @@ async def available_methods(
 @charges_router.post("/methods", tags=["methods"])
 @inject
 async def suitable_methods(
-    file: UploadFile, chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service])
+    files: list[UploadFile],
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+    io: IOService = Depends(Provide[Container.io_service]),
 ):
-    """Returns the list of suitable methods for the provided file.
-
-    **file**: File to get suitable methods for.
-    """
-
+    """Returns suitable methods for multiple files"""
     try:
-        methods = await chargefw2.get_suitable_methods(file)
-        return Response[list[dict]](data=methods)
+        directory = io.create_tmp_dir("suitable_methods")
+        await asyncio.gather(*[io.store_upload_file(file, directory) for file in files])
+        data = await chargefw2.get_suitable_methods_multi(directory)
+
+        return Response(data=data)
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting suitable methods."
@@ -140,6 +144,65 @@ async def calculate_charges(
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error calculating charges. {str(e)}"
+        ) from e
+
+
+@charges_router.post(
+    "/calculate/dir",
+    tags=["calculate"],
+    openapi_extra={"x-allowed-file-types": ["sdf", "mol2", "pdb", "mmcif"]},  # example
+)
+@inject
+async def calculate_charges_from_dir(
+    computation_id: Annotated[str, Query(description="Id of the computation.")],
+    method_name: Annotated[str, Query(description="Method name to calculate charges with.")],
+    parameters_name: Annotated[
+        str | None, Query(description="Parameters name to be used with the provided method.")
+    ] = None,
+    read_hetatm: Annotated[
+        bool, Query(description="Read HETATM records from PDB/mmCIF files.")
+    ] = True,
+    ignore_water: Annotated[
+        bool, Query(description="Discard water molecules from PDB/mmCIF files.")
+    ] = False,
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+):
+    """
+    Calculates partial atomic charges for files in the provided directory.
+    Returns a list of dictionaries with charges (decimal numbers).
+    """
+
+    try:
+        config = ChargeCalculationConfig(
+            method=method_name,
+            parameters=parameters_name,
+            read_hetatm=read_hetatm,
+            ignore_water=ignore_water,
+        )
+        calculations = await chargefw2.calculate_charges_from_dir(computation_id, config)
+        return Response(
+            data=calculations, total_count=len(calculations), page_size=len(calculations)
+        )
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error calculating charges. {str(e)}"
+        ) from e
+
+
+@charges_router.post("/setup", tags=["setup"])
+@inject
+async def setup(files: list[UploadFile], io: IOService = Depends(Provide[Container.io_service])):
+    """Stores the provided files on disk and returns the computation id"""
+
+    try:
+        computation_id = str(uuid.uuid4())
+        tmp_dir = io.create_tmp_dir(computation_id)
+        await asyncio.gather(*[io.store_upload_file(file, tmp_dir) for file in files])
+
+        return Response(data={"computationId": computation_id})
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error uploading files. {str(e)}"
         ) from e
 
 

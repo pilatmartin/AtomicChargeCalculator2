@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from pydantic import UUID4, BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 from core.integrations.chargefw2.base import Charges
@@ -44,7 +44,7 @@ class ChargeCalculationResult:
 class CalculationDto(BaseModel):
     """Calculation data transfer object"""
 
-    id: UUID4
+    file: str
     method: str
     parameters: str | None
     read_hetatm: bool
@@ -61,7 +61,7 @@ class CalculationDto(BaseModel):
         """Create DTO from calculation result"""
 
         return CalculationDto(
-            id=result.id,
+            file=result.file,
             method=config.method,
             parameters=config.parameters,
             read_hetatm=config.read_hetatm,

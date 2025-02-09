@@ -1,7 +1,11 @@
 """ChargeFW2 service module."""
 
 import asyncio
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+import os
+import uuid
+
 from fastapi import UploadFile
 
 # Temporary solution to get Molecules class
@@ -57,28 +61,47 @@ class ChargeFW2Service:
             self.logger.error(f"Error getting available methods: {e}")
             raise e
 
-    async def get_suitable_methods(self, file: UploadFile) -> list[dict]:
-        """Get suitable methods for charge calculation based on the provided file."""
-
-        workdir = self.io.create_tmp_dir("suitable-methods")
-        new_file_path, _ = await self.io.store_upload_file(file, workdir)
-        molecules = await self.read_molecules(new_file_path)
+    async def get_suitable_methods(self, directory: str) -> tuple[list[str], dict[str, list[str]]]:
+        """Get suitable methods for charge calculation based on files in the provided directory."""
 
         try:
-            self.logger.info(f"Getting suitable methods for file {file.filename}")
-            suitable_methods = await self._run_in_executor(
-                self.chargefw2.get_suitable_methods, molecules
-            )
+            self.logger.info(f"Getting suitable methods for directory '{directory}'")
 
-            # map from tuple to dictionary
-            suitable_methods = [
-                {"method": method, "parameters": parameters}
-                for method, parameters in suitable_methods
+            suitable_methods = Counter()
+            dir_contents = await self.io.listdir(directory)
+            for file in dir_contents:
+                input_file = os.path.join(directory, file)
+                molecules = await self.read_molecules(input_file)
+                methods: list[tuple[str, list[str]]] = await self._run_in_executor(
+                    self.chargefw2.get_suitable_methods, molecules
+                )
+
+                for method, parameters in methods:
+                    if not parameters or len(parameters) == 0:
+                        suitable_methods[(method,)] += 1
+                    else:
+                        for p in parameters:
+                            suitable_methods[(method, p)] += 1
+
+            all_valid = [
+                pair for pair in suitable_methods if suitable_methods[pair] == len(dir_contents)
             ]
 
-            return suitable_methods
+            # Remove duplicates from methods
+            tmp = {}
+            for data in all_valid:
+                tmp[data[0]] = None
+
+            methods = list(tmp.keys())
+
+            parameters = defaultdict(list)
+            for pair in all_valid:
+                if len(pair) == 2:
+                    parameters[pair[0]].append(pair[1])
+
+            return {"methods": methods, "parameters": parameters}
         except Exception as e:
-            self.logger.error(f"Error getting suitable methods for file {file.filename}: {e}")
+            self.logger.error(f"Error getting suitable methods for directory '{directory}': {e}")
             raise e
 
     async def get_available_parameters(self, method: str) -> list[str]:
@@ -172,6 +195,44 @@ class ChargeFW2Service:
         try:
             results = await asyncio.gather(
                 *[process_file(file) for file in files], return_exceptions=True
+            )
+            return [CalculationDto.from_result(result, config) for result in results]
+        finally:
+            self.io.remove_tmp_dir(workdir)
+
+    async def calculate_charges_from_dir(
+        self,
+        computation_id: str,
+        config: ChargeCalculationConfig,
+    ) -> list[CalculationDto]:
+        """Calculate charges for provided files."""
+
+        workdir = os.path.join(self.io.workdir, computation_id)
+        semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
+
+        async def process_file(file: str) -> ChargeCalculationResult:
+            full_path = os.path.join(workdir, file)
+            async with semaphore:
+                molecules = await self.read_molecules(
+                    full_path, config.read_hetatm, config.ignore_water
+                )
+                charges = await self._run_in_executor(
+                    self.chargefw2.calculate_charges,
+                    molecules,
+                    config.method,
+                    config.parameters,
+                )
+                result = ChargeCalculationResult(
+                    id=str(uuid.uuid4()), file=file, file_hash="idk", charges=charges
+                )
+                return result
+
+        # Process all files concurrently, store to database and cleanup
+        try:
+            dir_contents = await self.io.listdir(workdir)
+            results = await asyncio.gather(
+                *[process_file(file) for file in dir_contents],
+                return_exceptions=True,
             )
             return [CalculationDto.from_result(result, config) for result in results]
         finally:
