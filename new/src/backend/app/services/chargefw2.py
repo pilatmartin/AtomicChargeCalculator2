@@ -61,16 +61,17 @@ class ChargeFW2Service:
             self.logger.error(f"Error getting available methods: {e}")
             raise e
 
-    async def get_suitable_methods(self, directory: str) -> tuple[list[str], dict[str, list[str]]]:
+    async def get_suitable_methods(self, computation_id: str) -> dict:  # TODO: add better type
         """Get suitable methods for charge calculation based on files in the provided directory."""
 
         try:
-            self.logger.info(f"Getting suitable methods for directory '{directory}'")
+            self.logger.info(f"Getting suitable methods for computation id  '{computation_id}'")
 
             suitable_methods = Counter()
-            dir_contents = await self.io.listdir(directory)
+            workdir = os.path.join(self.io.workdir, computation_id)
+            dir_contents = await self.io.listdir(workdir)
             for file in dir_contents:
-                input_file = os.path.join(directory, file)
+                input_file = os.path.join(workdir, file)
                 molecules = await self.read_molecules(input_file)
                 methods: list[tuple[str, list[str]]] = await self._run_in_executor(
                     self.chargefw2.get_suitable_methods, molecules
@@ -101,7 +102,9 @@ class ChargeFW2Service:
 
             return {"methods": methods, "parameters": parameters}
         except Exception as e:
-            self.logger.error(f"Error getting suitable methods for directory '{directory}': {e}")
+            self.logger.error(
+                f"Error getting suitable methods for computation id '{computation_id}': {e}"
+            )
             raise e
 
     async def get_available_parameters(self, method: str) -> list[str]:
@@ -222,6 +225,7 @@ class ChargeFW2Service:
                     config.method,
                     config.parameters,
                 )
+                # TODO add file hash. perhaps file name?
                 result = ChargeCalculationResult(
                     id=str(uuid.uuid4()), file=file, file_hash="idk", charges=charges
                 )
@@ -229,10 +233,23 @@ class ChargeFW2Service:
 
         # Process all files concurrently, store to database and cleanup
         try:
+            # Use most suitable method if none provided
+            if not config.method:
+                suitable = await self.get_suitable_methods(computation_id)
+                config.method = suitable["methods"][0]
+                parameters: list[str] = suitable["parameters"].get(config.method, [])
+                config.parameters = (
+                    parameters[0].replace(".json", "") if len(parameters) > 0 else None
+                )
+                self.logger.info(
+                    f"""No method provided. 
+                        Using method '{config.method}' with parameters '{config.parameters}'."""
+                )
+
             dir_contents = await self.io.listdir(workdir)
             results = await asyncio.gather(
                 *[process_file(file) for file in dir_contents],
-                return_exceptions=True,
+                return_exceptions=False,
             )
             return [CalculationDto.from_result(result, config) for result in results]
         finally:

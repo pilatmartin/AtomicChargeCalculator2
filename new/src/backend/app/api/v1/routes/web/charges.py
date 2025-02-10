@@ -7,6 +7,7 @@ from fastapi import Depends, File, Path, Query, UploadFile, status
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
 
+from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
@@ -43,16 +44,11 @@ async def available_methods(
 @charges_router.post("/methods", tags=["methods"])
 @inject
 async def suitable_methods(
-    files: list[UploadFile],
-    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-    io: IOService = Depends(Provide[Container.io_service]),
+    computation_id: str, chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service])
 ):
-    """Returns suitable methods for multiple files"""
+    """Returns suitable methods for the provided computation."""
     try:
-        directory = io.create_tmp_dir("suitable_methods")
-        await asyncio.gather(*[io.store_upload_file(file, directory) for file in files])
-        data = await chargefw2.get_suitable_methods_multi(directory)
-
+        data = await chargefw2.get_suitable_methods(computation_id)
         return Response(data=data)
     except Exception as e:
         raise BadRequestError(
@@ -75,6 +71,13 @@ async def available_parameters(
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ):
     """Returns the list of available parameters for the provided method."""
+
+    methods = await chargefw2.get_available_methods()
+    if method_name not in methods:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Method '{method_name}' not found.",
+        )
 
     try:
         parameters = await chargefw2.get_available_parameters(method_name)
@@ -105,11 +108,7 @@ async def info(
         ) from e
 
 
-@charges_router.post(
-    "/calculate",
-    tags=["calculate"],
-    openapi_extra={"x-allowed-file-types": ["sdf", "mol2", "pdb", "mmcif"]},  # example
-)
+@charges_router.post("/calculate", tags=["calculate"])
 @inject
 async def calculate_charges(
     files: list[UploadFile],
@@ -147,15 +146,13 @@ async def calculate_charges(
         ) from e
 
 
-@charges_router.post(
-    "/calculate/dir",
-    tags=["calculate"],
-    openapi_extra={"x-allowed-file-types": ["sdf", "mol2", "pdb", "mmcif"]},  # example
-)
+@charges_router.post("/calculate/dir", tags=["calculate"])
 @inject
 async def calculate_charges_from_dir(
     computation_id: Annotated[str, Query(description="Id of the computation.")],
-    method_name: Annotated[str, Query(description="Method name to calculate charges with.")],
+    method_name: Annotated[
+        str | None, Query(description="Method name to calculate charges with.")
+    ] = None,
     parameters_name: Annotated[
         str | None, Query(description="Parameters name to be used with the provided method.")
     ] = None,
@@ -189,10 +186,36 @@ async def calculate_charges_from_dir(
         ) from e
 
 
-@charges_router.post("/setup", tags=["setup"])
+@charges_router.post(
+    "/setup",
+    tags=["setup"],
+    description=f"""Stores the provided files on disk and returns the computation id. 
+        Allowed file types are {", ".join(ALLOWED_FILE_TYPES)}.""",
+)
 @inject
 async def setup(files: list[UploadFile], io: IOService = Depends(Provide[Container.io_service])):
-    """Stores the provided files on disk and returns the computation id"""
+    """Stores the provided files on disk and returns the computation id."""
+
+    # TODO: move closure somewhere else
+    def is_ext_valid(filename: str) -> bool:
+        parts = filename.rsplit(".", 1)
+        ext = parts[-1]
+
+        return len(parts) == 2 and ext in ALLOWED_FILE_TYPES
+
+    if len(files) == 0:
+        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
+
+    if sum(file.size for file in files) > MAX_SETUP_FILES_SIZE:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum upload size is 250MB."
+        )
+
+    if not all(is_ext_valid(file.filename) for file in files):
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
+        )
 
     try:
         computation_id = str(uuid.uuid4())
