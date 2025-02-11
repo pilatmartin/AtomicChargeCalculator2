@@ -31,13 +31,18 @@ class IOLocal(IOBase):
         return os.listdir(directory)
 
     async def store_upload_file(self, file: UploadFile, directory: str) -> tuple[str, str]:
-        path: str = os.path.join(directory, IOBase.get_unique_filename(file.filename))
+        tmp_path: str = os.path.join(directory, IOBase.get_unique_filename(file.filename))
         hasher = hashlib.sha256()
         chunk_size = 1024 * 1024  # 1 MB
 
-        async with aiofiles.open(path, "wb") as out_file:
+        async with aiofiles.open(tmp_path, "wb") as out_file:
             while content := await file.read(chunk_size):
                 await out_file.write(content)
                 hasher.update(content)
 
-        return path, hasher.hexdigest()
+        # add hash to file name
+        file_hash = hasher.hexdigest()
+        new_filename = os.path.join(directory, f"{file_hash}_{file.filename}")
+        os.rename(tmp_path, new_filename)
+
+        return new_filename, file_hash

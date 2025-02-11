@@ -17,8 +17,10 @@ from core.models.calculation import (
     CalculationDto,
     CalculationsFilters,
     ChargeCalculationConfig,
+    ChargeCalculationPart,
     ChargeCalculationResult,
 )
+from core.models.molecule_info import MoleculeInfo
 from core.models.paging import PagingFilters, PagedList
 
 from db.repositories.calculations_repository import CalculationsRepository
@@ -136,7 +138,7 @@ class ChargeFW2Service:
             self.logger.error(f"Error loading molecules from file {file_path}: {e}")
             raise e
 
-    async def calculate_charges(
+    async def calculate_charges_old(
         self,
         files: list[UploadFile],
         config: ChargeCalculationConfig,
@@ -146,7 +148,7 @@ class ChargeFW2Service:
         workdir = self.io.create_tmp_dir("calculations")
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
-        async def process_file(file: UploadFile) -> ChargeCalculationResult:
+        async def process_file(file: UploadFile) -> ChargeCalculationPart:
             async with semaphore:
                 try:
                     new_file_path, file_hash = await self.io.store_upload_file(file, workdir)
@@ -177,7 +179,7 @@ class ChargeFW2Service:
                         )
                         charges = existing_calculation.charges
 
-                    result = ChargeCalculationResult(
+                    result = ChargeCalculationPart(
                         file=file.filename, file_hash=file_hash, charges=charges
                     )
 
@@ -192,28 +194,28 @@ class ChargeFW2Service:
                     self.logger.error(
                         f"Error calculating charges for file {file.filename}: {str(e)}"
                     )
-                    return ChargeCalculationResult(file=file.filename, file_hash=file_hash)
+                    return ChargeCalculationPart(file=file.filename, file_hash=file_hash)
 
         # Process all files concurrently, store to database and cleanup
         try:
             results = await asyncio.gather(
                 *[process_file(file) for file in files], return_exceptions=True
             )
-            return [CalculationDto.from_result(result, config) for result in results]
+            return [CalculationDto.from_result(result) for result in results]
         finally:
             self.io.remove_tmp_dir(workdir)
 
-    async def calculate_charges_from_dir(
+    async def calculate_charges(
         self,
         computation_id: str,
         config: ChargeCalculationConfig,
-    ) -> list[CalculationDto]:
+    ) -> ChargeCalculationResult:
         """Calculate charges for provided files."""
 
         workdir = os.path.join(self.io.workdir, computation_id)
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
-        async def process_file(file: str) -> ChargeCalculationResult:
+        async def process_file(file: str) -> ChargeCalculationPart:
             full_path = os.path.join(workdir, file)
             async with semaphore:
                 molecules = await self.read_molecules(
@@ -225,13 +227,15 @@ class ChargeFW2Service:
                     config.method,
                     config.parameters,
                 )
-                # TODO add file hash. perhaps file name?
-                result = ChargeCalculationResult(
-                    id=str(uuid.uuid4()), file=file, file_hash="idk", charges=charges
+                result = ChargeCalculationPart(
+                    id=str(uuid.uuid4()),
+                    file=file.split("_", 1)[-1],
+                    file_hash=file.split("_", 1)[0],
+                    charges=charges,
                 )
                 return result
 
-        # Process all files concurrently, store to database and cleanup
+        # Process all files concurrently
         try:
             # Use most suitable method if none provided
             if not config.method:
@@ -251,23 +255,66 @@ class ChargeFW2Service:
                 *[process_file(file) for file in dir_contents],
                 return_exceptions=False,
             )
-            return [CalculationDto.from_result(result, config) for result in results]
+            return ChargeCalculationResult(
+                config=config,
+                calculations=[CalculationDto.from_result(result) for result in results],
+            )
         finally:
-            self.io.remove_tmp_dir(workdir)
+            # TODO: Add error handling, remove tmp dir?
+            pass
+        #     self.io.remove_tmp_dir(workdir)
 
-    async def info(self, file: UploadFile) -> dict:
+    # async def to_mmcif(self, charges: ChargeCalculationResult, config: ChargeCalculationConfig):
+    #     output_file_path = os.path.join(self.io.workdir, "test.cif")
+    #     document = cif.read_file(output_file_path)
+    #     block = document.sole_block()
+
+    #     sb_ncbr_partial_atomic_charges_meta_prefix = "_sb_ncbr_partial_atomic_charges_meta."
+    #     sb_ncbr_partial_atomic_charges_prefix = "_sb_ncbr_partial_atomic_charges."
+    #     sb_ncbr_partial_atomic_charges_meta_attributes = ["id", "type", "method"]
+    #     sb_ncbr_partial_atomic_charges_attributes = ["type_id", "atom_id", "charge"]
+
+    #     block.find_mmcif_category(sb_ncbr_partial_atomic_charges_meta_prefix).erase()
+    #     block.find_mmcif_category(sb_ncbr_partial_atomic_charges_prefix).erase()
+
+    #     metadata_loop = block.init_loop(
+    #         sb_ncbr_partial_atomic_charges_meta_prefix,
+    #         sb_ncbr_partial_atomic_charges_meta_attributes,
+    #     )
+
+    #     for type_id, (method_internal_name, parameters_name) in enumerate(charges):
+    #         method_name = "veem"
+    #         parameters_name = "None"
+    #         metadata_loop.add_row(
+    #             [f"{type_id + 1}", "'empirical'", f"'{method_name}/{parameters_name}'"]
+    #         )
+
+    #     charges_loop = block.init_loop(
+    #         sb_ncbr_partial_atomic_charges_prefix, sb_ncbr_partial_atomic_charges_attributes
+    #     )
+
+    #     for type_id in enumerate(charges["phenols.sdf"]):
+    #         chgs = charges["phenols.sdf"]
+    #         for atom_id, charge in enumerate(chgs):
+    #             charges_loop.add_row([f"{1}", f"{atom_id}", f"{charge: .4f}"])
+
+    #     block.write_file(output_file_path)
+
+    async def info(self, file: UploadFile) -> MoleculeInfo:
         """Get information about the provided file."""
 
         try:
             workdir = self.io.create_tmp_dir("info")
             new_file_path, _ = await self.io.store_upload_file(file, workdir)
 
+            print("new_file_path", new_file_path)
+
             self.logger.info(f"Getting info for file {file.filename}.")
             molecules = await self.read_molecules(new_file_path)
 
             info = molecules.info()
 
-            return info.to_dict()
+            return MoleculeInfo(info.to_dict())
         except Exception as e:
             self.logger.error(f"Error getting info for file {file.filename}: {str(e)}")
             raise e

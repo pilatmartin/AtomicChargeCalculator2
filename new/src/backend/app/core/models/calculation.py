@@ -32,8 +32,8 @@ class ChargeCalculationConfig:
 
 
 @dataclass
-class ChargeCalculationResult:
-    """Result of charge calculation"""
+class ChargeCalculationPart:
+    """Result of charge calculation for a single file."""
 
     file: str
     file_hash: str
@@ -45,27 +45,25 @@ class CalculationDto(BaseModel):
     """Calculation data transfer object"""
 
     file: str
-    method: str
-    parameters: str | None
-    read_hetatm: bool
-    ignore_water: bool
     charges: dict
     success: bool = True
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
 
     @staticmethod
-    def from_result(
-        result: ChargeCalculationResult, config: ChargeCalculationConfig
-    ) -> "CalculationDto":
+    def from_result(result: ChargeCalculationPart) -> "CalculationDto":
         """Create DTO from calculation result"""
 
         return CalculationDto(
             file=result.file,
-            method=config.method,
-            parameters=config.parameters,
-            read_hetatm=config.read_hetatm,
-            ignore_water=config.ignore_water,
             charges=result.charges,
             success=result.charges is not None,
         )
+
+
+@dataclass
+class ChargeCalculationResult:
+    """Result of charge calculation"""
+
+    config: ChargeCalculationConfig
+    calculations: list[CalculationDto]
