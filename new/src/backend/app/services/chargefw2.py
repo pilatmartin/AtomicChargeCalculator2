@@ -145,6 +145,7 @@ class ChargeFW2Service:
             self.logger.error(f"Error loading molecules from file {file_path}: {e}")
             raise e
 
+    # TODO: Remove
     # async def calculate_charges_old(
     #     self,
     #     files: list[UploadFile],
@@ -272,86 +273,95 @@ class ChargeFW2Service:
             self.logger.error(f"Error calculating charges: {str(e)}")
             raise e
 
-    def transform(self, calculations: list[ChargeCalculationResult]) -> dict:
-        """transforms"""
-        transformed = {
-            "molecules": {},
-            "configs": [
-                {"method": calculation.config.method, "parameters": calculation.config.parameters}
-                for calculation in calculations
-            ],
-        }
-
-        for calculation in calculations:
-            for calculation_part in calculation.calculations:
-                if not calculation_part.success:
-                    continue
-
-                for molecule, charges in calculation_part.charges.items():
-                    if molecule not in transformed["molecules"]:
-                        transformed["molecules"][molecule] = {"charges": []}
-
-                    transformed["molecules"][molecule]["charges"].append(charges)
-
-        print("transformed", transformed)
-
-        return transformed
-
-    def write_to_mmcif(self, computation_id: str, data: dict, molecule: str) -> str:
-        """Write charges to mmcif file.
+    # TODO: Refactor. Move closures somewhere else?
+    def write_to_mmcif(
+        self, computation_id: str, calculations: list[ChargeCalculationResult]
+    ) -> dict:
+        """Write charges to mmcif files with names corresponding to the input molecules.
 
         Args:
             data (dict): Data to write
-            molecule (str): Molecule name
+            calculations (list[ChargeCalculationResult]): List of calculations to write.
 
         Returns:
-            str: Path to the created mmcif file
+            dict: Dictionary with "molecules" and "configs" keys.
         """
 
-        if molecule not in data["molecules"]:
-            raise ValueError("Molecule not found in data.")
+        def transform_data() -> dict:
+            """Transforms input data to a 'molecule-focused' format"""
+            transformed = {
+                "molecules": {},
+                "configs": [
+                    {
+                        "method": calculation.config.method,
+                        "parameters": calculation.config.parameters,
+                    }
+                    for calculation in calculations
+                ],
+            }
 
-        configs = data["configs"]
-        charges = data["molecules"][molecule]["charges"]
+            for calculation in calculations:
+                for calculation_part in calculation.calculations:
+                    if not calculation_part.success:
+                        continue
 
-        output_file_path = os.path.join(
-            self.io.get_charges_path(computation_id), f"{molecule}.fw2.cif"
-        )
+                    for molecule, charges in calculation_part.charges.items():
+                        if molecule not in transformed["molecules"]:
+                            transformed["molecules"][molecule] = {"charges": []}
 
-        document = cif.read_file(output_file_path)
-        block = document.sole_block()
+                        transformed["molecules"][molecule]["charges"].append(charges)
 
-        sb_ncbr_partial_atomic_charges_meta_prefix = "_sb_ncbr_partial_atomic_charges_meta."
-        sb_ncbr_partial_atomic_charges_prefix = "_sb_ncbr_partial_atomic_charges."
-        sb_ncbr_partial_atomic_charges_meta_attributes = ["id", "type", "method"]
-        sb_ncbr_partial_atomic_charges_attributes = ["type_id", "atom_id", "charge"]
+            return transformed
 
-        block.find_mmcif_category(sb_ncbr_partial_atomic_charges_meta_prefix).erase()
-        block.find_mmcif_category(sb_ncbr_partial_atomic_charges_prefix).erase()
+        def write(molecule: str, data: dict) -> str:
+            configs = data["configs"]
+            charges = data["molecules"][molecule]["charges"]
 
-        metadata_loop = block.init_loop(
-            sb_ncbr_partial_atomic_charges_meta_prefix,
-            sb_ncbr_partial_atomic_charges_meta_attributes,
-        )
-
-        for type_id, config in enumerate(configs):
-            method_name = config["method"]
-            parameters_name = config["parameters"]
-            metadata_loop.add_row(
-                [f"{type_id + 1}", "'empirical'", f"'{method_name}/{parameters_name}'"]
+            output_file_path = os.path.join(
+                self.io.get_charges_path(computation_id), f"{molecule.lower()}.fw2.cif"
             )
 
-        charges_loop = block.init_loop(
-            sb_ncbr_partial_atomic_charges_prefix, sb_ncbr_partial_atomic_charges_attributes
-        )
+            document = cif.read_file(output_file_path)
+            block = document.sole_block()
 
-        for type_id, charges in enumerate(charges):
-            for atom_id, charge in enumerate(charges):
-                charges_loop.add_row([f"{type_id + 1}", f"{atom_id + 1}", f"{charge: .4f}"])
+            sb_ncbr_partial_atomic_charges_meta_prefix = "_sb_ncbr_partial_atomic_charges_meta."
+            sb_ncbr_partial_atomic_charges_prefix = "_sb_ncbr_partial_atomic_charges."
+            sb_ncbr_partial_atomic_charges_meta_attributes = ["id", "type", "method"]
+            sb_ncbr_partial_atomic_charges_attributes = ["type_id", "atom_id", "charge"]
 
-        block.write_file(output_file_path)
+            block.find_mmcif_category(sb_ncbr_partial_atomic_charges_meta_prefix).erase()
+            block.find_mmcif_category(sb_ncbr_partial_atomic_charges_prefix).erase()
 
-        return output_file_path
+            metadata_loop = block.init_loop(
+                sb_ncbr_partial_atomic_charges_meta_prefix,
+                sb_ncbr_partial_atomic_charges_meta_attributes,
+            )
+
+            for type_id, config in enumerate(configs):
+                method_name = config["method"]
+                parameters_name = config["parameters"]
+                metadata_loop.add_row(
+                    [f"{type_id + 1}", "'empirical'", f"'{method_name}/{parameters_name}'"]
+                )
+
+            charges_loop = block.init_loop(
+                sb_ncbr_partial_atomic_charges_prefix, sb_ncbr_partial_atomic_charges_attributes
+            )
+
+            for type_id, charges in enumerate(charges):
+                for atom_id, charge in enumerate(charges):
+                    charges_loop.add_row([f"{type_id + 1}", f"{atom_id + 1}", f"{charge: .4f}"])
+
+            block.write_file(output_file_path)
+
+        data = transform_data()
+
+        configs = data["configs"]
+        molecules = list(data["molecules"])
+        for molecule in molecules:
+            write(molecule, data)
+
+        return {"molecules": molecules, "configs": configs}
 
     async def info(self, file: UploadFile) -> MoleculeInfo:
         """Get information about the provided file."""

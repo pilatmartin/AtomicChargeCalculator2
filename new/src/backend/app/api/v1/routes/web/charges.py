@@ -137,11 +137,7 @@ async def calculate_charges(
         )
 
         if response_format == "mmcif":
-            calc_data = chargefw2.transform(calculations)
-            molecules = list(calc_data["molecules"])
-            for molecule in molecules:
-                chargefw2.write_to_mmcif(computation_id, calc_data, molecule)
-            data = {"molecules": molecules, "configs": calc_data["configs"]}
+            data = chargefw2.write_to_mmcif(computation_id, calculations)
             return Response(data=data)
 
         return Response(data=calculations)
@@ -206,7 +202,7 @@ async def get_mmcif(
     """Returns a mmcif file for the provided molecule in the computation."""
 
     try:
-        path = os.path.join(io.get_charges_path(computation_id), f"{molecule}.fw2.cif")
+        path = os.path.join(io.get_charges_path(computation_id), f"{molecule.lower()}.fw2.cif")
         if not io.path_exists(path):
             raise FileNotFoundError()
 
