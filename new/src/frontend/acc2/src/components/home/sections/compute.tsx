@@ -8,10 +8,6 @@ import { Form } from "@acc2/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useComputationSetupMutation } from "@acc2/hooks/mutations/use-computation-setup-mutation";
-import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
-import { createContext, useContext } from "react";
-import { ComputeResponse } from "@acc2/api/compute";
-import { ComputationContext } from "@acc2/contexts/computation-context";
 
 const computeSchema = z.object({
   files: z
@@ -23,7 +19,6 @@ type ComputeType = z.infer<typeof computeSchema>;
 
 export const Compute = () => {
   const navigate = useNavigate();
-  const computationContext = useContext(ComputationContext);
   const form = useForm<ComputeType>({
     resolver: zodResolver(computeSchema),
     defaultValues: {
@@ -80,7 +75,7 @@ export const Compute = () => {
               {...form.register("files")}
               id="files"
               type="file"
-              accept=".sdf,.mol2,.pdb,.mmcif"
+              accept=".sdf,.mol2,.pdb,.mmcif,.cif"
               multiple
               className="border-2 border-primary cursor-pointer xs:w-fit"
             />

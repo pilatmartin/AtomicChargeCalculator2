@@ -1,46 +1,43 @@
 import { MolStarWrapper } from "./molstar";
-import { Controls } from "./controls";
+import { Controls } from "./controls/controls";
 import { ScrollArea } from "../ui/scroll-area";
 import { useNavigate, useSearchParams } from "react-router";
-import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
-import { useCallback, useEffect, useState } from "react";
-import { ComputeResponse } from "@acc2/api/compute";
+import { useEffect, useState } from "react";
 import MolstarPartialCharges from "molstar-partial-charges";
+import { ComputeResponse } from "@acc2/api/compute";
+import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
 
 export const Main = () => {
   const navigate = useNavigate();
-  const [searchParams, _] = useSearchParams();
+  const computationMutation = useComputationMutation();
+
+  const [searchParams, _setSearchParams] = useSearchParams();
+  const [molstar, setMolstar] = useState<MolstarPartialCharges>();
+  const [computation, setComputation] = useState<ComputeResponse>();
+
   const computationId = searchParams.get("comp_id");
   if (!computationId) {
     navigate("/");
     return null;
   }
 
-  const computeMutation = useComputationMutation();
-  const [computation, setComputation] = useState<ComputeResponse>();
-  const [molstar, setMolstar] = useState<MolstarPartialCharges>();
-
-  const compute = useCallback(async (): Promise<void> => {
-    const computeResponse = await computeMutation.mutateAsync(
-      {
-        computationId,
-      },
+  const compute = async () => {
+    const response = await computationMutation.mutateAsync(
+      { computationId },
       {
         onError: () => {
+          console.log("Something went wrong during computation.");
           navigate("/");
         },
       }
     );
 
-    if (!computeResponse.success) {
-      // TODO: add toast or smth
-      console.error(computeResponse.message);
+    if (!response.success) {
       navigate("/");
-      return;
+    } else {
+      setComputation(response.data);
     }
-
-    setComputation(computeResponse.data);
-  }, []);
+  };
 
   useEffect(() => {
     compute();
@@ -52,21 +49,14 @@ export const Main = () => {
         <h2 className="w-4/5 mx-auto max-w-content mt-8 text-3xl text-primary font-bold mb-2 sm:text-5xl">
           Computational Results
         </h2>
-        {computation && molstar && (
+        {molstar && computation && (
           <Controls
             computationId={computationId}
             computation={computation}
             molstar={molstar}
           />
         )}
-        {computation && (
-          <MolStarWrapper
-            molstar={molstar}
-            setMolstar={setMolstar}
-            computationId={computationId}
-            molecule={computation.molecules[0]}
-          />
-        )}
+        <MolStarWrapper setMolstar={setMolstar} />
       </ScrollArea>
     </main>
   );
