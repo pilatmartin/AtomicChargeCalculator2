@@ -2,6 +2,7 @@ import MolstarPartialCharges from "molstar-partial-charges";
 import { HTMLAttributes, useEffect } from "react";
 import { Card } from "../ui/card";
 import { cn } from "@acc2/lib/utils";
+import { useBusyContext } from "@acc2/hooks/contexts/use-busy-context";
 
 export type MolstarProps = {
   setMolstar: React.Dispatch<
@@ -14,10 +15,13 @@ export const MolStarWrapper = ({
   className,
   ...props
 }: MolstarProps) => {
+  const { addBusy, removeBusy } = useBusyContext();
   const setup = async () => {
+    addBusy();
     const molstar = await MolstarPartialCharges.create("molstar-root", {
       SbNcbrPartialCharges: true,
     });
+    removeBusy();
     setMolstar(molstar);
   };
 

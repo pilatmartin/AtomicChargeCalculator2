@@ -8,9 +8,9 @@ import { Form } from "@acc2/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useComputationSetupMutation } from "@acc2/hooks/mutations/use-computation-setup-mutation";
-import { Progress } from "@acc2/components/ui/progress";
 import { toast } from "sonner";
 import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
+import { Busy } from "@acc2/components/ui/busy";
 
 const computeSchema = z.object({
   files: z
@@ -45,10 +45,7 @@ export const Compute = () => {
         computationId: setupResponse.data.computationId,
       },
       {
-        onError: (error, variables, context) => {
-          console.log("something went wrong", error, variables, context);
-          toast.error(error.message);
-        },
+        onError: (error) => toast.error(error.message),
       }
     );
 
@@ -66,7 +63,6 @@ export const Compute = () => {
     });
 
     if (!response.success) {
-      // TODO: add toast or smth
       console.error(response.message);
       return;
     }
@@ -81,12 +77,12 @@ export const Compute = () => {
 
   return (
     <Card className="w-4/5 rounded-none shadow-xl mx-auto p-4 max-w-content mb-12 mt-0 xs:mt-8 md:mt-0 relative">
-      {setupMutation.isPending && (
+      {/* {setupMutation.isPending && (
         <div className="absolute inset-0">
           <Progress value={25} className="rounded-none" />
         </div>
-      )}
-      {/* <Busy isBusy={true}>Calculating Charges</Busy> */}
+      )} */}
+      <Busy isBusy={computationMutation.isPending} />
       <h2 className="text-5xl text-primary font-bold">Compute</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
