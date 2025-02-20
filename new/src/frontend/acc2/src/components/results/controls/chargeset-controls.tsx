@@ -1,4 +1,3 @@
-import { ComputeResponse } from "@acc2/api/compute";
 import {
   Select,
   SelectContent,
@@ -12,12 +11,10 @@ import { HTMLAttributes } from "react";
 export type MolstarChargesetControlsProps = {
   molstar: MolstarPartialCharges;
   setCurrentTypeId: React.Dispatch<React.SetStateAction<number>>;
-  configs: ComputeResponse["configs"];
 } & HTMLAttributes<HTMLElement>;
 
 export const MolstarChargesetControls = ({
   molstar,
-  configs,
   setCurrentTypeId,
 }: MolstarChargesetControlsProps) => {
   const onChargeSetSelect = (typeId: number) => {
@@ -36,11 +33,12 @@ export const MolstarChargesetControls = ({
           <SelectValue placeholder="Charge Set" />
         </SelectTrigger>
         <SelectContent>
-          {configs.map(({ method, parameters }, index) => (
-            <SelectItem key={index} value={`${index + 1}`}>
-              {`${method}${parameters ? "/" + parameters : ""}`}
-            </SelectItem>
-          ))}
+          {molstar &&
+            molstar.charges.getMethodNames().map((method, index) => (
+              <SelectItem key={index} value={`${index + 1}`}>
+                {method}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>

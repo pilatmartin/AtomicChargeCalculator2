@@ -7,11 +7,11 @@ export const useLoadMmcifMutation = (
   computationId: string
 ) => {
   return useMutation({
-    mutationFn: async ({ molecule }: { molecule: string }) => {
+    mutationFn: async ({ molecule = "" }: { molecule?: string }) => {
       await molstar.load(
-        `${baseApiUrl}/charges/mmcif?computation_id=${computationId}&molecule=${molecule}`,
+        `${baseApiUrl}/charges/${computationId}/mmcif?molecule=${molecule}`,
         "mmcif",
-        "acc2"
+        "ACC2"
       );
     },
     onError: (error) => console.error("Unable to load structure.", error),

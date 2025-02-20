@@ -8,6 +8,9 @@ import { Form } from "@acc2/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useComputationSetupMutation } from "@acc2/hooks/mutations/use-computation-setup-mutation";
+import { Progress } from "@acc2/components/ui/progress";
+import { toast } from "sonner";
+import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
 
 const computeSchema = z.object({
   files: z
@@ -19,6 +22,9 @@ type ComputeType = z.infer<typeof computeSchema>;
 
 export const Compute = () => {
   const navigate = useNavigate();
+  const setupMutation = useComputationSetupMutation();
+  const computationMutation = useComputationMutation();
+
   const form = useForm<ComputeType>({
     resolver: zodResolver(computeSchema),
     defaultValues: {
@@ -26,29 +32,38 @@ export const Compute = () => {
     },
   });
 
-  const setupMutation = useComputationSetupMutation();
-
   const onSubmit = async (data: ComputeType) => {
-    console.log(data);
-    const setupResonse = await setupMutation.mutateAsync(data.files);
-    if (!setupResonse.success) {
-      // TODO: add toast or smth
-      console.error(setupResonse.message);
+    const setupResponse = await setupMutation.mutateAsync(data.files);
+
+    if (!setupResponse.success) {
+      console.log(setupResponse.message);
       return;
     }
 
-    const computationId = setupResonse.data.computationId;
+    await computationMutation.mutateAsync(
+      {
+        computationId: setupResponse.data.computationId,
+      },
+      {
+        onError: (error, variables, context) => {
+          console.log("something went wrong", error, variables, context);
+          toast.error(error.message);
+        },
+      }
+    );
 
-    return navigate({
+    navigate({
       pathname: "results",
       search: createSearchParams({
-        comp_id: computationId,
+        comp_id: setupResponse.data.computationId,
       }).toString(),
     });
   };
 
   const onSetup = async (data: ComputeType) => {
-    const response = await setupMutation.mutateAsync(data.files);
+    const response = await setupMutation.mutateAsync(data.files, {
+      onError: () => toast.error("Unable to upload file(s). Try again later."),
+    });
 
     if (!response.success) {
       // TODO: add toast or smth
@@ -65,7 +80,13 @@ export const Compute = () => {
   };
 
   return (
-    <Card className="w-4/5 rounded-none shadow-xl mx-auto p-4 max-w-content mb-12 mt-0 xs:mt-8 md:mt-0">
+    <Card className="w-4/5 rounded-none shadow-xl mx-auto p-4 max-w-content mb-12 mt-0 xs:mt-8 md:mt-0 relative">
+      {setupMutation.isPending && (
+        <div className="absolute inset-0">
+          <Progress value={25} className="rounded-none" />
+        </div>
+      )}
+      {/* <Busy isBusy={true}>Calculating Charges</Busy> */}
       <h2 className="text-5xl text-primary font-bold">Compute</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -76,8 +97,8 @@ export const Compute = () => {
               id="files"
               type="file"
               accept=".sdf,.mol2,.pdb,.mmcif,.cif"
-              multiple
               className="border-2 border-primary cursor-pointer xs:w-fit"
+              multiple
             />
             <p className="text-sm text-black text-opacity-40">
               Supported filetypes are <span className="font-bold">sdf</span>,

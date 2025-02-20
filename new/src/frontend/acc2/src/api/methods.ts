@@ -1,9 +1,9 @@
 import { api } from "./base";
 import { Response } from "./types";
 
-// TODO: add types
-export const getAvailableMethods = async (): Promise<unknown> => {
-  return await api.get("/charges/methods");
+export const getAvailableMethods = async (): Promise<Response<string[]>> => {
+  const response = await api.get("/charges/methods");
+  return response.data;
 };
 
 export type SuitableMethods = {

@@ -33,19 +33,17 @@ export const MolstarViewControls = ({ molstar }: MolstarViewControlsProps) => {
     }
   };
 
+  const getDefaultView = () =>
+    molstar.type.isDefaultApplicable() ? "cartoon" : "balls-and-sticks";
+
   useEffect(() => {
-    onViewSelect("balls-and-sticks");
+    onViewSelect(getDefaultView());
   }, [molstar]);
 
   return (
     <div>
       <h3 className="font-bold mb-2">View</h3>
-      <Select
-        onValueChange={onViewSelect}
-        defaultValue={
-          molstar.type.isDefaultApplicable() ? "cartoon" : "balls-and-sticks"
-        }
-      >
+      <Select onValueChange={onViewSelect} defaultValue={getDefaultView()}>
         <SelectTrigger className="md:min-w-[180px] border-2">
           <SelectValue placeholder="Select View" />
         </SelectTrigger>

@@ -32,7 +32,7 @@ export const compute = async (
   computationId: string
 ): Promise<Response<ComputeResponse>> => {
   const response = await api.post(
-    "/charges/calculate",
+    `/charges/${computationId}/calculate`,
     [
       {
         method: null,
@@ -44,10 +44,16 @@ export const compute = async (
     ],
     {
       params: {
-        computation_id: computationId,
-        response_format: "mmcif",
+        response_format: "none",
       },
     }
   );
+  return response.data;
+};
+
+export const getMolecules = async (
+  computationId: string
+): Promise<Response<string[]>> => {
+  const response = await api.get(`/charges/${computationId}/molecules`);
   return response.data;
 };

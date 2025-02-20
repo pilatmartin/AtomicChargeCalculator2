@@ -18,12 +18,7 @@ export const MolStarWrapper = ({
     const molstar = await MolstarPartialCharges.create("molstar-root", {
       SbNcbrPartialCharges: true,
     });
-    // TODO: show controls
-    molstar.plugin.layout.setProps({
-      showControls: true,
-      isExpanded: true,
-    });
-    setMolstar(() => molstar);
+    setMolstar(molstar);
   };
 
   useEffect(() => {
