@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@acc2/components/ui/select";
+import { useControlsContext } from "@acc2/hooks/contexts/use-controls-context";
 import MolstarPartialCharges from "molstar-partial-charges";
 import { useEffect } from "react";
 
@@ -14,36 +15,22 @@ export type MolstarViewControlsProps = {
 
 const molstarViewTypes = ["balls-and-sticks", "cartoon", "surface"] as const;
 
-type MolstarViewType = (typeof molstarViewTypes)[number];
+export type MolstarViewType = (typeof molstarViewTypes)[number];
 
 export const MolstarViewControls = ({ molstar }: MolstarViewControlsProps) => {
-  const onViewSelect = async (view: MolstarViewType) => {
-    switch (view) {
-      case "balls-and-sticks":
-        await molstar.type.ballAndStick();
-        break;
-      case "cartoon":
-        await molstar.type.default();
-        break;
-      case "surface":
-        await molstar.type.surface();
-        break;
-      default:
-        console.error(`Invalid Molstar view type. ('${view}')`);
-    }
-  };
+  const context = useControlsContext(molstar);
 
   const getDefaultView = () =>
     molstar.type.isDefaultApplicable() ? "cartoon" : "balls-and-sticks";
 
   useEffect(() => {
-    onViewSelect(getDefaultView());
-  }, [molstar]);
+    context.set.viewType(getDefaultView());
+  }, [context.get.structure]);
 
   return (
     <div>
       <h3 className="font-bold mb-2">View</h3>
-      <Select onValueChange={onViewSelect} defaultValue={getDefaultView()}>
+      <Select onValueChange={context.set.viewType} value={context.get.viewType}>
         <SelectTrigger className="md:min-w-[180px] border-2">
           <SelectValue placeholder="Select View" />
         </SelectTrigger>

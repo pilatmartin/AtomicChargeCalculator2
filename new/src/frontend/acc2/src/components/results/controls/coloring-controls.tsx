@@ -7,8 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@acc2/components/ui/select";
+import { useControlsContext } from "@acc2/hooks/contexts/use-controls-context";
 import MolstarPartialCharges from "molstar-partial-charges";
-import { HTMLAttributes, useEffect, useRef, useState } from "react";
+import { HTMLAttributes, useEffect, useRef } from "react";
 
 export const molstarColoringTypes = [
   "structure",
@@ -25,34 +26,11 @@ export type MolstarColoringControlsProps = {
 export const MolstarColoringControls = ({
   molstar,
 }: MolstarColoringControlsProps) => {
-  const [coloring, setColoring] =
-    useState<MolstarColoringType>("charges-relative");
+  const context = useControlsContext(molstar);
   const maxValueRef = useRef<HTMLInputElement>(null);
 
-  const updateColoring = async (coloring: MolstarColoringType) => {
-    switch (coloring) {
-      case "structure":
-        // TODO: this does not work for some reason
-        await molstar.color.default();
-        break;
-      case "charges-relative":
-        await molstar.color.relative();
-        break;
-      case "charges-absolute":
-        console.log("coloring in switch", coloring);
-        if (maxValueRef.current) {
-          await molstar.color.absolute(maxValueRef.current.valueAsNumber);
-        }
-        break;
-      default:
-        console.warn(
-          `Invalid Molstar coloring type. ('${coloring}'), nothing changed.`
-        );
-    }
-  };
-
   const onMaxValueChange = async (maxValue: number) => {
-    await molstar.color.absolute(maxValue);
+    context.set.maxValue(maxValue);
   };
 
   const resetMaxValue = async () => {
@@ -72,16 +50,18 @@ export const MolstarColoringControls = ({
   }, [molstar]);
 
   useEffect(() => {
-    updateColoring(coloring);
+    context.set.coloringType(context.get.coloringType);
     resetMaxValue();
-  }, [coloring]);
+  }, [context.get.coloringType]);
 
   return (
     <div className="flex gap-4 flex-col sm:flex-row">
       <div className="grow">
         <h3 className="font-bold mb-2">Coloring</h3>
         <Select
-          onValueChange={(value) => setColoring(value as MolstarColoringType)}
+          onValueChange={(value) =>
+            context.set.coloringType(value as MolstarColoringType)
+          }
           defaultValue="charges-relative"
         >
           <SelectTrigger className="min-w-[180px] border-2">
@@ -100,7 +80,7 @@ export const MolstarColoringControls = ({
         </Select>
       </div>
       <div className="w-full col-span-1 sm:w-1/2">
-        {coloring === "charges-absolute" && (
+        {context.get.coloringType === "charges-absolute" && (
           <>
             <h3 className="mb-2 w-fit">Max Value</h3>
             <div className="flex gap-4">

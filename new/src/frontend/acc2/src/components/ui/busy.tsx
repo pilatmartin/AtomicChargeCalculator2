@@ -24,7 +24,7 @@ export const Busy = ({
     <div
       {...rest}
       className={cn(
-        "absolute inset-0 bg-secondary/35 place-content-center z-50",
+        "absolute inset-0 bg-secondary/35 place-content-center z-40",
         isBusy ? "grid" : "hidden",
         className
       )}

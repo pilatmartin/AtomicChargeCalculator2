@@ -5,21 +5,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@acc2/components/ui/select";
+import { useControlsContext } from "@acc2/hooks/contexts/use-controls-context";
 import MolstarPartialCharges from "molstar-partial-charges";
 import { HTMLAttributes } from "react";
 
 export type MolstarChargesetControlsProps = {
   molstar: MolstarPartialCharges;
-  setCurrentTypeId: React.Dispatch<React.SetStateAction<number>>;
 } & HTMLAttributes<HTMLElement>;
 
 export const MolstarChargesetControls = ({
   molstar,
-  setCurrentTypeId,
 }: MolstarChargesetControlsProps) => {
+  const context = useControlsContext(molstar);
   const onChargeSetSelect = (typeId: number) => {
-    molstar.charges.setTypeId(typeId);
-    setCurrentTypeId(typeId);
+    context.set.typeId(typeId);
   };
 
   return (

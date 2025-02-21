@@ -1,16 +1,14 @@
 import { HTMLAttributes, useEffect, useState } from "react";
 import { Card } from "../../ui/card";
 import { Separator } from "../../ui/separator";
-import { ComputeResponse } from "@acc2/api/compute";
 import MolstarPartialCharges from "molstar-partial-charges";
 import { useLoadMmcifMutation } from "@acc2/hooks/mutations/use-load-mmcif-mutation";
 import { MolstarViewControls } from "./view-controls";
-import {
-  MolstarColoringControls,
-  MolstarColoringType,
-} from "./coloring-controls";
+import { MolstarColoringControls } from "./coloring-controls";
 import { MolstarChargesetControls } from "./chargeset-controls";
 import { MolstarStructureControls } from "./structure-controls";
+import { useBusyContext } from "@acc2/hooks/contexts/use-busy-context";
+import { useControlsContext } from "@acc2/hooks/contexts/use-controls-context";
 
 export type ControlsProps = {
   computationId: string;
@@ -23,11 +21,16 @@ export const Controls = ({
   molstar,
   molecules,
 }: ControlsProps) => {
+  const context = useControlsContext(molstar);
+
   const mmcifMutation = useLoadMmcifMutation(molstar, computationId);
-  const [currentTypeId, setCurrentTypeId] = useState<number>(0);
   const [mmcifLoaded, setMmcifLoaded] = useState<boolean>(false);
+  const { addBusy, removeBusy } = useBusyContext();
+
+  const [names, setNames] = useState({ method: "", params: "" });
 
   const loadMolecule = async (molecule: string) => {
+    addBusy();
     await mmcifMutation.mutateAsync(
       { molecule },
       {
@@ -35,37 +38,42 @@ export const Controls = ({
       }
     );
     await molstar.color.relative();
+    context.set.methodNames(molstar.charges.getMethodNames());
+
+    removeBusy();
   };
 
   useEffect(() => {
     loadMolecule(molecules?.[0]);
   }, [molstar]);
 
+  useEffect(() => {
+    const name = context.get.methodNames?.[context.get.currentTypeId - 1];
+    const [method, params] = name?.split("/") ?? ["", ""];
+    setNames({ method, params });
+  }, [context.get.currentTypeId, context.get.methodNames]);
+
   // TODO get correct name for method and params
   return (
-    <Card className="w-4/5 rounded-none mx-auto p-4 max-w-content mt-4 flex flex-col">
+    <Card className="w-4/5 rounded-none mx-auto p-4 max-w-content mt-4 flex flex-col relative">
       <div className="flex gap-2">
         <h3 className="font-bold">Method:</h3>
-        <span>
-          {mmcifLoaded && molstar.charges.getMethodNames()[currentTypeId]}
-        </span>
+        <span>{names.method}</span>
       </div>
       <div className="flex gap-2">
         <h3 className="font-bold">Parameters:</h3>
-        <span>{}</span>
+        <span>{names.params}</span>
       </div>
       <Separator className="my-4" />
       {mmcifLoaded && (
         <div className="grid grid-cols-1 lg:grid-cols-2 xxl:grid-cols-3 gap-4">
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <MolstarStructureControls
+              molstar={molstar}
               molecules={molecules}
               onStructureSelect={loadMolecule}
             />
-            <MolstarChargesetControls
-              molstar={molstar}
-              setCurrentTypeId={setCurrentTypeId}
-            />
+            <MolstarChargesetControls molstar={molstar} />
           </div>
           <MolstarViewControls molstar={molstar} />
           <MolstarColoringControls molstar={molstar} />
