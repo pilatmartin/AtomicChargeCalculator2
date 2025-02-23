@@ -5,6 +5,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
@@ -29,11 +30,18 @@ const MethodSelector = ({ methods, onMethodChange }: MethodSelectorProps) => {
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {methods.map((method, index) => (
-            <SelectItem key={index} value={method.internalName}>
-              {method.name}
-            </SelectItem>
-          ))}
+          {Object.entries(Object.groupBy(methods, ({ type }) => type)).map(
+            ([type, methods]) => (
+              <SelectGroup>
+                <SelectLabel>{type}</SelectLabel>
+                {methods.map((method, index) => (
+                  <SelectItem key={index} value={method.internalName}>
+                    {method.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )
+          )}
         </SelectGroup>
       </SelectContent>
     </Select>
