@@ -275,11 +275,9 @@ class ChargeFW2Service:
             if not config.method:
                 # No method provided -> use most suitable method and parameters
                 suitable = await self.get_suitable_methods(computation_id)
-                config.method = suitable.methods[0]
-                parameters: list[str] = suitable.parameters.get(config.method, [])
-                config.parameters = (
-                    parameters[0].replace(".json", "") if len(parameters) > 0 else None
-                )
+                config.method = suitable.methods[0].internal_name
+                parameters = suitable.parameters.get(config.method, [])
+                config.parameters = parameters[0].internal_name if len(parameters) > 0 else None
                 self.logger.info(
                     f"""No method provided. 
                         Using method '{config.method}' with parameters '{config.parameters}'."""
@@ -289,14 +287,10 @@ class ChargeFW2Service:
             inputs = self.io.listdir(workdir)
             results = await asyncio.gather(
                 *[process_file(file) for file in inputs],
-                return_exceptions=True,
+                return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
             # Filter out exceptions
-            calculations = [
-                CalculationDto.from_result(result)
-                for result in results
-                if isinstance(result, CalculationDto)
-            ]
+            calculations = [CalculationDto.from_result(result) for result in results]
             return ChargeCalculationResult(
                 config=config,
                 calculations=calculations,

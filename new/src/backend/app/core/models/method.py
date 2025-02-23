@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 
-@dataclass
+@dataclass(frozen=True)
 class Method:
     """Method model."""
 
