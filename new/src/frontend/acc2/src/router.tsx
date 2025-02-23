@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Home } from "./pages/home";
-import { Setup } from "./pages/setup";
+import { SetupPage } from "./pages/setup";
 import { Results } from "./pages/results";
 import { Layout } from "./components/layout/layout";
 
@@ -13,7 +13,7 @@ export const Router = () => {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="setup" element={<Setup />} />
+          <Route path="setup" element={<SetupPage />} />
           <Route path="results" element={<Results />} />
         </Route>
       </Routes>

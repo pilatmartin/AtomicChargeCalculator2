@@ -1,10 +1,6 @@
 import { api } from "../base";
 import { ApiResponse } from "../types";
-import { ComputeResponse } from "./types";
-
-export type SetupResponse = {
-  computationId: string;
-};
+import { ComputeResponse, SetupResponse } from "./types";
 
 export const setup = async (files: FileList): Promise<SetupResponse> => {
   const formData = new FormData();

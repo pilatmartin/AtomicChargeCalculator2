@@ -5,3 +5,7 @@ export type ComputeResponse = {
     parameters: string;
   }[];
 };
+
+export type SetupResponse = {
+  computationId: string;
+};
