@@ -1,5 +1,5 @@
-import { api } from "./base";
-import { ApiResponse } from "./types";
+import { api } from "../base";
+import { ApiResponse } from "../types";
 
 export const getAvailableParameters = async (
   method: string

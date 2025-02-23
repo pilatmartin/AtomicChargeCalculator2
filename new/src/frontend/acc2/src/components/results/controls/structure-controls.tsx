@@ -1,4 +1,4 @@
-import { ComputeResponse } from "@acc2/api/compute";
+import { ComputeResponse } from "@acc2/api/compute/compute";
 import {
   Select,
   SelectContent,

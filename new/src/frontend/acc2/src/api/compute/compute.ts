@@ -1,5 +1,6 @@
-import { api } from "./base";
-import { ApiResponse } from "./types";
+import { api } from "../base";
+import { ApiResponse } from "../types";
+import { ComputeResponse } from "./types";
 
 export type SetupResponse = {
   computationId: string;
@@ -25,14 +26,6 @@ export const setup = async (files: FileList): Promise<SetupResponse> => {
   }
 
   return response.data.data;
-};
-
-export type ComputeResponse = {
-  molecules: string[];
-  configs: {
-    method: string;
-    parameters: string;
-  }[];
 };
 
 export const compute = async (
