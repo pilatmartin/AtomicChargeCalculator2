@@ -1,5 +1,6 @@
 services:  
   db:
+    container_name: acc2-db
     image: postgres:17-alpine
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -9,21 +10,28 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
     networks:
       - acc2-network
   
   api:
+    container_name: acc2-api
     build: ./backend
     ports: 
       - "8000:8000"
     environment:
       - ACC_DB_URL=postgresql://postgres:postgres@db:5432/postgres
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - acc2-network
-    depends_on:
-      - db
 
   web:
+    container_name: acc2-web
     build: ./frontend/acc2
     ports:
       - "3000:3000"
