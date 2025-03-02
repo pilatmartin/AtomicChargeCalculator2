@@ -9,3 +9,16 @@ export type ErrorResponse = {
 };
 
 export type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
+
+export type PagedData<T> = {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+};
+
+export type PagingFilters = {
+  page: number;
+  pageSize: number;
+};
