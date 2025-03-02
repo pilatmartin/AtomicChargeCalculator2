@@ -37,7 +37,7 @@ class IOBase(ABC):
             path_dst (str): Where to copy the file.
 
         Returns:
-            bool: True if the operation was successful, otherwise False.
+            str: Path to the copied file.
         """
         raise NotImplementedError()
 
@@ -63,6 +63,16 @@ class IOBase(ABC):
 
         Returns:
             tuple[str, str]: Tuple containing path to the file and hash of the file contents.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def write_file(self, path: str, content: str) -> None:
+        """Writes the provided content to the file.
+
+        Args:
+            path (str): Path to the file.
+            content (str): Content to be written to the file.
         """
         raise NotImplementedError()
 

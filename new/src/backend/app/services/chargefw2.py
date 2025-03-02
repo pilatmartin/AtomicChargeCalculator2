@@ -1,12 +1,11 @@
 """ChargeFW2 service module."""
 
+import asyncio
+import os
+
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from gemmi import cif
-
-import asyncio
-import os
-import uuid
 
 from fastapi import UploadFile
 
@@ -17,13 +16,15 @@ from core.integrations.chargefw2.base import ChargeFW2Base
 from core.logging.base import LoggerBase
 from core.models.calculation import (
     CalculationDto,
+    CalculationSetFullDto,
+    CalculationSetPreviewDto,
+    CalculationsFilters,
     ChargeCalculationConfig,
-    ChargeCalculationPart,
     ChargeCalculationResult,
 )
 from core.models.molecule_info import MoleculeInfo
 from core.models.method import Method
-from core.models.paging import PagingFilters, PagedList
+from core.models.paging import PagedList, PagingFilters
 from core.models.parameters import Parameters
 from core.models.suitable_methods import SuitableMethods
 
@@ -172,74 +173,6 @@ class ChargeFW2Service:
             self.logger.error(f"Error loading molecules from file {file_path}: {e}")
             raise e
 
-    # TODO: Remove
-    # async def calculate_charges_old(
-    #     self,
-    #     files: list[UploadFile],
-    #     config: ChargeCalculationConfig,
-    # ) -> list[CalculationDto]:
-    #     """Calculate charges for provided files."""
-
-    #     workdir = self.io.create_tmp_dir("calculations")
-    #     semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
-
-    #     async def process_file(file: UploadFile) -> ChargeCalculationPart:
-    #         async with semaphore:
-    #             try:
-    #                 new_file_path, file_hash = await self.io.store_upload_file(file, workdir)
-    #                 existing_calculation = self.calculations_repository.get(
-    #                     CalculationsFilters(
-    #                         hash=file_hash,
-    #                         method=config.method,
-    #                         parameters=config.parameters,
-    #                         read_hetatm=config.read_hetatm,
-    #                         ignore_water=config.ignore_water,
-    #                     )
-    #                 )
-
-    #                 if not existing_calculation:
-    #                     self.logger.info(f"Calculating charges for file {file.filename}.")
-    #                     molecules = await self.read_molecules(
-    #                         new_file_path, config.read_hetatm, config.ignore_water
-    #                     )
-    #                     charges = await self._run_in_executor(
-    #                         self.chargefw2.calculate_charges,
-    #                         molecules,
-    #                         config.method,
-    #                         config.parameters,
-    #                     )
-    #                 else:
-    #                     self.logger.info(
-    #                         f"Skipping file {file.filename}. Charges already calculated."
-    #                     )
-    #                     charges = existing_calculation.charges
-
-    #                 result = ChargeCalculationPart(
-    #                     file=file.filename, file_hash=file_hash, charges=charges
-    #                 )
-
-    #                 if not existing_calculation:
-    #                     new_calculation = self.calculations_repository.store(result, config)
-    #                     result.id = new_calculation.id
-    #                 else:
-    #                     result.id = existing_calculation.id
-
-    #                 return result
-    #             except Exception as e:
-    #                 self.logger.error(
-    #                     f"Error calculating charges for file {file.filename}: {str(e)}"
-    #                 )
-    #                 return ChargeCalculationPart(file=file.filename, file_hash=file_hash)
-
-    #     # Process all files concurrently, store to database and cleanup
-    #     try:
-    #         results = await asyncio.gather(
-    #             *[process_file(file) for file in files], return_exceptions=True
-    #         )
-    #         return [CalculationDto.from_result(result) for result in results]
-    #     finally:
-    #         self.io.remove_tmp_dir(workdir)
-
     async def calculate_charges(
         self, computation_id: str, config: ChargeCalculationConfig
     ) -> ChargeCalculationResult:
@@ -251,9 +184,28 @@ class ChargeFW2Service:
 
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
-        async def process_file(file: str) -> ChargeCalculationPart:
+        async def process_file(file: str) -> CalculationDto:
             full_path = os.path.join(workdir, file)
+            file_hash = file.split("_", 1)[0]
+            file_name = file.split("_", 1)[-1]
+
             async with semaphore:
+                exists = self.get_calculation(
+                    computation_id,
+                    CalculationsFilters(
+                        hash=file_hash,
+                        ignore_water=config.ignore_water,
+                        method=config.method,
+                        permissive_types=config.permissive_types,
+                        parameters=config.parameters,
+                        read_hetatm=config.read_hetatm,
+                    ),
+                )
+
+                if exists is not None:
+                    self.logger.info(f"Charges for {file_name} already exist, skipping.")
+                    return exists
+
                 molecules = await self.read_molecules(
                     full_path, config.read_hetatm, config.ignore_water, config.permissive_types
                 )
@@ -264,12 +216,16 @@ class ChargeFW2Service:
                     config.parameters,
                     charges_dir,
                 )
-                result = ChargeCalculationPart(
-                    id=str(uuid.uuid4()),
-                    file=file.split("_", 1)[-1],
-                    file_hash=file.split("_", 1)[0],
+
+                result = CalculationDto(
+                    file=file_name,
+                    file_hash=file_hash,
                     charges=charges,
                 )
+
+                await self.io.store_charges(computation_id, charges)
+                self.calculations_repository.store_calculation(computation_id, result, config)
+
                 return result
 
         try:
@@ -280,18 +236,16 @@ class ChargeFW2Service:
                 parameters = suitable.parameters.get(config.method, [])
                 config.parameters = parameters[0].internal_name if len(parameters) > 0 else None
                 self.logger.info(
-                    f"""No method provided. 
-                        Using method '{config.method}' with parameters '{config.parameters}'."""
+                    f"""No method provided.
+                         Using method '{config.method}' with parameters '{config.parameters}'."""
                 )
 
             # Process all files concurrently
             inputs = self.io.listdir(workdir)
-            results = await asyncio.gather(
+            calculations = await asyncio.gather(
                 *[process_file(file) for file in inputs],
                 return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
-            # Filter out exceptions
-            calculations = [CalculationDto.from_result(result) for result in results]
             return ChargeCalculationResult(
                 config=config,
                 calculations=calculations,
@@ -329,9 +283,6 @@ class ChargeFW2Service:
 
             for calculation in calculations:
                 for calculation_part in calculation.calculations:
-                    if not calculation_part.success:
-                        continue
-
                     for molecule, charges in calculation_part.charges.items():
                         if molecule not in transformed["molecules"]:
                             transformed["molecules"][molecule] = {"charges": []}
@@ -389,6 +340,31 @@ class ChargeFW2Service:
             write(molecule, data)
 
         return {"molecules": molecules, "configs": configs}
+
+    async def write_to_json(self, computation_id: str, data: list[ChargeCalculationResult]) -> None:
+        """Write charges to json file."""
+
+        await self.io.store_charges(computation_id, data)
+
+    def store_calculation_set(
+        self, computation_id: str, data: list[ChargeCalculationResult]
+    ) -> CalculationSetFullDto:
+        """Store calculation set to database."""
+        try:
+            self.logger.info(f"Storing calculation set {computation_id}.")
+            return self.calculations_repository.store_calculation_set(computation_id, data)
+        except Exception as e:
+            self.logger.error(f"Error storing calculation set {computation_id}: {str(e)}")
+            raise e
+
+    def delete_calculation_set(self, computation_id: str) -> None:
+        """Delete calculation set from database."""
+        try:
+            self.logger.info(f"Deleting calculation set {computation_id}.")
+            self.calculations_repository.delete_calculation_set(computation_id)
+        except Exception as e:
+            self.logger.error(f"Error deleting calculation set {computation_id}: {str(e)}")
+            raise e
 
     async def info(self, file: UploadFile) -> MoleculeInfo:
         """Get information about the provided file."""
@@ -463,14 +439,58 @@ class ChargeFW2Service:
 
         return path
 
-    def get_calculations(self, filters: PagingFilters) -> PagedList[CalculationDto]:
-        """Get all calculations stored in the database."""
+    def get_calculation_json(self, computation_id: str) -> str:
+        """Returns a json file for the provided path.
+
+        Args:
+            path (str): Path to computation results.
+
+        Raises:
+            FileNotFoundError: If the provided path does not exist.
+
+        Returns:
+            str: Path to the json file.
+        """
+
+        path = self.io.get_charges_path(computation_id)
+        json_path = os.path.join(path, "charges.json")
+
+        if not self.io.path_exists(json_path):
+            raise FileNotFoundError()
+
+        return json_path
+
+    def get_calculation_set(self, computation_id: str) -> CalculationSetFullDto:
+        """Get calculation set from database."""
 
         try:
-            self.logger.info("Getting all calculations.")
-            calculations = self.calculations_repository.get_all(filters=filters)
+            self.logger.info(f"Getting calculation set {computation_id}.")
+            return self.calculations_repository.get_calculation_set(computation_id)
+        except Exception as e:
+            self.logger.error(f"Error getting calculation set {computation_id}: {str(e)}")
+            raise e
+
+    def get_calculation(
+        self, computation_id: str, filters: CalculationsFilters
+    ) -> CalculationDto | None:
+        """Get calculation from database based on filters."""
+
+        try:
+            self.logger.info("Getting calculation from database.")
+            calculations = self.calculations_repository.get_calculation(computation_id, filters)
 
             return calculations
         except Exception as e:
-            self.logger.error(f"Error getting all calculations: {str(e)}")
+            self.logger.error(f"Error getting calculation from database: {str(e)}")
+            raise e
+
+    def get_calculations(self, filters: PagingFilters) -> PagedList[CalculationSetPreviewDto]:
+        """Get calculations from database based on filters."""
+
+        try:
+            self.logger.info("Getting calculations from database.")
+            calculations_list = self.calculations_repository.get_all(filters)
+            return calculations_list
+        except Exception as e:
+            self.logger.error(f"Error getting calculations from database: {str(e)}")
             raise e

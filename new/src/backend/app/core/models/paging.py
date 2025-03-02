@@ -26,7 +26,7 @@ class PagedList[T](BaseModel):  # add BaseModel
     _DEFAULT_PAGE: int = 1
     _DEFAULT_PAGE_SIZE: int = 10
 
-    data: list[T]
+    items: list[T]
     page: int
     page_size: int
     total_count: int
@@ -44,13 +44,13 @@ class PagedList[T](BaseModel):  # add BaseModel
         page = page if page > 0 else PagedList._DEFAULT_PAGE
         page_size = page_size if page_size > 0 else PagedList._DEFAULT_PAGE_SIZE
 
-        data = query.limit(page_size).offset((page - 1) * page_size).all()
+        items = query.limit(page_size).offset((page - 1) * page_size).all()
 
         total_count = query.count()
         total_pages = PagedList._get_total_pages(total_count, page_size)
 
         super().__init__(
-            data=data,
+            items=items,
             page=page,
             page_size=page_size,
             total_count=total_count,

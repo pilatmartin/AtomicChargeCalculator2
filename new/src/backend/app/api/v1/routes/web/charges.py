@@ -12,9 +12,10 @@ from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
-from core.models.calculation import ChargeCalculationConfig
+from core.models.calculation import CalculationSetPreviewDto, ChargeCalculationConfig
 from core.models.method import Method
 from core.models.molecule_info import MoleculeInfo
+from core.models.paging import PagedList, PagingFilters
 from core.models.parameters import Parameters
 from core.models.setup import Setup
 from core.models.suitable_methods import SuitableMethods
@@ -131,19 +132,28 @@ async def calculate_charges(
     """
 
     if configs is None or len(configs) == 0:
-        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No config provided.")
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No configurations provided.",
+        )
 
     try:
+        if chargefw2.get_calculation_set(computation_id) is None:
+            chargefw2.store_calculation_set(computation_id, [])
+
         calculations = await asyncio.gather(
             *[chargefw2.calculate_charges(computation_id, config) for config in configs]
         )
         _ = chargefw2.write_to_mmcif(computation_id, calculations)
+        await chargefw2.write_to_json(computation_id, calculations)
 
         if response_format == "none":
             return Response(data=None)
 
         return Response(data=calculations)
     except Exception as e:
+        # cleanup empty calculation set
+        chargefw2.delete_calculation_set(computation_id)
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
         ) from e
@@ -241,6 +251,29 @@ async def get_example_mmcif(
         ) from e
 
 
+@charges_router.get("/{computation_id}/json", tags=["json"])
+@inject
+async def get_json(
+    computation_id: Annotated[str, Path(description="UUID of the computation.")],
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+) -> FileResponse:
+    """Returns a mmcif file for the provided molecule in the computation."""
+
+    try:
+        json_path = chargefw2.get_calculation_json(computation_id)
+        print("JSON", json_path)
+        return FileResponse(path=json_path)
+    except FileNotFoundError as e:
+        raise NotFoundError(
+            detail=f"JSON file for computation '{computation_id}' not found."
+        ) from e
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Something went wrong while getting JSON data.",
+        ) from e
+
+
 @charges_router.get("/{computation_id}/molecules", tags=["molecules"])
 @inject
 async def get_molecules(
@@ -283,20 +316,20 @@ async def get_example_molecules(
         ) from e
 
 
-# @charges_router.get("/calculations", tags=["calculations"])
-# @inject
-# async def get_calculations(
-#     page: Annotated[int, Query(description="Page number.")] = 1,
-#     page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
-#     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-# ):
-#     """Returns all calculations stored in the database."""
+@charges_router.get("/calculations", tags=["calculations"])
+@inject
+async def get_calculations(
+    page: Annotated[int, Query(description="Page number.")] = 1,
+    page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+) -> Response[PagedList[CalculationSetPreviewDto]]:
+    """Returns all calculations stored in the database."""
 
-#     try:
-#         filters = PagingFilters(page=page, page_size=page_size)
-#         calculations = chargefw2.get_calculations(filters)
-#         return calculations  # use Response here
-#     except Exception as e:
-#         raise BadRequestError(
-#             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error getting calculations. {str(e)}"
-#         ) from e
+    try:
+        filters = PagingFilters(page=page, page_size=page_size)
+        calculations = chargefw2.get_calculations(filters)
+        return Response(data=calculations)
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
+        ) from e
