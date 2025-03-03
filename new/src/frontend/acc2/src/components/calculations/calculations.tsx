@@ -1,13 +1,4 @@
 import { useEffect, useState } from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
 import { ScrollArea } from "../ui/scroll-area";
 import { Calculation } from "./calculation";
 import { useCalculationsMutation } from "@acc2/hooks/mutations/use-calculations-mutation";
@@ -26,8 +17,8 @@ export const Calculations = () => {
     PagedData<CalculationPreview>
   >({
     items: [],
-    page: Number(searchParams.get("page") ?? 1),
-    pageSize: Number(searchParams.get("pageSize") ?? 5),
+    page: Math.max(1, Number(searchParams.get("page") ?? 1)),
+    pageSize: Math.max(1, Number(searchParams.get("pageSize") ?? 5)),
     totalCount: 0,
     totalPages: 1,
   });
