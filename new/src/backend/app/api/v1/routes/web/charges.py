@@ -1,8 +1,9 @@
 """Charge calculation routes."""
 
 import asyncio
-from typing import Annotated, Literal
 import uuid
+
+from typing import Annotated, Literal
 from fastapi import Depends, File, Path, Query, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
@@ -137,10 +138,10 @@ async def calculate_charges(
             detail="No configurations provided.",
         )
 
-    try:
-        if chargefw2.get_calculation_set(computation_id) is None:
-            chargefw2.store_calculation_set(computation_id, [])
+    if chargefw2.get_calculation_set(computation_id) is None:
+        raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
 
+    try:
         calculations = await asyncio.gather(
             *[chargefw2.calculate_charges(computation_id, config) for config in configs]
         )
@@ -152,8 +153,6 @@ async def calculate_charges(
 
         return Response(data=calculations)
     except Exception as e:
-        # cleanup empty calculation set
-        chargefw2.delete_calculation_set(computation_id)
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
         ) from e
@@ -167,7 +166,9 @@ async def calculate_charges(
 )
 @inject
 async def setup(
-    files: list[UploadFile], io: IOService = Depends(Provide[Container.io_service])
+    files: list[UploadFile],
+    io: IOService = Depends(Provide[Container.io_service]),
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[Setup]:
     """Stores the provided files on disk and returns the computation id."""
 
@@ -196,6 +197,7 @@ async def setup(
         computation_id = str(uuid.uuid4())
         tmp_dir = io.create_tmp_dir(io.get_input_path(computation_id))
         await asyncio.gather(*[io.store_upload_file(file, tmp_dir) for file in files])
+        chargefw2.store_calculation_set(computation_id, [])
 
         return Response(data={"computationId": computation_id})
     except Exception as e:
@@ -261,7 +263,6 @@ async def get_json(
 
     try:
         json_path = chargefw2.get_calculation_json(computation_id)
-        print("JSON", json_path)
         return FileResponse(path=json_path)
     except FileNotFoundError as e:
         raise NotFoundError(

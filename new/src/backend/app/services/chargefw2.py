@@ -2,9 +2,12 @@
 
 import asyncio
 import os
+import traceback
 
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
+
 from gemmi import cif
 
 from fastapi import UploadFile
@@ -15,6 +18,7 @@ from chargefw2 import Molecules
 from core.integrations.chargefw2.base import ChargeFW2Base
 from core.logging.base import LoggerBase
 from core.models.calculation import (
+    CalculationConfigDto,
     CalculationDto,
     CalculationSetFullDto,
     CalculationSetPreviewDto,
@@ -28,9 +32,14 @@ from core.models.paging import PagedList, PagingFilters
 from core.models.parameters import Parameters
 from core.models.suitable_methods import SuitableMethods
 
-from db.repositories.calculations_repository import CalculationsRepository
 
 from api.v1.constants import CHARGES_OUTPUT_EXTENSION
+
+from db.models.calculation import Calculation, CalculationConfig, CalculationSet
+from db.repositories.calculation_set_repository import CalculationSetRepository
+from db.repositories.calculation_config_repository import CalculationConfigRepository
+from db.repositories.calculation_repository import CalculationRepository
+
 from services.io import IOService
 
 
@@ -42,13 +51,17 @@ class ChargeFW2Service:
         chargefw2: ChargeFW2Base,
         logger: LoggerBase,
         io: IOService,
-        calculations_repository: CalculationsRepository,
+        set_repository: CalculationSetRepository,
+        calculation_repository: CalculationRepository,
+        config_repository: CalculationConfigRepository,
         max_workers: int = 4,
     ):
         self.chargefw2 = chargefw2
         self.logger = logger
         self.io = io
-        self.calculations_repository = calculations_repository
+        self.set_repository = set_repository
+        self.calculation_repository = calculation_repository
+        self.config_repository = config_repository
         self.executor = ThreadPoolExecutor(max_workers)
 
     async def _run_in_executor(self, func, *args, executor=None):
@@ -181,10 +194,9 @@ class ChargeFW2Service:
         workdir = self.io.get_input_path(computation_id)
         charges_dir = self.io.get_charges_path(computation_id)
         self.io.create_tmp_dir(charges_dir)
-
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
-        async def process_file(file: str) -> CalculationDto:
+        async def process_file(file: str, config: CalculationConfig) -> CalculationDto:
             full_path = os.path.join(workdir, file)
             file_hash = file.split("_", 1)[0]
             file_name = file.split("_", 1)[-1]
@@ -217,15 +229,17 @@ class ChargeFW2Service:
                     charges_dir,
                 )
 
-                result = CalculationDto(
-                    file=file_name,
-                    file_hash=file_hash,
-                    charges=charges,
+                result = CalculationDto(file=file_name, file_hash=file_hash, charges=charges)
+
+                self.calculation_repository.store(
+                    Calculation(
+                        file=file_name,
+                        file_hash=file_hash,
+                        charges=charges,
+                        set_id=computation_id,
+                        config_id=config.id,
+                    )
                 )
-
-                await self.io.store_charges(computation_id, charges)
-                self.calculations_repository.store_calculation(computation_id, result, config)
-
                 return result
 
         try:
@@ -240,10 +254,14 @@ class ChargeFW2Service:
                          Using method '{config.method}' with parameters '{config.parameters}'."""
                 )
 
+            db_config = self.config_repository.store(
+                CalculationConfig(set_id=computation_id, **asdict(config))
+            )
+
             # Process all files concurrently
             inputs = self.io.listdir(workdir)
             calculations = await asyncio.gather(
-                *[process_file(file) for file in inputs],
+                *[process_file(file, db_config) for file in inputs],
                 return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
             return ChargeCalculationResult(
@@ -251,7 +269,7 @@ class ChargeFW2Service:
                 calculations=calculations,
             )
         except Exception as e:
-            self.logger.error(f"Error calculating charges: {str(e)}")
+            self.logger.error(f"Error calculating charges: {traceback.format_exc()}")
             raise e
 
     # TODO: Refactor. Move closures somewhere else?
@@ -350,20 +368,49 @@ class ChargeFW2Service:
         self, computation_id: str, data: list[ChargeCalculationResult]
     ) -> CalculationSetFullDto:
         """Store calculation set to database."""
+
+        self.logger.info(f"Storing calculation set {computation_id}.")
+
         try:
-            self.logger.info(f"Storing calculation set {computation_id}.")
-            return self.calculations_repository.store_calculation_set(computation_id, data)
+            calculations: list[Calculation] = [
+                Calculation(
+                    file=calculation.file,
+                    file_hash=calculation.file_hash,
+                    charges=calculation.charges,
+                )
+                for result in data
+                for calculation in result.calculations
+            ]
+
+            configs: list[CalculationConfig] = [
+                CalculationConfig(**asdict(result.config)) for result in data
+            ]
+
+            calculation_set_to_store = CalculationSet(
+                id=computation_id, calculations=calculations, configs=configs
+            )
+
+            calculation_set = self.set_repository.store(calculation_set_to_store)
+            return CalculationSetFullDto(
+                id=calculation_set.id,
+                calculations=[CalculationDto.model_validate(calc) for calc in calculations],
+                configs=[CalculationConfigDto.model_validate(config) for config in configs],
+            )
         except Exception as e:
-            self.logger.error(f"Error storing calculation set {computation_id}: {str(e)}")
+            self.logger.error(
+                f"Error storing calculation set {computation_id}: {traceback.format_exc()}"
+            )
             raise e
 
     def delete_calculation_set(self, computation_id: str) -> None:
         """Delete calculation set from database."""
         try:
             self.logger.info(f"Deleting calculation set {computation_id}.")
-            self.calculations_repository.delete_calculation_set(computation_id)
+            self.set_repository.delete(computation_id)
         except Exception as e:
-            self.logger.error(f"Error deleting calculation set {computation_id}: {str(e)}")
+            self.logger.error(
+                f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
+            )
             raise e
 
     async def info(self, file: UploadFile) -> MoleculeInfo:
@@ -380,7 +427,9 @@ class ChargeFW2Service:
 
             return MoleculeInfo(info.to_dict())
         except Exception as e:
-            self.logger.error(f"Error getting info for file {file.filename}: {str(e)}")
+            self.logger.error(
+                f"Error getting info for file {file.filename}: {traceback.format_exc()}"
+            )
             raise e
         finally:
             self.io.remove_tmp_dir("info")
@@ -465,9 +514,11 @@ class ChargeFW2Service:
 
         try:
             self.logger.info(f"Getting calculation set {computation_id}.")
-            return self.calculations_repository.get_calculation_set(computation_id)
+            return self.set_repository.get(computation_id)
         except Exception as e:
-            self.logger.error(f"Error getting calculation set {computation_id}: {str(e)}")
+            self.logger.error(
+                f"Error getting calculation set {computation_id}: {traceback.format_exc()}"
+            )
             raise e
 
     def get_calculation(
@@ -477,11 +528,11 @@ class ChargeFW2Service:
 
         try:
             self.logger.info("Getting calculation from database.")
-            calculations = self.calculations_repository.get_calculation(computation_id, filters)
+            calculation = self.calculation_repository.get(computation_id, filters)
 
-            return calculations
+            return CalculationDto.model_validate(calculation) if calculation is not None else None
         except Exception as e:
-            self.logger.error(f"Error getting calculation from database: {str(e)}")
+            self.logger.error(f"Error getting calculation from database: {traceback.format_exc()}")
             raise e
 
     def get_calculations(self, filters: PagingFilters) -> PagedList[CalculationSetPreviewDto]:
@@ -489,8 +540,21 @@ class ChargeFW2Service:
 
         try:
             self.logger.info("Getting calculations from database.")
-            calculations_list = self.calculations_repository.get_all(filters)
-            return calculations_list
+            calculations_list = self.set_repository.get_all(filters)
+            calculations_list.items = [
+                CalculationSetPreviewDto.model_validate(
+                    {
+                        "id": calculation_set.id,
+                        "files": sorted(
+                            set(calculation.file for calculation in calculation_set.calculations)
+                        ),
+                        "configs": calculation_set.configs,
+                    }
+                )
+                for calculation_set in calculations_list.items
+            ]
+
+            return PagedList[CalculationSetPreviewDto].model_validate(calculations_list)
         except Exception as e:
-            self.logger.error(f"Error getting calculations from database: {str(e)}")
+            self.logger.error(f"Error getting calculations from database: {traceback.format_exc()}")
             raise e

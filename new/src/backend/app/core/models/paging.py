@@ -36,6 +36,7 @@ class PagedList[T](BaseModel):  # add BaseModel
         alias_generator=to_camel,
         populate_by_name=True,
         from_attributes=True,
+        arbitrary_types_allowed=True,
     )
 
     def __init__(
