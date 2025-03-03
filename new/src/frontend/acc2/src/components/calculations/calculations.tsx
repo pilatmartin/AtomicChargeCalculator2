@@ -15,21 +15,30 @@ import { PagedData, PagingFilters } from "@acc2/api/types";
 import { toast } from "sonner";
 import { handleApiError } from "@acc2/api/base";
 import { CalculationPreview } from "@acc2/api/calculations/types";
+import { useSearchParams } from "react-router";
+import { Paginator } from "../ui/paginator";
 
 export const Calculations = () => {
   const calculationMutation = useCalculationsMutation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [calculations, setCalculations] = useState<
     PagedData<CalculationPreview>
   >({
     items: [],
-    page: 1,
-    pageSize: 10,
+    page: Number(searchParams.get("page") ?? 1),
+    pageSize: Number(searchParams.get("pageSize") ?? 5),
     totalCount: 0,
     totalPages: 1,
   });
 
   const getCalculations = async (filters: PagingFilters) => {
+    setSearchParams(
+      new URLSearchParams({
+        page: `${filters.page}`,
+        pageSize: `${filters.pageSize}`,
+      })
+    );
     await calculationMutation.mutateAsync(filters, {
       onError: (error) => toast.error(handleApiError(error)),
       onSuccess: (data) => setCalculations(data),
@@ -37,7 +46,10 @@ export const Calculations = () => {
   };
 
   useEffect(() => {
-    getCalculations({ page: 1, pageSize: 10 });
+    getCalculations({
+      page: calculations.page,
+      pageSize: calculations.pageSize,
+    });
   }, []);
 
   return (
@@ -62,58 +74,12 @@ export const Calculations = () => {
               />
             ))}
           </ScrollArea>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem className="w-32">
-                {calculations.page <= 1 && (
-                  <PaginationPrevious
-                    href="#"
-                    tabIndex={-1}
-                    className="opacity-50 pointer-events-none"
-                    aria-disabled
-                  />
-                )}
-                {calculations.page > 1 && <PaginationPrevious href="#" />}
-              </PaginationItem>
-              {calculations.page > 1 && (
-                <PaginationItem>
-                  <PaginationLink href="#">
-                    {calculations.page - 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  {calculations.page}
-                </PaginationLink>
-              </PaginationItem>
-              {calculations.totalPages > calculations.page && (
-                <PaginationItem>
-                  <PaginationLink href="#">
-                    {calculations.page + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {calculations.totalPages > calculations.page + 1 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-              <PaginationItem className="w-32">
-                {calculations.totalPages > calculations.page && (
-                  <PaginationNext href="#" />
-                )}
-                {calculations.totalPages <= calculations.page && (
-                  <PaginationNext
-                    href="#"
-                    tabIndex={-1}
-                    className="opacity-50 pointer-events-none"
-                    aria-disabled
-                  />
-                )}
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <Paginator
+            page={calculations.page}
+            pageSize={calculations.pageSize}
+            totalPages={calculations.totalPages}
+            onPageChange={getCalculations}
+          />
         </>
       )}
     </main>
