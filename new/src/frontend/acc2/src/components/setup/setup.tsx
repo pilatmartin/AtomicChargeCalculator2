@@ -74,6 +74,34 @@ export const Setup = ({ computationId }: SetupProps) => {
     );
   };
 
+  const onAddToCalculation = () => {
+    if (!currentMethod) {
+      return;
+    }
+    if (currentMethod.hasParameters && !currentParameters) {
+      return;
+    }
+
+    const computations = form.getValues("computations");
+    if (
+      computations.find(
+        ({ method, parameters }) =>
+          method.internalName === currentMethod.internalName &&
+          parameters?.internalName === currentParameters?.internalName
+      )
+    ) {
+      return;
+    }
+
+    form.setValue("computations", [
+      ...form.getValues("computations"),
+      {
+        method: currentMethod,
+        parameters: currentParameters,
+      },
+    ]);
+  };
+
   const onMethodChange = (method: string) => {
     if (suitableMethods) {
       setCurrentMethod(() =>
@@ -132,22 +160,7 @@ export const Setup = ({ computationId }: SetupProps) => {
                 type="button"
                 className="mt-4 self-start"
                 variant={"secondary"}
-                onClick={() => {
-                  if (!currentMethod) {
-                    return;
-                  }
-                  if (currentMethod.hasParameters && !currentParameters) {
-                    return;
-                  }
-
-                  form.setValue("computations", [
-                    ...form.getValues("computations"),
-                    {
-                      method: currentMethod,
-                      parameters: currentParameters,
-                    },
-                  ]);
-                }}
+                onClick={onAddToCalculation}
               >
                 Add To Calculation
               </Button>
