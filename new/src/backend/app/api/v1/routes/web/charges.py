@@ -241,7 +241,7 @@ async def get_example_mmcif(
     try:
         examples_path = io.get_example_path(example_id)
         mmcif_path = chargefw2.get_molecule_mmcif(examples_path, molecule)
-        return Response(path=mmcif_path)
+        return FileResponse(path=mmcif_path)
     except FileNotFoundError as e:
         raise NotFoundError(
             detail=f"MMCIF file for molecule '{molecule}' in example '{example_id}' not found."
