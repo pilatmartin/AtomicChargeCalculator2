@@ -5,15 +5,18 @@ import os
 import shutil
 
 import aiofiles
+from dotenv import load_dotenv
 from fastapi import UploadFile
 
 from .base import IOBase
+
+load_dotenv()
 
 
 class IOLocal(IOBase):
     """Local IO operations."""
 
-    tmp_workdir: str = os.path.join("/", "tmp", "acc2")
+    tmp_workdir: str = os.environ.get("ACC2_DATA_DIR")
 
     def create_tmp_dir(self, name: str = "") -> str:
         path = os.path.join(IOLocal.tmp_workdir, name)
