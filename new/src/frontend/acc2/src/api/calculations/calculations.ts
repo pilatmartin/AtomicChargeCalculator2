@@ -24,18 +24,6 @@ export const getCalculations = async (
   return response.data.data;
 };
 
-export const getCalculationJson = async (
-  calculationId: string
-): Promise<string> => {
-  const response = await api.get<string>(`/charges/${calculationId}/json`);
-
-  if (!response.data) {
-    throw Error("Unable to get calculation json.");
-  }
-
-  return response.data;
-};
-
 export const downloadCalculation = async (
   calculationId: string
 ): Promise<Blob> => {
