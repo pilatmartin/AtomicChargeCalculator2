@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import { ScrollArea } from "../ui/scroll-area";
 import { Calculation } from "./calculation";
 import { useCalculationsMutation } from "@acc2/hooks/mutations/use-calculations-mutation";
 import {
   CalculationsFilters,
   isValidCalculationOrderField,
   isValidOrderDirection,
-  OrderFilters,
   PagedData,
-  PagingFilters,
 } from "@acc2/api/types";
 import { toast } from "sonner";
 import { handleApiError } from "@acc2/api/base";
