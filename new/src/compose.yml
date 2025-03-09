@@ -28,7 +28,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ACC_DB_URL=postgresql://postgres:postgres@db:5432/postgres
+      - ACC2_DB_URL=postgresql://postgres:postgres@db:5432/postgres
     depends_on:
       db:
         condition: service_healthy
