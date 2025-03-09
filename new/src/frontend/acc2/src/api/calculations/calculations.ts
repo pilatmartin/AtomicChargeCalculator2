@@ -1,9 +1,9 @@
 import { api } from "../base";
-import { ApiResponse, PagedData, PagingFilters } from "../types";
+import { ApiResponse, CalculationsFilters, PagedData } from "../types";
 import { CalculationPreview } from "./types";
 
 export const getCalculations = async (
-  filters: PagingFilters
+  filters: CalculationsFilters
 ): Promise<PagedData<CalculationPreview>> => {
   const response = await api.get<ApiResponse<PagedData<CalculationPreview>>>(
     `/charges/calculations`,
@@ -11,6 +11,8 @@ export const getCalculations = async (
       params: {
         page: filters.page,
         page_size: filters.pageSize,
+        order: filters.order,
+        order_by: filters.orderBy,
       },
     }
   );
@@ -29,6 +31,20 @@ export const getCalculationJson = async (
 
   if (!response.data) {
     throw Error("Unable to get calculation json.");
+  }
+
+  return response.data;
+};
+
+export const downloadCalculation = async (
+  calculationId: string
+): Promise<Blob> => {
+  const response = await api.get<Blob>(`/charges/${calculationId}/download`, {
+    responseType: "blob",
+  });
+
+  if (!response.data) {
+    throw Error("Unable to download calculation data.");
   }
 
   return response.data;

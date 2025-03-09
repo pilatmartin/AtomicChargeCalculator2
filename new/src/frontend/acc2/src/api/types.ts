@@ -22,3 +22,32 @@ export type PagingFilters = {
   page: number;
   pageSize: number;
 };
+
+export type OrderFilters<T extends string> = {
+  order: OrderDirection;
+  orderBy: T;
+};
+
+// Type for order direction query param
+const orderDirections = ["asc", "desc"] as const;
+
+type OrderDirection = (typeof orderDirections)[number];
+
+export const isValidOrderDirection = (
+  value: string
+): value is OrderDirection => {
+  return orderDirections.includes(value as OrderDirection);
+};
+
+// Type for order fields used with calculations
+const calculationsOrderFields = ["created_at"] as const;
+type CalculationsOrderFields = (typeof calculationsOrderFields)[number];
+
+export type CalculationsFilters = PagingFilters &
+  OrderFilters<CalculationsOrderFields>;
+
+export const isValidCalculationOrderField = (
+  value: string
+): value is CalculationsOrderFields => {
+  return calculationsOrderFields.includes(value as CalculationsOrderFields);
+};

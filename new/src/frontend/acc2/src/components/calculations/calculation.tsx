@@ -4,9 +4,16 @@ import { Badge } from "../ui/badge";
 import { cn } from "@acc2/lib/utils";
 import { useNavigate } from "react-router";
 import { CalculationPreview } from "@acc2/api/calculations/types";
-import { useCalculationJsonMutation } from "@acc2/hooks/mutations/use-calculation-json-mutation";
 import { toast } from "sonner";
 import { handleApiError } from "@acc2/api/base";
+
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import { HoverCard, HoverCardContent } from "@radix-ui/react-hover-card";
+import { HoverCardTrigger } from "../ui/hover-card";
+import { useCalculationDownloadMutation } from "@acc2/hooks/mutations/use-calculation-download-mutation";
+import { Info } from "lucide-react";
+dayjs.extend(localizedFormat);
 
 export type CalculationProps = {
   calculation: CalculationPreview;
@@ -17,22 +24,19 @@ export const Calculation = ({
   className,
   ...props
 }: CalculationProps) => {
-  const { id, configs, files } = calculation;
+  const { id, configs, files, createdAt } = calculation;
   const navigate = useNavigate();
-  const jsonMutation = useCalculationJsonMutation();
+  const downloadMutation = useCalculationDownloadMutation();
 
   const onDownload = async () => {
-    await jsonMutation.mutateAsync(id, {
+    await downloadMutation.mutateAsync(id, {
       onError: (error) => toast.error(handleApiError(error)),
       onSuccess: async (data) => {
-        const blob = new Blob([JSON.stringify(data, null, 4)], {
-          type: "application/json",
-        });
-        const href = URL.createObjectURL(blob);
+        const href = URL.createObjectURL(data);
         const link = document.createElement("a");
 
         link.href = href;
-        link.download = `${id}-charges.json`;
+        link.download = "charges.zip";
         document.body.appendChild(link);
         link.click();
 
@@ -43,43 +47,60 @@ export const Calculation = ({
   };
 
   return (
-    <div {...props} className={cn("w-full border border-solid p-4", className)}>
+    <div
+      {...props}
+      className={cn("w-full border border-solid p-4 relative", className)}
+    >
       <div className="mb-4">
-        <span className="block font-bold">Files</span>
+        <span className="block font-bold text-md mb-2">Files</span>
         <div className="flex gap-2 flex-wrap">
-          {files.map((file, index) => (
-            <Badge
-              key={`file-${index}`}
-              className="cursor-default"
-              variant={"secondary"}
-            >
-              {file}
-            </Badge>
-          ))}
+          {Object.entries(files)
+            .toSorted((a, b) => a[0].localeCompare(b[0]))
+            .map(([file, stats], index) => (
+              <HoverCard openDelay={0} closeDelay={0} key={`file-${index}`}>
+                <HoverCardTrigger asChild>
+                  <Badge className="cursor-pointer rounded" variant="secondary">
+                    <span className="mr-2">{file}</span>
+                    <Info height={15} width={15} />
+                  </Badge>
+                </HoverCardTrigger>
+                <HoverCardContent className="bg-white border z-50 p-4 text-sm shadow mt-2 flex flex-col gap-2">
+                  <div className="flex flex-col">
+                    <span className="mr-2 font-bold">Total Molecules</span>
+                    <span>{stats.totalMolecules}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="mr-2 font-bold">Total Atoms</span>
+                    <span>{stats.totalAtoms}</span>
+                  </div>
+                  <div>
+                    <span className="block font-bold">Atom Type Counts</span>
+                    {stats.atomTypeCounts
+                      .toSorted((a, b) => a.symbol.localeCompare(b.symbol))
+                      .map(({ symbol, count }, index) => (
+                        <div
+                          key={`${calculation.id}-${file}-atomTypeCounts-${index}`}
+                        >
+                          <span className="font-bold mr-1 text-muted-foreground">
+                            {symbol}:
+                          </span>
+                          <span className="mr-2">{count}</span>
+                        </div>
+                      ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            ))}
         </div>
       </div>
-      {/* <div className="mb-4">
-        <span className="block font-bold">Molecules</span>
-        <div className="flex gap-2 flex-wrap">
-          {molecules.map((molecule, index) => (
-            <Badge
-              key={`molecule-${index}`}
-              className="cursor-default"
-              variant={"secondary"}
-            >
-              {molecule}
-            </Badge>
-          ))}
-        </div>
-      </div> */}
       <div>
-        <span className="block font-bold">Calculations</span>
+        <span className="block font-bold mb-2">Calculations</span>
         <div className="flex gap-2 flex-wrap">
           {configs.map(({ method, parameters }, index) => (
             <Badge
               key={`molecule-${index}`}
-              className="cursor-default"
-              variant={"secondary"}
+              className="cursor-default rounded"
+              variant="secondary"
             >
               <span>{method}</span>
               {parameters && <span>&nbsp;({parameters})</span>}
@@ -91,7 +112,7 @@ export const Calculation = ({
         <Button
           type="button"
           variant={"default"}
-          className="self-end w-full xs:w-36"
+          className="self-end w-full xs:w-28"
           onClick={() => {
             navigate({
               pathname: "/results",
@@ -99,17 +120,20 @@ export const Calculation = ({
             });
           }}
         >
-          Go to Results
+          View
         </Button>
         <Button
           type="button"
           variant={"secondary"}
-          className="self-end w-full xs:w-36"
+          className="self-end w-full xs:w-28"
           onClick={onDownload}
         >
-          Get JSON
+          Download
         </Button>
       </div>
+      <span className="absolute right-4 top-4 text-xs">
+        {dayjs(createdAt).format("LLL")}
+      </span>
     </div>
   );
 };

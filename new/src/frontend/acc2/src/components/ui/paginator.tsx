@@ -1,3 +1,4 @@
+import { cn } from "@acc2/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -13,16 +14,17 @@ export type PaginatorProps = {
   pageSize: number;
   totalPages: number;
   onPageChange: (filters: PagingFilters) => void;
-};
+} & React.ComponentProps<"nav">;
 
 export const Paginator = ({
   page,
   pageSize,
   totalPages,
   onPageChange,
+  className,
 }: PaginatorProps) => {
   return (
-    <Pagination>
+    <Pagination className={cn(className)}>
       <PaginationContent>
         <PaginationItem className="w-32">
           {page <= 1 && (

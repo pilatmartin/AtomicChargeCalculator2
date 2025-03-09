@@ -37,8 +37,11 @@ export type SetupProps = {
 export const Setup = ({ computationId }: SetupProps) => {
   const navigate = useNavigate();
 
-  const { data: suitableMethods, isPending } =
-    useSuitableMethodsQuery(computationId);
+  const {
+    data: suitableMethods,
+    isPending,
+    isError,
+  } = useSuitableMethodsQuery(computationId);
   const computationMutation = useComputationMutation();
 
   const [currentMethod, setCurrentMethod] = useState<MethodType | undefined>(
@@ -120,6 +123,13 @@ export const Setup = ({ computationId }: SetupProps) => {
     }
     setCurrentMethod(() => defaultMethod);
   }, [suitableMethods]);
+
+  useEffect(() => {
+    if (isError) {
+      navigate("/");
+      toast.error("Something went wrong while fetching setup info.");
+    }
+  }, [isError]);
 
   return (
     <main className="mx-auto w-full selection:text-white selection:bg-primary mb-12">
