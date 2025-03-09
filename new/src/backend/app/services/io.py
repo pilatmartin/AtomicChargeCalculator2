@@ -29,7 +29,7 @@ class IOService:
 
         try:
             self.logger.info(f"Creating temporary directory with name: {name}")
-            path = self.io.create_tmp_dir(name)
+            path = self.io.create_dir(name)
             return path
         except Exception as e:
             self.logger.info(f"Unable to create temporary directory '{name}': {e}")
@@ -41,7 +41,7 @@ class IOService:
         self.logger.info(f"Removing temporary directory {path}")
 
         try:
-            self.io.remove_tmp_dir(path)
+            self.io.remove_dir(path)
         except Exception as e:
             self.logger.error(f"Unable to remove temporary directory '{path}': {e}")
             raise e
@@ -95,6 +95,33 @@ class IOService:
             )
         except Exception as e:
             self.logger.error(f"Error storing charges for computation {computation_id}: {e}")
+            raise e
+
+    def zip_charges(self, directory: str) -> str:
+        """Create archive from directory."""
+
+        self.logger.info(f"Creating archive from {directory}.")
+
+        try:
+            archive_dir = os.path.join(directory, "archive")
+            self.io.mkdir(archive_dir)
+
+            for extension in ["cif", "pqr", "txt", "mol2"]:
+                self.io.mkdir(os.path.join(archive_dir, extension))
+
+            for file in self.io.listdir(directory):
+                extension = file.rsplit(".", 1)[-1]
+                file_path = os.path.join(directory, file)
+
+                if extension in ["pqr", "txt", "mol2"]:
+                    new_name = file.split("_", 1)[-1]  # removing hash from filename
+                    self.io.cp(file_path, os.path.join(archive_dir, extension, new_name))
+                elif extension == "cif":
+                    self.io.cp(file_path, os.path.join(archive_dir, extension))
+
+            return self.io.zip(archive_dir, archive_dir)
+        except Exception as e:
+            self.logger.error(f"Error creating archive from {directory}: {e}")
             raise e
 
     def listdir(self, directory: str) -> list[str]:

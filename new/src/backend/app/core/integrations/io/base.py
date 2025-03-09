@@ -11,20 +11,41 @@ class IOBase(ABC):
     """Service for interaction with the file system."""
 
     @abstractmethod
-    def create_tmp_dir(self, name: str = "") -> str:
-        """Creates temporary directory.
+    def mkdir(self, path: str) -> str:
+        """Creates directory.
+
+        Args:
+            path (str): Path to the directory which will be created.
 
         Returns:
-                str: Name of the temporary directory which will be created.
+            str: Path to the created directory.
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def remove_tmp_dir(self, dir_name: str) -> None:
-        """Removes temporary directory.
+    def rmdir(self, path: str) -> None:
+        """Removes directory.
 
         Args:
-            name (str): Name of the temporary directory which will be removed.
+            path (str): Path to the directory which will be removed.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def create_dir(self, name: str) -> str:
+        """Creates a directory in the current working directory.
+
+        Returns:
+                str: Name of the  directory which will be created.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def remove_dir(self, dir_name: str) -> None:
+        """Removes a directory from the current working directory.
+
+        Args:
+            name (str): Name of the directory which will be removed.
         """
         raise NotImplementedError()
 
@@ -38,6 +59,19 @@ class IOBase(ABC):
 
         Returns:
             str: Path to the copied file.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def zip(self, path: str, destination: str) -> str:
+        """Zips the provided directory.
+
+        Args:
+            path (str): Path to directory to zip.
+            destination (str): Where to store the zipped directory (without extension).
+
+        Returns:
+            str: Path to the zipped directory.
         """
         raise NotImplementedError()
 

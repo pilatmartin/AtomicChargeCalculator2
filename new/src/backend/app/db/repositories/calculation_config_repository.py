@@ -6,7 +6,7 @@ from typing import Callable
 from sqlalchemy import and_
 from sqlalchemy.orm.session import Session
 
-from db.models.calculation import CalculationConfig
+from db.models.calculation.calculation_config import CalculationConfig
 from db.repositories.calculation_set_repository import CalculationSetRepository
 
 

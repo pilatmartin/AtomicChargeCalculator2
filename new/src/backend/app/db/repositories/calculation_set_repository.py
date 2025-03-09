@@ -1,13 +1,20 @@
 """This module provides a repository for calculation sets."""
 
 from contextlib import AbstractContextManager
-from typing import Callable
+from dataclasses import dataclass
+from typing import Callable, Literal
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
 
 from core.models.paging import PagedList, PagingFilters
-from db.models.calculation import CalculationSet
+from db.models.calculation.calculation_set import CalculationSet
+
+
+@dataclass
+class CalculationSetFilters(PagingFilters):
+    order_by: str
+    order: Literal["asc", "desc"]
 
 
 class CalculationSetRepository:
@@ -16,7 +23,7 @@ class CalculationSetRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]):
         self.session_factory = session_factory
 
-    def get_all(self, filters: PagingFilters) -> PagedList[CalculationSet]:
+    def get_all(self, filters: CalculationSetFilters) -> PagedList[CalculationSet]:
         """Get all previous calculations matching the provided filters.
 
         Args:
@@ -31,6 +38,8 @@ class CalculationSetRepository:
                 session.query(CalculationSet)
                 .options(joinedload(CalculationSet.calculations))
                 .options(joinedload(CalculationSet.configs))
+                .order_by(getattr(getattr(CalculationSet, filters.order_by), filters.order)())
+                .filter(CalculationSet.calculations.any())
             )
             calculations = PagedList(query=query, page=filters.page, page_size=filters.page_size)
 

@@ -8,7 +8,9 @@ from sqlalchemy.orm.session import Session
 
 from core.models.paging import PagedList, PagingFilters
 from core.models.calculation import CalculationsFilters
-from db.models.calculation import Calculation, CalculationConfig
+
+from db.models.calculation.calculation import Calculation
+from db.models.calculation.calculation_config import CalculationConfig
 from db.repositories.calculation_set_repository import CalculationSetRepository
 
 

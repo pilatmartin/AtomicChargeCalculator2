@@ -26,17 +26,23 @@ from core.models.calculation import (
     ChargeCalculationConfig,
     ChargeCalculationResult,
 )
-from core.models.molecule_info import MoleculeInfo
+from core.models.molecule_info import MoleculeSetStats
 from core.models.method import Method
-from core.models.paging import PagedList, PagingFilters
+from core.models.paging import PagedList
 from core.models.parameters import Parameters
 from core.models.suitable_methods import SuitableMethods
 
 
 from api.v1.constants import CHARGES_OUTPUT_EXTENSION
 
-from db.models.calculation import Calculation, CalculationConfig, CalculationSet
-from db.repositories.calculation_set_repository import CalculationSetRepository
+from db.models.calculation.calculation import Calculation
+from db.models.calculation.calculation_config import CalculationConfig
+from db.models.calculation.calculation_set import CalculationSet
+
+from db.repositories.calculation_set_repository import (
+    CalculationSetRepository,
+    CalculationSetFilters,
+)
 from db.repositories.calculation_config_repository import CalculationConfigRepository
 from db.repositories.calculation_repository import CalculationRepository
 
@@ -229,12 +235,16 @@ class ChargeFW2Service:
                     charges_dir,
                 )
 
-                result = CalculationDto(file=file_name, file_hash=file_hash, charges=charges)
+                info = MoleculeSetStats(molecules.info().to_dict())
+                result = CalculationDto(
+                    file=file_name, file_hash=file_hash, info=info, charges=charges
+                )
 
                 self.calculation_repository.store(
                     Calculation(
                         file=file_name,
                         file_hash=file_hash,
+                        info=asdict(info),
                         charges=charges,
                         set_id=computation_id,
                         config_id=config.id,
@@ -254,6 +264,8 @@ class ChargeFW2Service:
                          Using method '{config.method}' with parameters '{config.parameters}'."""
                 )
 
+            # this should be moved outside so the same config
+            # does not get inserted for each file
             db_config = self.config_repository.store(
                 CalculationConfig(set_id=computation_id, **asdict(config))
             )
@@ -413,7 +425,7 @@ class ChargeFW2Service:
             )
             raise e
 
-    async def info(self, file: UploadFile) -> MoleculeInfo:
+    async def info(self, file: UploadFile) -> MoleculeSetStats:
         """Get information about the provided file."""
 
         try:
@@ -425,7 +437,7 @@ class ChargeFW2Service:
 
             info = molecules.info()
 
-            return MoleculeInfo(info.to_dict())
+            return MoleculeSetStats(info.to_dict())
         except Exception as e:
             self.logger.error(
                 f"Error getting info for file {file.filename}: {traceback.format_exc()}"
@@ -535,7 +547,9 @@ class ChargeFW2Service:
             self.logger.error(f"Error getting calculation from database: {traceback.format_exc()}")
             raise e
 
-    def get_calculations(self, filters: PagingFilters) -> PagedList[CalculationSetPreviewDto]:
+    def get_calculations(
+        self, filters: CalculationSetFilters
+    ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
 
         try:
@@ -545,10 +559,12 @@ class ChargeFW2Service:
                 CalculationSetPreviewDto.model_validate(
                     {
                         "id": calculation_set.id,
-                        "files": sorted(
-                            set(calculation.file for calculation in calculation_set.calculations)
-                        ),
+                        "files": {
+                            calculation.file: calculation.info
+                            for calculation in set(calculation_set.calculations)
+                        },
                         "configs": calculation_set.configs,
+                        "created_at": calculation_set.created_at,
                     }
                 )
                 for calculation_set in calculations_list.items

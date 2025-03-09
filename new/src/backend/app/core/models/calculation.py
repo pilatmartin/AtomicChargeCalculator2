@@ -1,12 +1,16 @@
 """Calculation models"""
 
 from dataclasses import dataclass, field
+from datetime import datetime
 import uuid
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 from core.models.paging import PagingFilters
+from core.integrations.chargefw2.base import Charges
+
+from core.models.molecule_info import MoleculeSetStats
 
 
 @dataclass
@@ -38,7 +42,8 @@ class CalculationDto(BaseModel):
 
     file: str
     file_hash: str
-    charges: dict
+    info: MoleculeSetStats
+    charges: Charges
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
 
@@ -74,15 +79,15 @@ class CalculationSetDto[T](BaseModel):
 
 
 CalculationSetFullDto = CalculationSetDto[CalculationDto]
-# CalculationSetPreviewDto = CalculationSetDto[CalculationPreviewDto]
 
 
 class CalculationSetPreviewDto(BaseModel):
     """Calculation set preview data transfer object"""
 
     id: uuid.UUID
-    files: list[str]
+    files: dict[str, MoleculeSetStats]
     configs: list[CalculationConfigDto]
+    created_at: datetime
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
 

@@ -15,14 +15,15 @@ from api.v1.schemas.response import Response
 from core.dependency_injection.container import Container
 from core.models.calculation import CalculationSetPreviewDto, ChargeCalculationConfig
 from core.models.method import Method
-from core.models.molecule_info import MoleculeInfo
-from core.models.paging import PagedList, PagingFilters
+from core.models.molecule_info import MoleculeSetStats
+from core.models.paging import PagedList
 from core.models.parameters import Parameters
 from core.models.setup import Setup
 from core.models.suitable_methods import SuitableMethods
 from core.exceptions.http import BadRequestError, NotFoundError
 
 
+from db.repositories.calculation_set_repository import CalculationSetFilters
 from services.io import IOService
 from services.chargefw2 import ChargeFW2Service
 
@@ -102,7 +103,7 @@ async def available_parameters(
 async def info(
     file: Annotated[UploadFile, File(description="File for which to get information.")],
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-) -> Response[MoleculeInfo]:
+) -> Response[MoleculeSetStats]:
     """
     Returns information about the provided file.
     Number of molecules, total atoms and individual atoms.
@@ -322,15 +323,43 @@ async def get_example_molecules(
 async def get_calculations(
     page: Annotated[int, Query(description="Page number.")] = 1,
     page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
+    order_by: Annotated[Literal["created_at"], Query(description="Order by field.")] = "created_at",
+    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[PagedList[CalculationSetPreviewDto]]:
     """Returns all calculations stored in the database."""
 
     try:
-        filters = PagingFilters(page=page, page_size=page_size)
+        filters = CalculationSetFilters(
+            order=order, order_by=order_by, page=page, page_size=page_size
+        )
         calculations = chargefw2.get_calculations(filters)
         return Response(data=calculations)
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
+        ) from e
+
+
+@charges_router.get("/{computation_id}/download", tags=["download"])
+@inject
+async def download_charges(
+    computation_id: Annotated[str, Path(description="UUID of the computation.")],
+    io: IOService = Depends(Provide[Container.io_service]),
+):
+    """Returns a zip file with all charges for the provided computation."""
+
+    try:
+        charges_path = io.get_charges_path(computation_id)
+        if not io.path_exists(charges_path):
+            raise FileNotFoundError()
+
+        archive_path = io.zip_charges(charges_path)
+
+        return FileResponse(path=archive_path, media_type="application/zip")
+    except FileNotFoundError as e:
+        raise NotFoundError(detail=f"Computation '{computation_id}' not found.") from e
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading charges."
         ) from e
