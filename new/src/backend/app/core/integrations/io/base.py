@@ -101,16 +101,6 @@ class IOBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def write_file(self, path: str, content: str) -> None:
-        """Writes the provided content to the file.
-
-        Args:
-            path (str): Path to the file.
-            content (str): Content to be written to the file.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def path_exists(self, path: str) -> bool:
         """Check if the provided path exists.
 

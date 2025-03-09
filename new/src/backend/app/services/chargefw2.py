@@ -20,7 +20,7 @@ from core.logging.base import LoggerBase
 from core.models.calculation import (
     CalculationConfigDto,
     CalculationDto,
-    CalculationSetFullDto,
+    CalculationSetDto,
     CalculationSetPreviewDto,
     CalculationsFilters,
     ChargeCalculationConfig,
@@ -371,14 +371,9 @@ class ChargeFW2Service:
 
         return {"molecules": molecules, "configs": configs}
 
-    async def write_to_json(self, computation_id: str, data: list[ChargeCalculationResult]) -> None:
-        """Write charges to json file."""
-
-        await self.io.store_charges(computation_id, data)
-
     def store_calculation_set(
         self, computation_id: str, data: list[ChargeCalculationResult]
-    ) -> CalculationSetFullDto:
+    ) -> CalculationSetDto:
         """Store calculation set to database."""
 
         self.logger.info(f"Storing calculation set {computation_id}.")
@@ -403,7 +398,7 @@ class ChargeFW2Service:
             )
 
             calculation_set = self.set_repository.store(calculation_set_to_store)
-            return CalculationSetFullDto(
+            return CalculationSetDto(
                 id=calculation_set.id,
                 calculations=[CalculationDto.model_validate(calc) for calc in calculations],
                 configs=[CalculationConfigDto.model_validate(config) for config in configs],
@@ -500,28 +495,7 @@ class ChargeFW2Service:
 
         return path
 
-    def get_calculation_json(self, computation_id: str) -> str:
-        """Returns a json file for the provided path.
-
-        Args:
-            path (str): Path to computation results.
-
-        Raises:
-            FileNotFoundError: If the provided path does not exist.
-
-        Returns:
-            str: Path to the json file.
-        """
-
-        path = self.io.get_charges_path(computation_id)
-        json_path = os.path.join(path, "charges.json")
-
-        if not self.io.path_exists(json_path):
-            raise FileNotFoundError()
-
-        return json_path
-
-    def get_calculation_set(self, computation_id: str) -> CalculationSetFullDto:
+    def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
         """Get calculation set from database."""
 
         try:

@@ -68,17 +68,14 @@ class CalculationPreviewDto(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
 
 
-class CalculationSetDto[T](BaseModel):
+class CalculationSetDto(BaseModel):
     """Calculation set data transfer object"""
 
     id: uuid.UUID
-    calculations: list[T]
+    calculations: list[CalculationDto]
     configs: list[CalculationConfigDto]
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
-
-
-CalculationSetFullDto = CalculationSetDto[CalculationDto]
 
 
 class CalculationSetPreviewDto(BaseModel):

@@ -1,13 +1,11 @@
 """Service for handling file operations."""
 
 import os
-import json
 
 from dotenv import load_dotenv
 from fastapi import UploadFile
 
 from core.logging.base import LoggerBase
-from core.integrations.chargefw2.base import Charges
 from core.integrations.io.base import IOBase
 
 
@@ -77,24 +75,6 @@ class IOService:
             return await self.io.store_upload_file(file, directory)
         except Exception as e:
             self.logger.error(f"Error storing file {file.filename}: {e}")
-            raise e
-
-    async def store_charges(self, computation_id: str, charges: Charges) -> None:
-        """Store charges in the provided directory.
-
-        Args:
-            computation_id (str): Id of the computation.
-            charges (Charges): Charges to store.
-        """
-        self.logger.info(f"Storing charges for computation {computation_id}.")
-
-        try:
-            path = os.path.join(self.get_charges_path(computation_id), "charges.json")
-            await self.io.write_file(
-                path, json.dumps(charges, indent=4, default=lambda o: o.__dict__)
-            )
-        except Exception as e:
-            self.logger.error(f"Error storing charges for computation {computation_id}: {e}")
             raise e
 
     def zip_charges(self, directory: str) -> str:

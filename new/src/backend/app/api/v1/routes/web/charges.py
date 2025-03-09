@@ -147,7 +147,6 @@ async def calculate_charges(
             *[chargefw2.calculate_charges(computation_id, config) for config in configs]
         )
         _ = chargefw2.write_to_mmcif(computation_id, calculations)
-        await chargefw2.write_to_json(computation_id, calculations)
 
         if response_format == "none":
             return Response(data=None)
@@ -251,28 +250,6 @@ async def get_example_mmcif(
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Something went wrong while getting MMCIF data.",
-        ) from e
-
-
-@charges_router.get("/{computation_id}/json", tags=["json"])
-@inject
-async def get_json(
-    computation_id: Annotated[str, Path(description="UUID of the computation.")],
-    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-) -> FileResponse:
-    """Returns a mmcif file for the provided molecule in the computation."""
-
-    try:
-        json_path = chargefw2.get_calculation_json(computation_id)
-        return FileResponse(path=json_path)
-    except FileNotFoundError as e:
-        raise NotFoundError(
-            detail=f"JSON file for computation '{computation_id}' not found."
-        ) from e
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Something went wrong while getting JSON data.",
         ) from e
 
 
