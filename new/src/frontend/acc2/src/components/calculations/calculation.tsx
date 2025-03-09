@@ -1,7 +1,7 @@
 import { HTMLAttributes } from "react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { cn } from "@acc2/lib/utils";
+import { cn, downloadBlob } from "@acc2/lib/utils";
 import { useNavigate } from "react-router";
 import { CalculationPreview } from "@acc2/api/calculations/types";
 import { toast } from "sonner";
@@ -31,18 +31,7 @@ export const Calculation = ({
   const onDownload = async () => {
     await downloadMutation.mutateAsync(id, {
       onError: (error) => toast.error(handleApiError(error)),
-      onSuccess: async (data) => {
-        const href = URL.createObjectURL(data);
-        const link = document.createElement("a");
-
-        link.href = href;
-        link.download = "charges.zip";
-        document.body.appendChild(link);
-        link.click();
-
-        document.body.removeChild(link);
-        URL.revokeObjectURL(href);
-      },
+      onSuccess: async (data) => downloadBlob(data, "charges.zip"),
     });
   };
 
