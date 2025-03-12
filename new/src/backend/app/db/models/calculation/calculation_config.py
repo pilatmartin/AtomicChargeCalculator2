@@ -3,7 +3,7 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from db.database import Base
+from db.models import Base
 
 
 class CalculationConfig(Base):

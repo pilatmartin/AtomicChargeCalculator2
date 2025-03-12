@@ -1,9 +1,11 @@
 import uuid
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, relationship, mapped_column
-from db.database import Base
+
 from core.integrations.chargefw2.base import Charges
 from core.models.molecule_info import MoleculeSetStats
+
+from db.models import Base
 
 
 class Calculation(Base):

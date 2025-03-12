@@ -4,7 +4,8 @@ import sqlalchemy as sa
 from datetime import datetime
 
 from sqlalchemy.orm import Mapped, relationship, mapped_column
-from db.database import Base
+
+from db.models import Base
 
 
 class CalculationSet(Base):

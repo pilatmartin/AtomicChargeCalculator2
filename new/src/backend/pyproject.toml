@@ -21,6 +21,7 @@ gunicorn = "^23.0.0"
 sqlalchemy = "^2.0.37"
 psycopg2 = "^2.9.10"
 gemmi = "^0.7.0"
+alembic = "^1.15.1"
 
 
 [build-system]
