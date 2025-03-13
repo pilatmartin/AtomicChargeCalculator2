@@ -193,7 +193,7 @@ class ChargeFW2Service:
             raise e
 
     async def calculate_charges(
-        self, computation_id: str, config: list[ChargeCalculationConfig]
+        self, computation_id: str, config: CalculationConfig
     ) -> ChargeCalculationResult:
         """Calculate charges for provided files."""
 
@@ -209,7 +209,7 @@ class ChargeFW2Service:
             file_name = file.split("_", 1)[-1]
 
             async with semaphore:
-                exists = await self.get_calculation(
+                exists = self.get_calculation(
                     computation_id,
                     CalculationsFilters(
                         hash=file_hash,
@@ -241,7 +241,7 @@ class ChargeFW2Service:
                     file=file_name, file_hash=file_hash, info=info, charges=charges
                 )
 
-                await self.calculation_repository.store(
+                self.calculation_repository.store(
                     Calculation(
                         file=file_name,
                         file_hash=file_hash,
@@ -261,7 +261,13 @@ class ChargeFW2Service:
                 return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
             return ChargeCalculationResult(
-                config=config,
+                config=ChargeCalculationConfig(
+                    method=config.method,
+                    parameters=config.parameters,
+                    read_hetatm=config.read_hetatm,
+                    ignore_water=config.ignore_water,
+                    permissive_types=config.permissive_types,
+                ),
                 calculations=calculations,
             )
         except Exception as e:
@@ -270,7 +276,7 @@ class ChargeFW2Service:
 
     async def calculate_charges_multi(
         self, computation_id: str, configs: list[ChargeCalculationConfig]
-    ) -> ChargeCalculationResult:
+    ) -> list[ChargeCalculationResult]:
         """Calculate charges for provided files.
 
         Args:
@@ -281,7 +287,7 @@ class ChargeFW2Service:
             ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
         """
 
-        async def process_config(config: ChargeCalculationConfig) -> ChargeCalculationConfig:
+        async def process_config(config: ChargeCalculationConfig) -> ChargeCalculationResult:
             if not config.method:
                 # No method provided -> use most suitable method and parameters
                 suitable = await self.get_suitable_methods(computation_id)
@@ -301,10 +307,10 @@ class ChargeFW2Service:
                 )
 
             # store config in db
-            db_config = await self.config_repository.store(
+            db_config = self.config_repository.store(
                 CalculationConfig(set_id=computation_id, **asdict(config))
             )
-            await self.calculate_charges(computation_id, db_config)
+            return await self.calculate_charges(computation_id, db_config)
 
         calculations = await asyncio.gather(*[process_config(config) for config in configs])
         _ = self.write_to_mmcif(computation_id, calculations)
@@ -398,7 +404,7 @@ class ChargeFW2Service:
 
         return {"molecules": molecules, "configs": configs}
 
-    async def store_calculation_set(
+    def store_calculation_set(
         self, computation_id: str, data: list[ChargeCalculationResult]
     ) -> CalculationSetDto:
         """Store calculation set to database."""
@@ -424,7 +430,7 @@ class ChargeFW2Service:
                 id=computation_id, calculations=calculations, configs=configs
             )
 
-            calculation_set = await self.set_repository.store(calculation_set_to_store)
+            calculation_set = self.set_repository.store(calculation_set_to_store)
             return CalculationSetDto(
                 id=calculation_set.id,
                 calculations=[CalculationDto.model_validate(calc) for calc in calculations],
@@ -436,11 +442,11 @@ class ChargeFW2Service:
             )
             raise e
 
-    async def delete_calculation_set(self, computation_id: str) -> None:
+    def delete_calculation_set(self, computation_id: str) -> None:
         """Delete calculation set from database."""
         try:
             self.logger.info(f"Deleting calculation set {computation_id}.")
-            await self.set_repository.delete(computation_id)
+            self.set_repository.delete(computation_id)
         except Exception as e:
             self.logger.error(
                 f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
@@ -522,40 +528,40 @@ class ChargeFW2Service:
 
         return path
 
-    async def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
+    def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
         """Get calculation set from database."""
 
         try:
             self.logger.info(f"Getting calculation set {computation_id}.")
-            return await self.set_repository.get(computation_id)
+            return self.set_repository.get(computation_id)
         except Exception as e:
             self.logger.error(
                 f"Error getting calculation set {computation_id}: {traceback.format_exc()}"
             )
             raise e
 
-    async def get_calculation(
+    def get_calculation(
         self, computation_id: str, filters: CalculationsFilters
     ) -> CalculationDto | None:
         """Get calculation from database based on filters."""
 
         try:
             self.logger.info("Getting calculation from database.")
-            calculation = await self.calculation_repository.get(computation_id, filters)
+            calculation = self.calculation_repository.get(computation_id, filters)
 
             return CalculationDto.model_validate(calculation) if calculation is not None else None
         except Exception as e:
             self.logger.error(f"Error getting calculation from database: {traceback.format_exc()}")
             raise e
 
-    async def get_calculations(
+    def get_calculations(
         self, filters: CalculationSetFilters
     ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
 
         try:
             self.logger.info("Getting calculations from database.")
-            calculations_list = await self.set_repository.get_all(filters)
+            calculations_list = self.set_repository.get_all(filters)
             calculations_list.items = [
                 CalculationSetPreviewDto.model_validate(
                     {

@@ -140,7 +140,7 @@ async def calculate_charges(
             detail="No configurations provided.",
         )
 
-    if await chargefw2.get_calculation_set(computation_id) is None:
+    if chargefw2.get_calculation_set(computation_id) is None:
         raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
 
     try:
@@ -197,7 +197,7 @@ async def setup(
         workdir = io.get_input_path(computation_id)
         io.create_dir(workdir)
         await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
-        await chargefw2.store_calculation_set(computation_id, [])
+        chargefw2.store_calculation_set(computation_id, [])
 
         return Response(data={"computationId": computation_id})
     except Exception as e:
@@ -311,7 +311,7 @@ async def get_calculations(
         filters = CalculationSetFilters(
             order=order, order_by=order_by, page=page, page_size=page_size
         )
-        calculations = await chargefw2.get_calculations(filters)
+        calculations = chargefw2.get_calculations(filters)
         return Response(data=calculations)
     except Exception as e:
         print(traceback.format_exc())

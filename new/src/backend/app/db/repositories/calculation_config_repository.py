@@ -19,7 +19,7 @@ class CalculationConfigRepository:
         self.session_manager = session_manager
         self.set_repository = set_repository
 
-    async def get_all(self, calculation_set_id: str) -> list[CalculationConfig]:
+    def get_all(self, calculation_set_id: str) -> list[CalculationConfig]:
         """Get all calculation configs for given calculation set.
 
         Args:
@@ -31,14 +31,12 @@ class CalculationConfigRepository:
 
         statement = select(CalculationConfig).where(CalculationConfig.set_id == calculation_set_id)
 
-        async with self.session_manager.session() as session:
-            configs = (await session.execute(statement)).scalars().all()
+        with self.session_manager.session() as session:
+            configs = (session.execute(statement)).scalars().all()
 
             return configs
 
-    async def get(
-        self, calculation_set_id: str, config: CalculationConfig
-    ) -> CalculationConfig | None:
+    def get(self, calculation_set_id: str, config: CalculationConfig) -> CalculationConfig | None:
         """Get a single calculation config matching the provided filters.
 
         Args:
@@ -60,12 +58,12 @@ class CalculationConfigRepository:
             )
         )
 
-        async with self.session_manager.session() as session:
-            config = (await session.execute(statement)).scalars().first()
+        with self.session_manager.session() as session:
+            config = (session.execute(statement)).scalars().first()
 
             return config
 
-    async def delete(self, config_id: str) -> None:
+    def delete(self, config_id: str) -> None:
         """Delete all calculation configs for given calculation set.
 
         Args:
@@ -75,16 +73,16 @@ class CalculationConfigRepository:
 
         statement = select(CalculationConfig).where(CalculationConfig.id == config_id)
 
-        async with self.session_manager.session() as session:
-            config = (await session.execute(statement)).scalars().first()
+        with self.session_manager.session() as session:
+            config = (session.execute(statement)).scalars().first()
 
             if config is None:
                 return
 
-            await session.delete(config)
-            await session.commit()
+            session.delete(config)
+            session.commit()
 
-    async def store(self, config: CalculationConfig) -> CalculationConfig:
+    def store(self, config: CalculationConfig) -> CalculationConfig:
         """Store a single calculation config in the database.
 
         Args:
@@ -97,13 +95,13 @@ class CalculationConfigRepository:
             CalculationConfig: Stored calculation config.
         """
 
-        calculation_set = await self.set_repository.get(config.set_id)
+        calculation_set = self.set_repository.get(config.set_id)
 
         if calculation_set is None:
             raise ValueError("Calculation set not found.")
 
-        async with self.session_manager.session() as session:
+        with self.session_manager.session() as session:
             session.add(config)
-            await session.commit()
-            await session.refresh(config)
+            session.commit()
+            session.refresh(config)
             return config

@@ -3,7 +3,6 @@
 from sqlalchemy import and_, Select, select
 from sqlalchemy.orm import joinedload
 
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models.paging import PagedList, PagingFilters
 from core.models.calculation import CalculationsFilters
@@ -25,9 +24,7 @@ class CalculationRepository:
         self.session_manager = session_manager
         self.set_repository = set_repository
 
-    async def get_all(
-        self, calculation_set_id: str, filters: PagingFilters
-    ) -> PagedList[Calculation]:
+    def get_all(self, calculation_set_id: str, filters: PagingFilters) -> PagedList[Calculation]:
         """Get all previous calculations matching the provided filters.
 
         Args:
@@ -39,13 +36,11 @@ class CalculationRepository:
         """
 
         statement = select(Calculation).filter(Calculation.set_id == calculation_set_id)
-        calculations = await self._paginate(statement, filters.page, filters.page_size)
+        calculations = self._paginate(statement, filters.page, filters.page_size)
 
         return calculations
 
-    async def get(
-        self, calculation_set_id: str, filters: CalculationsFilters, session: AsyncSession = None
-    ) -> Calculation | None:
+    def get(self, calculation_set_id: str, filters: CalculationsFilters) -> Calculation | None:
         """Get a single previous calculation by id.
 
         Args:
@@ -72,15 +67,11 @@ class CalculationRepository:
             )
         )
 
-        if session is not None:
-            calculation = (await session.execute(statement)).unique().scalars().first()
+        with self.session_manager.session() as session:
+            calculation = (session.execute(statement)).unique().scalars().first()
             return calculation
 
-        async with self.session_manager.session() as session:
-            calculation = (await session.execute(statement)).unique().scalars().first()
-            return calculation
-
-    async def delete(self, calculation_id: str) -> None:
+    def delete(self, calculation_id: str) -> None:
         """Delete a single previous calculation by id.
 
         Args:
@@ -89,16 +80,16 @@ class CalculationRepository:
 
         statement = select(Calculation).where(Calculation.id == calculation_id)
 
-        async with self.session_manager.session() as session:
-            calculation = (await session.execute(statement)).scalars().first()
+        with self.session_manager.session() as session:
+            calculation = (session.execute(statement)).scalars().first()
 
             if calculation is None:
                 return
 
-            await session.delete(calculation)
-            await session.commit()
+            session.delete(calculation)
+            session.commit()
 
-    async def store(self, calculation: Calculation) -> Calculation:
+    def store(self, calculation: Calculation) -> Calculation:
         """Store a single calculation set in the database.
 
         Args:
@@ -111,27 +102,25 @@ class CalculationRepository:
             Calculation: Stored calculation set.
         """
 
-        calculation_set = await self.set_repository.get(calculation.set_id)
+        calculation_set = self.set_repository.get(calculation.set_id)
 
         if calculation_set is None:
             raise ValueError("Calculation set not found.")
 
-        async with self.session_manager.session() as session:
+        with self.session_manager.session() as session:
             session.add(calculation)
-            await session.commit()
-            await session.refresh(calculation)
+            session.commit()
+            session.refresh(calculation)
 
             return calculation
 
-    async def _paginate(
-        self, statement: Select, page: int, page_size: int
-    ) -> PagedList[Calculation]:
+    def _paginate(self, statement: Select, page: int, page_size: int) -> PagedList[Calculation]:
         total_statement = select(func.count()).select_from(statement)
         items_statement = statement.limit(page_size).offset((page - 1) * page_size)
 
-        async with self.session_manager.session() as session:
-            total_count = (await session.execute(total_statement)).scalar()
-            items = (await session.execute(items_statement)).scalars(Calculation).all()
+        with self.session_manager.session() as session:
+            total_count = (session.execute(total_statement)).scalar()
+            items = (session.execute(items_statement)).scalars(Calculation).all()
 
             return PagedList[Calculation](
                 page=page, page_size=page_size, total_count=total_count, items=items
