@@ -193,13 +193,14 @@ class ChargeFW2Service:
             raise e
 
     async def calculate_charges(
-        self, computation_id: str, config: ChargeCalculationConfig
+        self, computation_id: str, config: list[ChargeCalculationConfig]
     ) -> ChargeCalculationResult:
         """Calculate charges for provided files."""
 
         workdir = self.io.get_input_path(computation_id)
         charges_dir = self.io.get_charges_path(computation_id)
-        self.io.create_tmp_dir(charges_dir)
+        self.io.create_dir(charges_dir)
+
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
         async def process_file(file: str, config: CalculationConfig) -> CalculationDto:
@@ -208,7 +209,7 @@ class ChargeFW2Service:
             file_name = file.split("_", 1)[-1]
 
             async with semaphore:
-                exists = self.get_calculation(
+                exists = await self.get_calculation(
                     computation_id,
                     CalculationsFilters(
                         hash=file_hash,
@@ -240,7 +241,7 @@ class ChargeFW2Service:
                     file=file_name, file_hash=file_hash, info=info, charges=charges
                 )
 
-                self.calculation_repository.store(
+                await self.calculation_repository.store(
                     Calculation(
                         file=file_name,
                         file_hash=file_hash,
@@ -253,27 +254,10 @@ class ChargeFW2Service:
                 return result
 
         try:
-            if not config.method:
-                # No method provided -> use most suitable method and parameters
-                suitable = await self.get_suitable_methods(computation_id)
-                config.method = suitable.methods[0].internal_name
-                parameters = suitable.parameters.get(config.method, [])
-                config.parameters = parameters[0].internal_name if len(parameters) > 0 else None
-                self.logger.info(
-                    f"""No method provided.
-                         Using method '{config.method}' with parameters '{config.parameters}'."""
-                )
-
-            # this should be moved outside so the same config
-            # does not get inserted for each file
-            db_config = self.config_repository.store(
-                CalculationConfig(set_id=computation_id, **asdict(config))
-            )
-
             # Process all files concurrently
             inputs = self.io.listdir(workdir)
             calculations = await asyncio.gather(
-                *[process_file(file, db_config) for file in inputs],
+                *[process_file(file, config) for file in inputs],
                 return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
             return ChargeCalculationResult(
@@ -283,6 +267,49 @@ class ChargeFW2Service:
         except Exception as e:
             self.logger.error(f"Error calculating charges: {traceback.format_exc()}")
             raise e
+
+    async def calculate_charges_multi(
+        self, computation_id: str, configs: list[ChargeCalculationConfig]
+    ) -> ChargeCalculationResult:
+        """Calculate charges for provided files.
+
+        Args:
+            computation_id (str): Computation id
+            configs (list[ChargeCalculationConfig]): List of configurations.
+
+        Returns:
+            ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
+        """
+
+        async def process_config(config: ChargeCalculationConfig) -> ChargeCalculationConfig:
+            if not config.method:
+                # No method provided -> use most suitable method and parameters
+                suitable = await self.get_suitable_methods(computation_id)
+
+                if len(suitable.methods) == 0:
+                    self.logger.error(
+                        f"No suitable methods found for charge calculation {computation_id}."
+                    )
+                    raise Exception("No suitable methods found.")
+
+                config.method = suitable.methods[0].internal_name
+                parameters = suitable.parameters.get(config.method, [])
+                config.parameters = parameters[0].internal_name if len(parameters) > 0 else None
+                self.logger.info(
+                    f"""No method provided.
+                         Using method '{config.method}' with parameters '{config.parameters}'."""
+                )
+
+            # store config in db
+            db_config = await self.config_repository.store(
+                CalculationConfig(set_id=computation_id, **asdict(config))
+            )
+            await self.calculate_charges(computation_id, db_config)
+
+        calculations = await asyncio.gather(*[process_config(config) for config in configs])
+        _ = self.write_to_mmcif(computation_id, calculations)
+
+        return calculations
 
     # TODO: Refactor. Move closures somewhere else?
     def write_to_mmcif(
@@ -371,7 +398,7 @@ class ChargeFW2Service:
 
         return {"molecules": molecules, "configs": configs}
 
-    def store_calculation_set(
+    async def store_calculation_set(
         self, computation_id: str, data: list[ChargeCalculationResult]
     ) -> CalculationSetDto:
         """Store calculation set to database."""
@@ -397,7 +424,7 @@ class ChargeFW2Service:
                 id=computation_id, calculations=calculations, configs=configs
             )
 
-            calculation_set = self.set_repository.store(calculation_set_to_store)
+            calculation_set = await self.set_repository.store(calculation_set_to_store)
             return CalculationSetDto(
                 id=calculation_set.id,
                 calculations=[CalculationDto.model_validate(calc) for calc in calculations],
@@ -409,11 +436,11 @@ class ChargeFW2Service:
             )
             raise e
 
-    def delete_calculation_set(self, computation_id: str) -> None:
+    async def delete_calculation_set(self, computation_id: str) -> None:
         """Delete calculation set from database."""
         try:
             self.logger.info(f"Deleting calculation set {computation_id}.")
-            self.set_repository.delete(computation_id)
+            await self.set_repository.delete(computation_id)
         except Exception as e:
             self.logger.error(
                 f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
@@ -424,7 +451,7 @@ class ChargeFW2Service:
         """Get information about the provided file."""
 
         try:
-            workdir = self.io.create_tmp_dir("info")
+            workdir = self.io.create_workdir("info")
             new_file_path, _ = await self.io.store_upload_file(file, workdir)
 
             self.logger.info(f"Getting info for file {file.filename}.")
@@ -439,7 +466,7 @@ class ChargeFW2Service:
             )
             raise e
         finally:
-            self.io.remove_tmp_dir("info")
+            self.io.remove_workdir("info")
 
     def get_calculation_molecules(self, path: str) -> list[str]:
         """Returns molecules stored in the provided path.
@@ -495,40 +522,40 @@ class ChargeFW2Service:
 
         return path
 
-    def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
+    async def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
         """Get calculation set from database."""
 
         try:
             self.logger.info(f"Getting calculation set {computation_id}.")
-            return self.set_repository.get(computation_id)
+            return await self.set_repository.get(computation_id)
         except Exception as e:
             self.logger.error(
                 f"Error getting calculation set {computation_id}: {traceback.format_exc()}"
             )
             raise e
 
-    def get_calculation(
+    async def get_calculation(
         self, computation_id: str, filters: CalculationsFilters
     ) -> CalculationDto | None:
         """Get calculation from database based on filters."""
 
         try:
             self.logger.info("Getting calculation from database.")
-            calculation = self.calculation_repository.get(computation_id, filters)
+            calculation = await self.calculation_repository.get(computation_id, filters)
 
             return CalculationDto.model_validate(calculation) if calculation is not None else None
         except Exception as e:
             self.logger.error(f"Error getting calculation from database: {traceback.format_exc()}")
             raise e
 
-    def get_calculations(
+    async def get_calculations(
         self, filters: CalculationSetFilters
     ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
 
         try:
             self.logger.info("Getting calculations from database.")
-            calculations_list = self.set_repository.get_all(filters)
+            calculations_list = await self.set_repository.get_all(filters)
             calculations_list.items = [
                 CalculationSetPreviewDto.model_validate(
                     {

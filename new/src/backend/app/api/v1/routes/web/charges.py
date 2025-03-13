@@ -1,6 +1,7 @@
 """Charge calculation routes."""
 
 import asyncio
+import traceback
 import uuid
 
 from typing import Annotated, Literal
@@ -139,20 +140,18 @@ async def calculate_charges(
             detail="No configurations provided.",
         )
 
-    if chargefw2.get_calculation_set(computation_id) is None:
+    if await chargefw2.get_calculation_set(computation_id) is None:
         raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
 
     try:
-        calculations = await asyncio.gather(
-            *[chargefw2.calculate_charges(computation_id, config) for config in configs]
-        )
-        _ = chargefw2.write_to_mmcif(computation_id, calculations)
+        calculations = await chargefw2.calculate_charges_multi(computation_id, configs)
 
         if response_format == "none":
             return Response(data=None)
 
         return Response(data=calculations)
     except Exception as e:
+        print(traceback.format_exc())
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
         ) from e
@@ -195,14 +194,16 @@ async def setup(
 
     try:
         computation_id = str(uuid.uuid4())
-        tmp_dir = io.create_tmp_dir(io.get_input_path(computation_id))
-        await asyncio.gather(*[io.store_upload_file(file, tmp_dir) for file in files])
-        chargefw2.store_calculation_set(computation_id, [])
+        workdir = io.get_input_path(computation_id)
+        io.create_dir(workdir)
+        await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
+        await chargefw2.store_calculation_set(computation_id, [])
 
         return Response(data={"computationId": computation_id})
     except Exception as e:
         raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error uploading files."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error uploading files.",
         ) from e
 
 
@@ -310,9 +311,10 @@ async def get_calculations(
         filters = CalculationSetFilters(
             order=order, order_by=order_by, page=page, page_size=page_size
         )
-        calculations = chargefw2.get_calculations(filters)
+        calculations = await chargefw2.get_calculations(filters)
         return Response(data=calculations)
     except Exception as e:
+        print(traceback.format_exc())
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
         ) from e

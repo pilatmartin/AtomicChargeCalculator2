@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-from sqlalchemy.orm import Query
 
 
 @dataclass
@@ -40,14 +39,16 @@ class PagedList[T](BaseModel):  # add BaseModel
     )
 
     def __init__(
-        self, query: Query, page: int = _DEFAULT_PAGE, page_size: int = _DEFAULT_PAGE_SIZE
+        self,
+        items: list[T],
+        page: int = _DEFAULT_PAGE,
+        page_size: int = _DEFAULT_PAGE_SIZE,
+        total_count: int = 0,
+        total_pages: int = 0,
     ) -> None:
         page = page if page > 0 else PagedList._DEFAULT_PAGE
         page_size = page_size if page_size > 0 else PagedList._DEFAULT_PAGE_SIZE
 
-        items = query.limit(page_size).offset((page - 1) * page_size).all()
-
-        total_count = query.count()
         total_pages = PagedList._get_total_pages(total_count, page_size)
 
         super().__init__(

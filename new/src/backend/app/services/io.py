@@ -15,42 +15,44 @@ load_dotenv()
 class IOService:
     """Service for handling file operations."""
 
+    workdir = os.environ.get("ACC2_DATA_DIR")
+
     def __init__(self, io: IOBase, logger: LoggerBase):
         self.io = io
         self.logger = logger
 
-    def create_tmp_dir(self, name: str) -> str:
-        """Create temporary directory with the provided name."""
+    def create_workdir(self, name: str) -> str:
+        """Create directory with the provided name in the working directory."""
 
         if name == "":
             raise ValueError("Name cannot be empty.")
 
         try:
-            self.logger.info(f"Creating temporary directory with name: {name}")
-            path = self.io.create_dir(name)
+            self.logger.info(f"Creating working directory with name: {name}")
+            path = self.io.mkdir(os.path.join(self.workdir, name))
             return path
         except Exception as e:
-            self.logger.info(f"Unable to create temporary directory '{name}': {e}")
+            self.logger.info(f"Unable to create working directory '{name}': {e}")
             raise e
 
-    def remove_tmp_dir(self, path: str) -> None:
-        """Remove temporary directory."""
+    def remove_workdir(self, name: str) -> None:
+        """Remove directory from a working directory."""
 
-        self.logger.info(f"Removing temporary directory {path}")
+        self.logger.info(f"Removing working directory {name}")
 
         try:
-            self.io.remove_dir(path)
+            self.io.mkdir(os.path.join(self.workdir, name))
         except Exception as e:
-            self.logger.error(f"Unable to remove temporary directory '{path}': {e}")
+            self.logger.error(f"Unable to remove working directory '{name}': {e}")
             raise e
 
     def create_dir(self, path: str) -> None:
-        """Create directory."""
+        """Create directory based on path."""
 
         self.logger.info(f"Creating directory {path}")
 
         try:
-            self.io.create_dir(path)
+            self.io.mkdir(path)
         except Exception as e:
             self.logger.error(f"Unable to create directory '{path}': {e}")
             raise e
@@ -114,11 +116,11 @@ class IOService:
 
     def get_input_path(self, computation_id: str) -> str:
         """Get path to input directory."""
-        return os.path.join(self.io.tmp_workdir, computation_id, "input")
+        return os.path.join(self.workdir, computation_id, "input")
 
     def get_charges_path(self, computation_id: str) -> str:
         """Get path to charges directory."""
-        return os.path.join(self.io.tmp_workdir, computation_id, "charges")
+        return os.path.join(self.workdir, computation_id, "charges")
 
     def get_example_path(self, example_id: str) -> str:
         """Get path to example directory."""

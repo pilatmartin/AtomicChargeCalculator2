@@ -32,24 +32,6 @@ class IOBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def create_dir(self, name: str) -> str:
-        """Creates a directory in the current working directory.
-
-        Returns:
-                str: Name of the  directory which will be created.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def remove_dir(self, dir_name: str) -> None:
-        """Removes a directory from the current working directory.
-
-        Args:
-            name (str): Name of the directory which will be removed.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def cp(self, path_src: str, path_dst: str) -> str:
         """Copies file from 'path_src' to 'path_dst'.
 

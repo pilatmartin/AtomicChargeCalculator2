@@ -1,11 +1,9 @@
 """This module provides a repository for calculation configs."""
 
-from contextlib import AbstractContextManager
-from typing import Callable
+from sqlalchemy import and_, select
 
-from sqlalchemy import and_
-from sqlalchemy.orm.session import Session
 
+from db.database import SessionManager
 from db.models.calculation.calculation_config import CalculationConfig
 from db.repositories.calculation_set_repository import CalculationSetRepository
 
@@ -15,13 +13,13 @@ class CalculationConfigRepository:
 
     def __init__(
         self,
-        session_factory: Callable[..., AbstractContextManager[Session]],
+        session_manager: SessionManager,
         set_repository: CalculationSetRepository,
     ):
-        self.session_factory = session_factory
+        self.session_manager = session_manager
         self.set_repository = set_repository
 
-    def get_all(self, calculation_set_id: str) -> list[CalculationConfig]:
+    async def get_all(self, calculation_set_id: str) -> list[CalculationConfig]:
         """Get all calculation configs for given calculation set.
 
         Args:
@@ -31,14 +29,16 @@ class CalculationConfigRepository:
             list[CalculationConfig]: List of calculation configs.
         """
 
-        with self.session_factory() as session:
-            return (
-                session.query(CalculationConfig)
-                .filter(CalculationConfig.set_id == calculation_set_id)
-                .all()
-            )
+        statement = select(CalculationConfig).where(CalculationConfig.set_id == calculation_set_id)
 
-    def get(self, calculation_set_id: str, config: CalculationConfig) -> CalculationConfig | None:
+        async with self.session_manager.session() as session:
+            configs = (await session.execute(statement)).scalars().all()
+
+            return configs
+
+    async def get(
+        self, calculation_set_id: str, config: CalculationConfig
+    ) -> CalculationConfig | None:
         """Get a single calculation config matching the provided filters.
 
         Args:
@@ -49,23 +49,23 @@ class CalculationConfigRepository:
             CalculationConfig | None: Calculation config or None if not found.
         """
 
-        with self.session_factory() as session:
-            return (
-                session.query(CalculationConfig)
-                .filter(
-                    and_(
-                        CalculationConfig.set_id == calculation_set_id,
-                        CalculationConfig.method == config.method,
-                        CalculationConfig.parameters == config.parameters,
-                        CalculationConfig.read_hetatm == config.read_hetatm,
-                        CalculationConfig.ignore_water == config.ignore_water,
-                        CalculationConfig.permissive_types == config.permissive_types,
-                    )
-                )
-                .first()
+        statement = select(CalculationConfig).where(
+            and_(
+                CalculationConfig.set_id == calculation_set_id,
+                CalculationConfig.method == config.method,
+                CalculationConfig.parameters == config.parameters,
+                CalculationConfig.read_hetatm == config.read_hetatm,
+                CalculationConfig.ignore_water == config.ignore_water,
+                CalculationConfig.permissive_types == config.permissive_types,
             )
+        )
 
-    def delete(self, config_id: str) -> None:
+        async with self.session_manager.session() as session:
+            config = (await session.execute(statement)).scalars().first()
+
+            return config
+
+    async def delete(self, config_id: str) -> None:
         """Delete all calculation configs for given calculation set.
 
         Args:
@@ -73,16 +73,18 @@ class CalculationConfigRepository:
             config (CalculationConfig): Calculation config.
         """
 
-        with self.session_factory() as session:
-            config = session.query(CalculationConfig).filter(CalculationConfig.id == config_id)
+        statement = select(CalculationConfig).where(CalculationConfig.id == config_id)
+
+        async with self.session_manager.session() as session:
+            config = (await session.execute(statement)).scalars().first()
 
             if config is None:
                 return
 
-            config.delete()
-            session.commit()
+            await session.delete(config)
+            await session.commit()
 
-    def store(self, config: CalculationConfig) -> CalculationConfig:
+    async def store(self, config: CalculationConfig) -> CalculationConfig:
         """Store a single calculation config in the database.
 
         Args:
@@ -95,14 +97,13 @@ class CalculationConfigRepository:
             CalculationConfig: Stored calculation config.
         """
 
-        calculation_set = self.set_repository.get(config.set_id)
+        calculation_set = await self.set_repository.get(config.set_id)
 
         if calculation_set is None:
             raise ValueError("Calculation set not found.")
 
-        with self.session_factory() as session:
+        async with self.session_manager.session() as session:
             session.add(config)
-            session.commit()
-            session.refresh(config)
-
+            await session.commit()
+            await session.refresh(config)
             return config

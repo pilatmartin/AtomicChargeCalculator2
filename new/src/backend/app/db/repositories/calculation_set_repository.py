@@ -1,18 +1,22 @@
 """This module provides a repository for calculation sets."""
 
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
-from typing import Callable, Literal
+from typing import Literal
 
+from sqlalchemy import Select, func, select
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.session import Session
+
 
 from core.models.paging import PagedList, PagingFilters
+
+from db.database import SessionManager
 from db.models.calculation.calculation_set import CalculationSet
 
 
 @dataclass
 class CalculationSetFilters(PagingFilters):
+    """Filters for calculation sets."""
+
     order_by: str
     order: Literal["asc", "desc"]
 
@@ -20,10 +24,10 @@ class CalculationSetFilters(PagingFilters):
 class CalculationSetRepository:
     """Repository for managing calculation sets."""
 
-    def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]):
-        self.session_factory = session_factory
+    def __init__(self, session_manager: SessionManager):
+        self.session_manager = session_manager
 
-    def get_all(self, filters: CalculationSetFilters) -> PagedList[CalculationSet]:
+    async def get_all(self, filters: CalculationSetFilters) -> PagedList[CalculationSet]:
         """Get all previous calculations matching the provided filters.
 
         Args:
@@ -33,19 +37,19 @@ class CalculationSetRepository:
             PagedList[CalculationSet]: Paged list of calculation sets.
         """
 
-        with self.session_factory() as session:
-            query = (
-                session.query(CalculationSet)
-                .options(joinedload(CalculationSet.calculations))
-                .options(joinedload(CalculationSet.configs))
-                .order_by(getattr(getattr(CalculationSet, filters.order_by), filters.order)())
-                .filter(CalculationSet.calculations.any())
-            )
-            calculations = PagedList(query=query, page=filters.page, page_size=filters.page_size)
+        statement = (
+            select(CalculationSet)
+            .options(joinedload(CalculationSet.calculations))
+            .options(joinedload(CalculationSet.configs))
+            .order_by(getattr(getattr(CalculationSet, filters.order_by), filters.order)())
+            .where(CalculationSet.calculations.any())
+        )
 
-            return calculations
+        calculations = await self._paginate(statement, filters.page, filters.page_size)
 
-    def get(self, calculation_id: str) -> CalculationSet | None:
+        return calculations
+
+    async def get(self, calculation_id: str) -> CalculationSet | None:
         """Get a single previous calculation by id.
 
         Args:
@@ -55,28 +59,39 @@ class CalculationSetRepository:
             CalculationSet: Calculation set.
         """
 
-        with self.session_factory() as session:
-            return session.query(CalculationSet).filter(CalculationSet.id == calculation_id).first()
+        statement = (
+            select(CalculationSet)
+            .options(joinedload(CalculationSet.calculations))
+            .options(joinedload(CalculationSet.configs))
+            .where(CalculationSet.id == calculation_id)
+        )
 
-    def delete(self, calculation_id: str) -> None:
+        async with self.session_manager.session() as session:
+            calculation_set = (
+                (await session.execute(statement)).unique().scalars(CalculationSet).first()
+            )
+
+            return calculation_set
+
+    async def delete(self, calculation_id: str) -> None:
         """Delete a single previous calculation by id.
 
         Args:
             calculation_id (str): Calculation id to delete.
         """
 
-        with self.session_factory() as session:
-            calculation_set = (
-                session.query(CalculationSet).filter(CalculationSet.id == calculation_id).first()
-            )
+        statement = select(CalculationSet).where(CalculationSet.id == calculation_id)
+
+        async with self.session_manager.session() as session:
+            calculation_set = (await session.execute(statement)).scalars(CalculationSet).first()
 
             if not calculation_set:
                 return
 
-            session.delete(calculation_set)
-            session.commit()
+            await session.delete(calculation_set)
+            await session.commit()
 
-    def store(self, calculation_set: CalculationSet) -> CalculationSet:
+    async def store(self, calculation_set: CalculationSet) -> CalculationSet:
         """Store a single calculation set in the database.
 
         Args:
@@ -86,8 +101,23 @@ class CalculationSetRepository:
             CalculationSet: Stored calculation set.
         """
 
-        with self.session_factory() as session:
+        async with self.session_manager.session() as session:
             session.add(calculation_set)
-            session.commit()
-            session.refresh(calculation_set)
+            await session.commit()
+            await session.refresh(calculation_set)
+
             return calculation_set
+
+    async def _paginate(
+        self, statement: Select, page: int, page_size: int
+    ) -> PagedList[CalculationSet]:
+        total_statement = select(func.count()).select_from(statement)
+        items_statement = statement.limit(page_size).offset((page - 1) * page_size)
+
+        async with self.session_manager.session() as session:
+            total_count = (await session.execute(total_statement)).unique().scalar()
+            items = (await session.execute(items_statement)).unique().scalars(CalculationSet).all()
+
+            return PagedList[CalculationSet](
+                page=page, page_size=page_size, total_count=total_count, items=items
+            )

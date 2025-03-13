@@ -9,7 +9,7 @@ from core.logging.file_logger import FileLogger
 from core.integrations.chargefw2.chargefw2 import ChargeFW2Local
 from core.integrations.io.io import IOLocal
 
-from db.database import Database
+from db.database import Database, SessionManager
 from db.repositories.calculation_config_repository import CalculationConfigRepository
 from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import CalculationSetRepository
@@ -32,17 +32,18 @@ class Container(containers.DeclarativeContainer):
 
     # database
     db = providers.Singleton(Database, db_url=os.environ.get("ACC2_DB_URL"))
+    session_manager = providers.Singleton(
+        SessionManager, session_factory=db.provided.session_factory
+    )
 
     # repositories
-    set_repository = providers.Factory(
-        CalculationSetRepository, session_factory=db.provided.session
-    )
+    set_repository = providers.Factory(CalculationSetRepository, session_manager=session_manager)
     calculation_repository = providers.Factory(
-        CalculationRepository, session_factory=db.provided.session, set_repository=set_repository
+        CalculationRepository, session_manager=session_manager, set_repository=set_repository
     )
     config_repository = providers.Factory(
         CalculationConfigRepository,
-        session_factory=db.provided.session,
+        session_manager=session_manager,
         set_repository=set_repository,
     )
 

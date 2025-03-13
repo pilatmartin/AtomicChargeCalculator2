@@ -16,23 +16,12 @@ load_dotenv()
 class IOLocal(IOBase):
     """Local IO operations."""
 
-    tmp_workdir: str = os.environ.get("ACC2_DATA_DIR")
-
     def mkdir(self, path: str) -> str:
         os.makedirs(path, exist_ok=True)
         return path
 
     def rmdir(self, path: str) -> None:
         shutil.rmtree(path)
-
-    def create_dir(self, name: str) -> str:
-        path = os.path.join(IOLocal.tmp_workdir, name)
-        os.makedirs(path, exist_ok=True)
-
-        return path
-
-    def remove_dir(self, dir_name: str) -> None:
-        shutil.rmtree(os.path.join(IOLocal.tmp_workdir, dir_name))
 
     def cp(self, path_src: str, path_dst: str) -> str:
         return shutil.copy(path_src, path_dst)
