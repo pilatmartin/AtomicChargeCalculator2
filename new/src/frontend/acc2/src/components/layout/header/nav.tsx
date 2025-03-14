@@ -8,16 +8,11 @@ import {
 import { Menu } from "lucide-react";
 import { NavLink } from "react-router";
 import LoginImg from "../../../assets/images/button-login.svg";
-import { useLoginMutation } from "@acc2/hooks/mutations/use-login-mutation";
-import { toast } from "sonner";
+import { baseApiUrl } from "@acc2/api/base";
 
 export const Nav = () => {
-  const loginMutation = useLoginMutation();
-
-  const onLoginClick = async () => {
-    await loginMutation.mutateAsync(void 0, {
-      onError: () => toast.error("Something went wrong when trying to log in."),
-    });
+  const onLoginClick = () => {
+    window.location.href = `${baseApiUrl}/auth/login`;
   };
 
   return (
