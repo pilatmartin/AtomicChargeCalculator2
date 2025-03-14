@@ -13,6 +13,7 @@ from db.database import Database, SessionManager
 from db.repositories.calculation_config_repository import CalculationConfigRepository
 from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import CalculationSetRepository
+from db.repositories.user_repository import UserRepository
 
 from services.chargefw2 import ChargeFW2Service
 from services.io import IOService
@@ -46,6 +47,7 @@ class Container(containers.DeclarativeContainer):
         session_manager=session_manager,
         set_repository=set_repository,
     )
+    user_repository = providers.Factory(UserRepository, session_manager=session_manager)
 
     # services
     logger_service = providers.Singleton(FileLogger)

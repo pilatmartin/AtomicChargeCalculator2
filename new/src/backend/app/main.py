@@ -45,6 +45,7 @@ def create_app() -> FastAPI:
     container.wire()
 
     app.add_middleware(LoggingMiddleware)
+    manager.attach_middleware(app)
     app.add_exception_handler(HTTPException, http_exception_handler)
 
     app.include_router(router=web_charges_router, prefix=PREFIX)
