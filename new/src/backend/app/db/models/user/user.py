@@ -14,7 +14,9 @@ class User(Base):
     id: Mapped[str] = mapped_column(sa.Uuid, primary_key=True, default=uuid.uuid4)
     openid: Mapped[str] = mapped_column(sa.VARCHAR(100), nullable=False)
 
-    calculations = relationship("CalculationSet", cascade="all, delete-orphan")
+    calculation_sets = relationship(
+        "CalculationSet", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<User id={self.id}, openid={self.openid}>"

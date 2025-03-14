@@ -17,6 +17,8 @@ from fastapi.routing import APIRouter
 from fastapi_login import LoginManager
 from pydantic import BaseModel
 
+from jose import jwt
+
 OIDC_DISCOVERY_URL = "https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration"
 
 oidc_config = {}
@@ -97,6 +99,7 @@ async def login():
         "client_id": "ba457349-a931-4908-b0d3-434efc715489",
         "scope": "openid",
         "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/api/v1/auth/callback",
+        # "redirect_uri": "http://localhost:8000/v1/auth/callback",
         # "state": state,
     }
 
@@ -114,7 +117,10 @@ async def logout():
 
 
 @auth_router.get("/callback", tags=["callback"])
-async def auth_callback(code: str):
+@inject
+async def auth_callback(
+    code: str, user_repository: UserRepository = Depends(Provide[Container.user_repository])
+):
     """Handle the callback from the OIDC provider."""
 
     # if state not in state_store:
@@ -150,6 +156,15 @@ async def auth_callback(code: str):
             )
 
         tokens = TokenResponse(**response.json())
+
+        claims = jwt.get_unverified_claims(tokens.access_token)
+        openid = claims["sub"]
+
+        # create user if does not exist
+        user = user_repository.get(openid)
+        if user is None:
+            user = User(openid=openid)
+            user_repository.store(user)
 
         if tokens.id_token is not None:
             # TODO verify token
