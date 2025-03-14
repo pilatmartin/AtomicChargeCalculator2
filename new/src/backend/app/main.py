@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from typing import Tuple
 
 from api.v1.routes.web.charges import charges_router as web_charges_router
-from api.v1.routes.web.auth import auth_router
+from api.v1.routes.web.auth import auth_router, manager
 from api.v1.routes.web.protonation import protonation_router
 from api.v1.routes.web.user import user_router
 from api.v1.middleware.logging import LoggingMiddleware

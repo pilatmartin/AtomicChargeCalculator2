@@ -23,8 +23,8 @@ from core.models.calculation import (
     CalculationSetDto,
     CalculationSetPreviewDto,
     CalculationsFilters,
-    ChargeCalculationConfig,
-    ChargeCalculationResult,
+    ChargeCalculationConfigDto,
+    CalculationResultDto,
 )
 from core.models.molecule_info import MoleculeSetStats
 from core.models.method import Method
@@ -194,7 +194,7 @@ class ChargeFW2Service:
 
     async def calculate_charges(
         self, computation_id: str, config: CalculationConfig
-    ) -> ChargeCalculationResult:
+    ) -> CalculationResultDto:
         """Calculate charges for provided files."""
 
         workdir = self.io.get_input_path(computation_id)
@@ -251,6 +251,7 @@ class ChargeFW2Service:
                         config_id=config.id,
                     )
                 )
+
                 return result
 
         try:
@@ -260,14 +261,16 @@ class ChargeFW2Service:
                 *[process_file(file, config) for file in inputs],
                 return_exceptions=False,  # TODO: what should happen if only one computation fails?
             )
-            return ChargeCalculationResult(
-                config=ChargeCalculationConfig(
-                    method=config.method,
-                    parameters=config.parameters,
-                    read_hetatm=config.read_hetatm,
-                    ignore_water=config.ignore_water,
-                    permissive_types=config.permissive_types,
-                ),
+            config_dto = ChargeCalculationConfigDto(
+                method=config.method,
+                parameters=config.parameters,
+                read_hetatm=config.read_hetatm,
+                ignore_water=config.ignore_water,
+                permissive_types=config.permissive_types,
+            )
+
+            return CalculationResultDto(
+                config=config_dto,
                 calculations=calculations,
             )
         except Exception as e:
@@ -275,8 +278,8 @@ class ChargeFW2Service:
             raise e
 
     async def calculate_charges_multi(
-        self, computation_id: str, configs: list[ChargeCalculationConfig]
-    ) -> list[ChargeCalculationResult]:
+        self, computation_id: str, configs: list[ChargeCalculationConfigDto]
+    ) -> list[CalculationResultDto]:
         """Calculate charges for provided files.
 
         Args:
@@ -287,7 +290,7 @@ class ChargeFW2Service:
             ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
         """
 
-        async def process_config(config: ChargeCalculationConfig) -> ChargeCalculationResult:
+        async def process_config(config: ChargeCalculationConfigDto) -> CalculationResultDto:
             if not config.method:
                 # No method provided -> use most suitable method and parameters
                 suitable = await self.get_suitable_methods(computation_id)
@@ -318,9 +321,7 @@ class ChargeFW2Service:
         return calculations
 
     # TODO: Refactor. Move closures somewhere else?
-    def write_to_mmcif(
-        self, computation_id: str, calculations: list[ChargeCalculationResult]
-    ) -> dict:
+    def write_to_mmcif(self, computation_id: str, calculations: list[CalculationResultDto]) -> dict:
         """Write charges to mmcif files with names corresponding to the input molecules.
 
         Args:
@@ -405,7 +406,7 @@ class ChargeFW2Service:
         return {"molecules": molecules, "configs": configs}
 
     def store_calculation_set(
-        self, computation_id: str, data: list[ChargeCalculationResult]
+        self, computation_id: str, data: list[CalculationResultDto]
     ) -> CalculationSetDto:
         """Store calculation set to database."""
 

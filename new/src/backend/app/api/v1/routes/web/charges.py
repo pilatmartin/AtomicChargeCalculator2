@@ -14,7 +14,7 @@ from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
-from core.models.calculation import CalculationSetPreviewDto, ChargeCalculationConfig
+from core.models.calculation import CalculationSetPreviewDto, ChargeCalculationConfigDto
 from core.models.method import Method
 from core.models.molecule_info import MoleculeSetStats
 from core.models.paging import PagedList
@@ -123,7 +123,7 @@ async def info(
 @inject
 async def calculate_charges(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
-    configs: list[ChargeCalculationConfig],
+    configs: list[ChargeCalculationConfigDto],
     response_format: Annotated[
         Literal["charges", "none"], Query(description="Output format.")
     ] = "charges",
@@ -325,7 +325,7 @@ async def get_calculations(
 async def download_charges(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
     io: IOService = Depends(Provide[Container.io_service]),
-):
+) -> FileResponse:
     """Returns a zip file with all charges for the provided computation."""
 
     try:
