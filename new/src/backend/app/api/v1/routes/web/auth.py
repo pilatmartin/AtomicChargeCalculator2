@@ -114,7 +114,7 @@ async def logout():
 
 
 @auth_router.get("/callback", tags=["callback"])
-async def auth_callback(code: str, state: str):
+async def auth_callback(code: str):
     """Handle the callback from the OIDC provider."""
 
     # if state not in state_store:
@@ -134,7 +134,7 @@ async def auth_callback(code: str, state: str):
             data={
                 "grant_type": "authorization_code",
                 "code": code,
-                "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/",
+                "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/api/v1/auth/callback",
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             auth=httpx.BasicAuth(
@@ -156,7 +156,7 @@ async def auth_callback(code: str, state: str):
             pass
 
         # set session cookie
-        response = RedirectResponse(url="/")
+        response = RedirectResponse(url="https://acc2-dev.biodata.ceitec.cz/")
         manager.set_cookie(response, tokens.access_token)
 
         return response
