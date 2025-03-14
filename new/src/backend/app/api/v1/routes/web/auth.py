@@ -1,28 +1,29 @@
 """Auth routes."""
 
-import httpx
+import os
 import secrets
-import urllib.parse
 import urllib
+import urllib.parse
 
+import httpx
+from core.dependency_injection.container import Container
+from db.models.user.user import User
+from db.repositories.user_repository import UserRepository
 from dependency_injector.wiring import Provide, inject
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi_login import LoginManager
 from pydantic import BaseModel
 
-from db.models.user.user import User
-from db.repositories.user_repository import UserRepository
-
-from core.dependency_injection.container import Container
-
-
 OIDC_DISCOVERY_URL = "https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration"
 
 oidc_config = {}
 state_store = {}
 session_store = {}
+
+load_dotenv()
 
 
 class TokenResponse(BaseModel):
@@ -136,6 +137,10 @@ async def auth_callback(code: str, state: str):
                 "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/",
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
+            auth=httpx.BasicAuth(
+                username=os.environ.get("OIDC_CLIENT_ID"),
+                password=os.environ.get("OIDC_CLIENT_SECRET"),
+            ),
         )
 
         if response.status_code != 200:
