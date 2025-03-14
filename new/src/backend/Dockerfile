@@ -75,10 +75,9 @@ COPY --from=build /dependencies/* /usr/lib/x86_64-linux-gnu/
 WORKDIR /acc2
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-interaction --no-ansi
-RUN alembic upgrade head
 
 COPY ./app /acc2/app
+COPY ./entrypoint.sh /acc2/
+RUN chmod +x /acc2/entrypoint.sh
 
-WORKDIR /acc2/app
-
-CMD ["gunicorn", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "600", "--bind", "0.0.0.0:8000", "main:web_app"]
+ENTRYPOINT ["/acc2/entrypoint.sh"]
