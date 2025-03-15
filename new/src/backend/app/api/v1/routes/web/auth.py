@@ -1,33 +1,19 @@
 """Auth routes."""
 
-import os
-import secrets
 import urllib
 import urllib.parse
 
 import httpx
+from api.v1.schemas.response import Response
 from core.dependency_injection.container import Container
 from db.models.user.user import User
 from db.repositories.user_repository import UserRepository
 from dependency_injector.wiring import Provide, inject
-from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
-from fastapi_login import LoginManager
 from pydantic import BaseModel
-
-from jose import jwt
-
-from api.v1.schemas.response import Response
-
-OIDC_DISCOVERY_URL = "https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration"
-
-oidc_config = {}
-state_store = {}
-session_store = {}
-
-load_dotenv()
+from services.oidc import OIDCService
 
 
 class TokenResponse(BaseModel):
@@ -40,100 +26,63 @@ class TokenResponse(BaseModel):
     id_token: str
 
 
-manager = LoginManager(
-    secret=secrets.token_hex(32),
-    token_url="/auth/callback",
-    use_header=False,
-    use_cookie=True,
-    cookie_name="access_token",
-)
-
-
-@manager.user_loader()
-@inject
-async def user_loader(
-    openid: str, user_repository: UserRepository = Depends(Provide[Container.user_repository])
-) -> User | None:
-    """Get a user from the database.
-
-    Args:
-        openid (str): Openid of the user.
-
-    Returns:
-        User | None: User with provided openid if exists, otherwise None.
-    """
-    return user_repository.get(openid)
-
-
-async def get_oidc_config() -> dict:
-    """Get the OIDC configuration from the discovery endpoint or cache, if available.
-
-    Returns:
-        dict: OIDC configuration.
-    """
-
-    global oidc_config
-    if oidc_config:
-        return oidc_config
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(OIDC_DISCOVERY_URL)
-        response.raise_for_status()
-        oidc_config = response.json()
-
-    return oidc_config
-
-
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @auth_router.get("/login", tags=["login"])
-async def login():
+async def login(oidc_service: OIDCService = Depends(Provide[Container.oidc_service])):
     """Initiate the OIDC authentication flow."""
-    # state = secrets.token_urlsafe(32)
-    # state_store[state] = {"created_at": datetime.now(timezone.utc)}
-
-    config = await get_oidc_config()
+    config = await oidc_service.get_oidc_config()
     auth_endpoint = config["authorization_endpoint"]
-
     params = {
         "response_type": "code",
-        "client_id": "ba457349-a931-4908-b0d3-434efc715489",
+        "client_id": oidc_service.client_id,
         "scope": "openid",
-        "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/api/v1/auth/callback",
-        # "redirect_uri": "http://localhost:8000/v1/auth/callback",
-        # "state": state,
+        "redirect_uri": oidc_service.redirect_uri,
     }
-
     query = urllib.parse.urlencode(params)
 
     return RedirectResponse(f"{auth_endpoint}?{query}")
 
 
 @auth_router.get("/logout", tags=["logout"])
-async def logout():
+@inject
+async def logout(
+    request: Request, oidc_service: OIDCService = Depends(Provide[Container.oidc_service])
+):
     """Log out the user."""
-    response = RedirectResponse(url="/")
-    response.delete_cookie(manager.cookie_name)
+    config = await oidc_service.get_oidc_config()
+    token = request.cookies.get("access_token")
+    redirect_uri = "https://acc2-dev.biodata.ceitec.cz/"
+
+    if "end_session_endpoint" in config:
+        end_session_endpoint = config["end_session_endpoint"]
+        params = {
+            "client_id": oidc_service.client_id,
+            "post_logout_redirect_uri": redirect_uri,
+        }
+
+        if token:
+            params["id_token_hint"] = token
+
+        query = urllib.parse.urlencode(params)
+        return RedirectResponse(f"{end_session_endpoint}?{query}")
+
+    response = RedirectResponse(redirect_uri)
+    response.delete_cookie("access_token", secure=True, httponly=True)
     return response
 
 
 @auth_router.get("/callback", tags=["callback"])
 @inject
 async def auth_callback(
-    code: str, user_repository: UserRepository = Depends(Provide[Container.user_repository])
+    code: str,
+    oidc_service: OIDCService = Depends(Provide[Container.oidc_service]),
+    user_repository: UserRepository = Depends(Provide[Container.user_repository]),
 ):
     """Handle the callback from the OIDC provider."""
 
-    # if state not in state_store:
-    # raise HTTPException(status_code=400, detail="Invalid state parameter.")
-
-    # state_data = state_store.pop(state)
-
-    # if datetime.now(timezone.utc) - state_data["created_at"] > timedelta(minutes=10):
-    # raise HTTPException(status_code=400, detail="State parameter expired.")
-
-    config = await get_oidc_config()
+    config = await oidc_service.get_oidc_config()
     token_endpoint = config["token_endpoint"]
 
     async with httpx.AsyncClient() as client:
@@ -142,12 +91,12 @@ async def auth_callback(
             data={
                 "grant_type": "authorization_code",
                 "code": code,
-                "redirect_uri": "https://acc2-dev.biodata.ceitec.cz/api/v1/auth/callback",
+                "redirect_uri": oidc_service.redirect_uri,
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             auth=httpx.BasicAuth(
-                username=os.environ.get("OIDC_CLIENT_ID"),
-                password=os.environ.get("OIDC_CLIENT_SECRET"),
+                username=oidc_service.client_id,
+                password=oidc_service.client_secret,
             ),
         )
 
@@ -159,26 +108,33 @@ async def auth_callback(
 
         tokens = TokenResponse(**response.json())
 
-        claims = jwt.get_unverified_claims(tokens.access_token)
-        openid = claims["sub"]
+        payload = await oidc_service.verify_token(tokens.access_token)
+
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Failed to verify token",
+            )
 
         # create user if does not exist
+        openid = payload["sub"]
         user = user_repository.get(openid)
         if user is None:
             user = User(openid=openid)
             user_repository.store(user)
 
-        if tokens.id_token is not None:
-            # TODO verify token
-            pass
-
         # set session cookie
         response = RedirectResponse(url="https://acc2-dev.biodata.ceitec.cz/")
-        manager.set_cookie(response, tokens.access_token)
+        response.set_cookie("access_token", tokens.access_token)
 
         return response
 
 
 @auth_router.get("/verify", tags=["verify"])
-async def verify(user: User = Depends(manager.optional)):
+@inject
+async def verify(request: Request):
+    """Verifies if user is logged in."""
+    user = request.state.user
+
+    print("verifying user", user)
     return Response(data={"isAuthenticated": user is not None})

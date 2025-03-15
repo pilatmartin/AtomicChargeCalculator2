@@ -15,6 +15,7 @@ from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import CalculationSetRepository
 from db.repositories.user_repository import UserRepository
 
+from services.oidc import OIDCService
 from services.chargefw2 import ChargeFW2Service
 from services.io import IOService
 
@@ -61,3 +62,4 @@ class Container(containers.DeclarativeContainer):
         calculation_repository=calculation_repository,
         config_repository=config_repository,
     )
+    oidc_service = providers.Singleton(OIDCService, logger=logger_service)
