@@ -50,7 +50,11 @@ export const Nav = () => {
             <img src={LoginImg} alt="Login Button" width={150} />
           </button>
         )}
-        {isAuthenticated && <button className="hover:underline">Logout</button>}
+        {isAuthenticated && (
+          <button className="hover:underline" onClick={onLogoutClick}>
+            Logout
+          </button>
+        )}
       </div>
       <div className="block sm:hidden ml-auto">
         <DropdownMenu>
