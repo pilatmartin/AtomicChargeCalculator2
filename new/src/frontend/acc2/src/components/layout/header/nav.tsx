@@ -8,11 +8,24 @@ import {
 import { Menu } from "lucide-react";
 import { NavLink } from "react-router";
 import LoginImg from "../../../assets/images/button-login.svg";
-import { baseApiUrl } from "@acc2/api/base";
+import { baseApiUrl, handleApiError } from "@acc2/api/base";
+import { useAuth } from "@acc2/hooks/queries/use-auth";
+import { useLogoutMutation } from "@acc2/hooks/mutations/use-logout-mutation";
+import { toast } from "sonner";
 
 export const Nav = () => {
+  const logoutMutation = useLogoutMutation();
+  const { isAuthenticated } = useAuth();
+
   const onLoginClick = () => {
     window.location.href = `${baseApiUrl}/auth/login`;
+  };
+
+  const onLogoutClick = async () => {
+    await logoutMutation.mutateAsync(undefined, {
+      onError: (error) => toast.error(handleApiError(error)),
+      onSuccess: () => toast.success("You have been successfully logged out."),
+    });
   };
 
   return (
@@ -36,9 +49,12 @@ export const Nav = () => {
             Calculations
           </NavLink>
         </div>
-        <button className="ml-auto" onClick={onLoginClick}>
-          <img src={LoginImg} alt="Login Button" width={150} />
-        </button>
+        {!isAuthenticated && (
+          <button className="ml-auto" onClick={onLoginClick}>
+            <img src={LoginImg} alt="Login Button" width={150} />
+          </button>
+        )}
+        {isAuthenticated && <button className="hover:underline">Logout</button>}
       </div>
       <div className="block sm:hidden ml-auto">
         <DropdownMenu>
@@ -56,26 +72,33 @@ export const Nav = () => {
                 Home
               </NavLink>
             </DropdownMenuItem>
-            <DropdownMenuItem className="relative">
-              <NavLink
-                to={"/calculations"}
-                className={({ isActive }) =>
-                  `${isActive ? "underline" : "no-underline"}`
-                }
-              >
-                Calculations
-              </NavLink>
-            </DropdownMenuItem>
+            {isAuthenticated && (
+              <DropdownMenuItem className="relative">
+                <NavLink
+                  to={"/calculations"}
+                  className={({ isActive }) =>
+                    `${isActive ? "underline" : "no-underline"}`
+                  }
+                >
+                  Calculations
+                </NavLink>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <button>
-                <img
-                  src={LoginImg}
-                  alt="Login Button"
-                  height={10}
-                  width={150}
-                />
-              </button>
+              {!isAuthenticated && (
+                <button onClick={onLoginClick}>
+                  <img
+                    src={LoginImg}
+                    alt="Login Button"
+                    height={10}
+                    width={150}
+                  />
+                </button>
+              )}
+              {isAuthenticated && (
+                <button onClick={onLogoutClick}>Logout</button>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -11,13 +11,15 @@ from db.models.user.user import User
 from db.repositories.user_repository import UserRepository
 from dependency_injector.wiring import Provide, inject
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi_login import LoginManager
 from pydantic import BaseModel
 
 from jose import jwt
+
+from api.v1.schemas.response import Response
 
 OIDC_DISCOVERY_URL = "https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration"
 
@@ -40,7 +42,7 @@ class TokenResponse(BaseModel):
 
 manager = LoginManager(
     secret=secrets.token_hex(32),
-    token_url="/login",
+    token_url="/auth/callback",
     use_header=False,
     use_cookie=True,
     cookie_name="access_token",
@@ -177,7 +179,6 @@ async def auth_callback(
         return response
 
 
-@auth_router.get("/me", tags=["me"])
-async def get_current_user(request: Request):
-    """Get informatin about current user (me)."""
-    return request.state.user
+@auth_router.get("/verify", tags=["verify"])
+async def verify(user: User = Depends(manager.optional)):
+    return Response(data={"isAuthenticated": user is not None})
