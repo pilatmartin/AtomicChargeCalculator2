@@ -15,9 +15,11 @@ from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import CalculationSetRepository
 from db.repositories.user_repository import UserRepository
 
-from services.oidc import OIDCService
+from services.calculation_storage import CalculationStorageService
 from services.chargefw2 import ChargeFW2Service
 from services.io import IOService
+from services.mmcif import MmCIFService
+from services.oidc import OIDCService
 
 
 load_dotenv(find_dotenv())
@@ -53,13 +55,20 @@ class Container(containers.DeclarativeContainer):
     # services
     logger_service = providers.Singleton(FileLogger)
     io_service = providers.Singleton(IOService, logger=logger_service, io=io)
+    mmcif_service = providers.Singleton(MmCIFService, logger=logger_service, io=io_service)
+    storage_service = providers.Singleton(
+        CalculationStorageService,
+        logger=logger_service,
+        set_repository=set_repository,
+        calculation_repository=calculation_repository,
+        config_repository=config_repository,
+    )
     chargefw2_service = providers.Singleton(
         ChargeFW2Service,
         chargefw2=chargefw2,
         logger=logger_service,
         io=io_service,
-        set_repository=set_repository,
-        calculation_repository=calculation_repository,
-        config_repository=config_repository,
+        mmcif_service=mmcif_service,
+        calculation_storage=storage_service,
     )
     oidc_service = providers.Singleton(OIDCService, logger=logger_service)
