@@ -8,13 +8,10 @@ import {
 import { Menu } from "lucide-react";
 import { NavLink } from "react-router";
 import LoginImg from "../../../assets/images/button-login.svg";
-import { baseApiUrl, handleApiError } from "@acc2/api/base";
+import { baseApiUrl } from "@acc2/api/base";
 import { useAuth } from "@acc2/hooks/queries/use-auth";
-import { useLogoutMutation } from "@acc2/hooks/mutations/use-logout-mutation";
-import { toast } from "sonner";
 
 export const Nav = () => {
-  const logoutMutation = useLogoutMutation();
   const { isAuthenticated } = useAuth();
 
   const onLoginClick = () => {
@@ -22,10 +19,7 @@ export const Nav = () => {
   };
 
   const onLogoutClick = async () => {
-    await logoutMutation.mutateAsync(undefined, {
-      onError: (error) => toast.error(handleApiError(error)),
-      onSuccess: () => toast.success("You have been successfully logged out."),
-    });
+    window.location.href = `${baseApiUrl}/auth/logout`;
   };
 
   return (

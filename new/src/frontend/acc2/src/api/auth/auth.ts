@@ -12,13 +12,3 @@ export const verifyAuth = async () => {
 
   return response.data.data;
 };
-
-export const logout = async () => {
-  const response = await api.get<ApiResponse<void>>("/auth/logout");
-
-  if (!response.data.success) {
-    throw Error(response.data.message);
-  }
-
-  return response.data.data;
-};
