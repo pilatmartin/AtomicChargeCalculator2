@@ -40,17 +40,19 @@ export const Nav = () => {
           >
             Home
           </NavLink>
-          <NavLink
-            to={"/calculations"}
-            className={({ isActive }) =>
-              `${isActive ? "underline" : "no-underline"} hover:underline`
-            }
-          >
-            Calculations
-          </NavLink>
+          {isAuthenticated && (
+            <NavLink
+              to={"/calculations"}
+              className={({ isActive }) =>
+                `${isActive ? "underline" : "no-underline"} hover:underline`
+              }
+            >
+              Calculations
+            </NavLink>
+          )}
         </div>
         {!isAuthenticated && (
-          <button className="ml-auto" onClick={onLoginClick}>
+          <button className="ml-auto hover:scale-105" onClick={onLoginClick}>
             <img src={LoginImg} alt="Login Button" width={150} />
           </button>
         )}
