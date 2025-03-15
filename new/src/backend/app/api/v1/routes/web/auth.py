@@ -56,6 +56,8 @@ async def logout(
     token = request.cookies.get("access_token")
     redirect_uri = "https://acc2-dev.biodata.ceitec.cz/"
 
+    response = RedirectResponse(redirect_uri)
+
     if "end_session_endpoint" in config:
         end_session_endpoint = config["end_session_endpoint"]
         params = {
@@ -67,10 +69,10 @@ async def logout(
             params["id_token_hint"] = token
 
         query = urllib.parse.urlencode(params)
-        return RedirectResponse(f"{end_session_endpoint}?{query}")
+        response = RedirectResponse(f"{end_session_endpoint}?{query}")
 
-    response = RedirectResponse(redirect_uri)
-    response.delete_cookie("access_token", secure=True, httponly=True)
+    response.delete_cookie("access_token", secure=True, httponly=True, path="/")
+
     return response
 
 
