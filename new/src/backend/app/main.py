@@ -8,11 +8,12 @@ from fastapi import FastAPI, HTTPException
 from typing import Tuple
 
 from api.v1.routes.web.charges import charges_router as web_charges_router
-from api.v1.routes.web.auth import auth_router, manager
+from api.v1.routes.web.auth import auth_router
 from api.v1.routes.web.protonation import protonation_router
 from api.v1.routes.web.user import user_router
 from api.v1.middleware.logging import LoggingMiddleware
 from api.v1.middleware.exceptions import http_exception_handler
+from api.v1.middleware.user_loader import UserLoaderMiddleware
 
 from core.dependency_injection.container import Container
 
@@ -45,7 +46,8 @@ def create_app() -> FastAPI:
     container.wire()
 
     app.add_middleware(LoggingMiddleware)
-    manager.attach_middleware(app)
+    app.add_middleware(UserLoaderMiddleware)
+
     app.add_exception_handler(HTTPException, http_exception_handler)
 
     app.include_router(router=web_charges_router, prefix=PREFIX)

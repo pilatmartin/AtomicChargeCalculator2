@@ -30,6 +30,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @auth_router.get("/login", tags=["login"])
+@inject
 async def login(oidc_service: OIDCService = Depends(Provide[Container.oidc_service])):
     """Initiate the OIDC authentication flow."""
     config = await oidc_service.get_oidc_config()
@@ -131,7 +132,6 @@ async def auth_callback(
 
 
 @auth_router.get("/verify", tags=["verify"])
-@inject
 async def verify(request: Request):
     """Verifies if user is logged in."""
     user = request.state.user
