@@ -406,7 +406,7 @@ class ChargeFW2Service:
         return {"molecules": molecules, "configs": configs}
 
     def store_calculation_set(
-        self, computation_id: str, data: list[CalculationResultDto]
+        self, computation_id: str, user_id: str | None, data: list[CalculationResultDto]
     ) -> CalculationSetDto:
         """Store calculation set to database."""
 
@@ -428,7 +428,7 @@ class ChargeFW2Service:
             ]
 
             calculation_set_to_store = CalculationSet(
-                id=computation_id, calculations=calculations, configs=configs
+                id=computation_id, calculations=calculations, configs=configs, user_id=user_id
             )
 
             calculation_set = self.set_repository.store(calculation_set_to_store)

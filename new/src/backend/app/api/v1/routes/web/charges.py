@@ -1,11 +1,10 @@
 """Charge calculation routes."""
 
 import asyncio
-import traceback
 import uuid
 
 from typing import Annotated, Literal
-from fastapi import Depends, File, Path, Query, UploadFile, status
+from fastapi import Depends, File, HTTPException, Path, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
@@ -151,7 +150,6 @@ async def calculate_charges(
 
         return Response(data=calculations)
     except Exception as e:
-        print(traceback.format_exc())
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
         ) from e
@@ -165,6 +163,7 @@ async def calculate_charges(
 )
 @inject
 async def setup(
+    request: Request,
     files: list[UploadFile],
     io: IOService = Depends(Provide[Container.io_service]),
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
@@ -192,12 +191,14 @@ async def setup(
             detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
         )
 
+    user_id = request.state.user.id if request.state.user is not None else None
+
     try:
         computation_id = str(uuid.uuid4())
         workdir = io.get_input_path(computation_id)
         io.create_dir(workdir)
         await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
-        chargefw2.store_calculation_set(computation_id, [])
+        chargefw2.store_calculation_set(computation_id, user_id, [])
 
         return Response(data={"computationId": computation_id})
     except Exception as e:
@@ -299,6 +300,7 @@ async def get_example_molecules(
 @charges_router.get("/calculations", tags=["calculations"])
 @inject
 async def get_calculations(
+    request: Request,
     page: Annotated[int, Query(description="Page number.")] = 1,
     page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
     order_by: Annotated[Literal["created_at"], Query(description="Order by field.")] = "created_at",
@@ -306,15 +308,21 @@ async def get_calculations(
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[PagedList[CalculationSetPreviewDto]]:
     """Returns all calculations stored in the database."""
+    user = request.state.user
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You need to be logged in to get calculations.",
+        )
 
     try:
         filters = CalculationSetFilters(
-            order=order, order_by=order_by, page=page, page_size=page_size
+            order=order, order_by=order_by, page=page, page_size=page_size, user_id=user.id
         )
         calculations = chargefw2.get_calculations(filters)
         return Response(data=calculations)
     except Exception as e:
-        print(traceback.format_exc())
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
         ) from e

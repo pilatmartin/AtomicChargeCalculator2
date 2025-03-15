@@ -136,7 +136,6 @@ async def auth_callback(
 @auth_router.get("/verify", tags=["verify"])
 async def verify(request: Request):
     """Verifies if user is logged in."""
-    user = request.state.user
 
-    print("verifying user", user)
+    user = request.state.user
     return Response(data={"isAuthenticated": user is not None})

@@ -27,11 +27,9 @@ class UserLoaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request.state.user = None
         cookie = request.cookies.get("access_token")
-        print("cookie", cookie)
 
         if cookie:
             payload = await self.oidc_service.verify_token(cookie)
-            print("payload", payload)
             if payload:
                 openid = payload["sub"]
                 self.logger.info(f"Request contains valid token, loading user {openid}.")
