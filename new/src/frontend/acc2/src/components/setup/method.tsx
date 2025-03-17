@@ -12,7 +12,6 @@ import {
 import { Separator } from "../ui/separator";
 import { cn } from "@acc2/lib/utils";
 import { Method as MethodType, SuitableMethods } from "@acc2/api/methods/types";
-import { usePublicationQuery } from "@acc2/hooks/queries/use-publication-query";
 import { Publication } from "./publication";
 
 export type MethodSelectorProps = {
@@ -58,7 +57,7 @@ const MethodPublication = ({ method }: MethodPublicationProps) => {
     <>
       <h4 className="text-sm font-bold">Full Name</h4>
       <p className="text-sm mb-2">{method?.fullName}</p>
-      {method && <Publication idk={method} />}
+      {method && <Publication publicationSource={method} />}
     </>
   );
 };

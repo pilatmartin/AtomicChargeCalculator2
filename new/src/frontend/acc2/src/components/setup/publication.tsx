@@ -4,11 +4,12 @@ import { usePublicationQuery } from "@acc2/hooks/queries/use-publication-query";
 import { Busy } from "../ui/busy";
 
 export type PublicationProps = {
-  idk: Parameters | Method;
+  publicationSource: Parameters | Method;
 };
 
-export const Publication = ({ idk }: PublicationProps) => {
-  const { data: publication, isPending } = usePublicationQuery(idk);
+export const Publication = ({ publicationSource }: PublicationProps) => {
+  const { data: publication, isPending } =
+    usePublicationQuery(publicationSource);
 
   const parsePublication = (publication: string) => {
     const doiRegex = /doi:(.*)/;

@@ -1,4 +1,3 @@
-import { Info } from "lucide-react";
 import { Card } from "../ui/card";
 import {
   Select,
@@ -7,19 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { Separator } from "../ui/separator";
 import { HTMLAttributes, SetStateAction } from "react";
 import { cn } from "@acc2/lib/utils";
 import { Parameters as ParametersType } from "@acc2/api/parameters/types";
-import { usePublicationQuery } from "@acc2/hooks/queries/use-publication-query";
 import { Publication } from "./publication";
-import { InfoTooltip } from "./tooltip";
+import { InfoTooltip } from "./info-tooltip";
 
 type ParametersSelectorProps = {
   currentParameters: ParametersType | undefined;
@@ -65,7 +57,7 @@ type ParametersPublicationProps = {
 };
 
 const ParametersPublication = ({ parameters }: ParametersPublicationProps) => {
-  return <>{parameters && <Publication idk={parameters} />}</>;
+  return <>{parameters && <Publication publicationSource={parameters} />}</>;
 };
 
 export type ParametersProps = {
