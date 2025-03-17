@@ -1,0 +1,46 @@
+import { Method } from "@acc2/api/methods/types";
+import { Parameters } from "@acc2/api/parameters/types";
+import { usePublicationQuery } from "@acc2/hooks/queries/use-publication-query";
+import { Busy } from "../ui/busy";
+
+export type PublicationProps = {
+  idk: Parameters | Method;
+};
+
+export const Publication = ({ idk }: PublicationProps) => {
+  const { data: publication, isPending } = usePublicationQuery(idk);
+
+  const parsePublication = (publication: string) => {
+    const doiRegex = /doi:(.*)/;
+    const doi = publication.match(doiRegex)?.[1] ?? "";
+
+    return {
+      text: publication.replace(doiRegex, ""),
+      url: `https://doi.org/${doi}`,
+      doi,
+    };
+  };
+
+  const publicationInfo = parsePublication(publication ?? "");
+
+  return (
+    <>
+      {publication && (
+        <div className="relative">
+          <Busy isBusy={isPending} />
+          <h4 className="text-sm font-bold">Publication</h4>
+          <p className="text-sm">
+            {publicationInfo.text}
+            <a
+              href={publicationInfo.url}
+              target="_blank"
+              className="text-primary hover:underline"
+            >
+              doi:{publicationInfo.doi}
+            </a>
+          </p>
+        </div>
+      )}
+    </>
+  );
+};
