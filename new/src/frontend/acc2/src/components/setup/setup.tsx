@@ -18,12 +18,17 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Switch } from "../ui/switch";
+import { InfoTooltip } from "./info-tooltip";
 
 const setupSchema = z.object({
   computations: z.array(
     z.object({
       method: z.custom<MethodType>(),
       parameters: z.custom<ParametersType>().optional(),
+      readHetatm: z.boolean(),
+      ignoreWater: z.boolean(),
+      permissiveTypes: z.boolean(),
     })
   ),
 });
@@ -49,6 +54,12 @@ export const Setup = ({ computationId }: SetupProps) => {
   );
   const [currentParameters, setCurrentParameters] = useState<ParametersType>();
 
+  const [settings, setSettings] = useState({
+    readHetatm: true,
+    ignoreWater: false,
+    permissiveTypes: true,
+  });
+
   const form = useForm<SetupFormType>({
     resolver: zodResolver(setupSchema),
     defaultValues: {
@@ -60,10 +71,13 @@ export const Setup = ({ computationId }: SetupProps) => {
     await computationMutation.mutateAsync(
       {
         computationId,
-        computations: data.computations.map((c) => ({
-          method: c.method.internalName,
-          parameters: c.parameters?.internalName,
-        })),
+        computations: data.computations.map(
+          ({ method, parameters, ...settings }) => ({
+            method: method.internalName,
+            parameters: parameters?.internalName,
+            ...settings,
+          })
+        ),
       },
       {
         onError: (error) => toast.error(handleApiError(error)),
@@ -101,6 +115,9 @@ export const Setup = ({ computationId }: SetupProps) => {
       {
         method: currentMethod,
         parameters: currentParameters,
+        readHetatm: settings.readHetatm,
+        ignoreWater: settings.ignoreWater,
+        permissiveTypes: settings.permissiveTypes,
       },
     ]);
   };
@@ -166,6 +183,56 @@ export const Setup = ({ computationId }: SetupProps) => {
                   </>
                 )}
               </div>
+              <Card className="rounded-none p-4 mt-4 flex gap-4">
+                <div className="flex gap-2 items-center">
+                  <Switch
+                    id="read-hetatm"
+                    checked={settings.readHetatm}
+                    onCheckedChange={(readHetatm) =>
+                      setSettings((settings) => ({
+                        ...settings,
+                        readHetatm,
+                      }))
+                    }
+                  />
+                  <label htmlFor="read-hetatm" className="font-bold">
+                    Read HETATM
+                    <InfoTooltip info="Read HETATM records from PDB/mmCIF files." />
+                  </label>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Switch
+                    id="ignore-water"
+                    checked={settings.ignoreWater}
+                    onCheckedChange={(ignoreWater) =>
+                      setSettings((settings) => ({
+                        ...settings,
+                        ignoreWater,
+                      }))
+                    }
+                  />
+                  <label htmlFor="ignore-water" className="font-bold">
+                    Ignore water
+                    <InfoTooltip info="Discard water molecules from PDB/mmCIF files." />
+                  </label>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Switch
+                    id="permissive-types"
+                    checked={settings.permissiveTypes}
+                    onCheckedChange={(permissiveTypes) =>
+                      setSettings((settings) => ({
+                        ...settings,
+                        permissiveTypes,
+                      }))
+                    }
+                  />
+                  <label htmlFor="permissive-types" className="font-bold">
+                    Permissive types
+                    <InfoTooltip info="Use similar parameters for similar atom/bond types if no exact match is found." />
+                  </label>
+                </div>
+              </Card>
               <Button
                 type="button"
                 className="mt-4 self-start"
