@@ -40,8 +40,9 @@ export const Calculations = ({ className, ...props }: CalculationsProps) => {
               >
                 <span>{method.name}</span>
                 {parameters && <span>&nbsp;({parameters.name})</span>}
-                {Object.values(settings).map((checked) => (
+                {Object.values(settings).map((checked, index) => (
                   <div
+                    key={`${method.internalName}-${parameters?.internalName}-${index}`}
                     className={cn(
                       "ml-2 w-2 h-2 rounded-full",
                       checked ? "bg-primary" : "bg-gray-400"
@@ -75,13 +76,13 @@ export const Calculations = ({ className, ...props }: CalculationsProps) => {
                 <div className="flex flex-col">
                   <span className="font-bold text-sm">Ignore water</span>
                   <span className="text-xs">
-                    {settings.readHetatm ? "Enabled" : "Disabled"}
+                    {settings.ignoreWater ? "Enabled" : "Disabled"}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold text-sm">Permissive types</span>
                   <span className="text-xs">
-                    {settings.readHetatm ? "Enabled" : "Disabled"}
+                    {settings.permissiveTypes ? "Enabled" : "Disabled"}
                   </span>
                 </div>
               </div>

@@ -2,8 +2,8 @@ import { handleApiError } from "@acc2/api/base";
 import type { Method as MethodType } from "@acc2/api/methods/types";
 import type { Parameters as ParametersType } from "@acc2/api/parameters/types";
 import { Calculations } from "@acc2/components/setup/calculations";
-import { Method } from "@acc2/components/setup/method";
-import { Parameters } from "@acc2/components/setup/parameters";
+import { Method } from "@acc2/components/setup/method/method";
+import { Parameters } from "@acc2/components/setup/parameters/parameters";
 import { Busy } from "@acc2/components/ui/busy";
 import { Button } from "@acc2/components/ui/button";
 import { Card } from "@acc2/components/ui/card";
@@ -18,8 +18,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Switch } from "../ui/switch";
-import { InfoTooltip } from "./info-tooltip";
+import { SetupSettings } from "./settings";
 
 const setupSchema = z.object({
   computations: z.array(
@@ -183,56 +182,7 @@ export const Setup = ({ computationId }: SetupProps) => {
                   </>
                 )}
               </div>
-              <Card className="rounded-none p-4 mt-4 flex gap-4">
-                <div className="flex gap-2 items-center">
-                  <Switch
-                    id="read-hetatm"
-                    checked={settings.readHetatm}
-                    onCheckedChange={(readHetatm) =>
-                      setSettings((settings) => ({
-                        ...settings,
-                        readHetatm,
-                      }))
-                    }
-                  />
-                  <label htmlFor="read-hetatm" className="font-bold">
-                    Read HETATM
-                    <InfoTooltip info="Read HETATM records from PDB/mmCIF files." />
-                  </label>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Switch
-                    id="ignore-water"
-                    checked={settings.ignoreWater}
-                    onCheckedChange={(ignoreWater) =>
-                      setSettings((settings) => ({
-                        ...settings,
-                        ignoreWater,
-                      }))
-                    }
-                  />
-                  <label htmlFor="ignore-water" className="font-bold">
-                    Ignore water
-                    <InfoTooltip info="Discard water molecules from PDB/mmCIF files." />
-                  </label>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Switch
-                    id="permissive-types"
-                    checked={settings.permissiveTypes}
-                    onCheckedChange={(permissiveTypes) =>
-                      setSettings((settings) => ({
-                        ...settings,
-                        permissiveTypes,
-                      }))
-                    }
-                  />
-                  <label htmlFor="permissive-types" className="font-bold">
-                    Permissive types
-                    <InfoTooltip info="Use similar parameters for similar atom/bond types if no exact match is found." />
-                  </label>
-                </div>
-              </Card>
+              <SetupSettings settings={settings} setSettings={setSettings} />
               <Button
                 type="button"
                 className="mt-4 self-start"
