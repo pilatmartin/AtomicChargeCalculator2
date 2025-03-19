@@ -114,6 +114,20 @@ class IOService:
         """Check if path exists."""
         return self.io.path_exists(path)
 
+    def get_user_files_path(self, user_id: str) -> str:
+        """Get path to input directory."""
+        return os.path.join(self.workdir, "user", user_id, "files")
+
+    def get_user_charges_path(self, user_id: str, computation_id: str) -> str:
+        """Get path to charges directory."""
+        return os.path.join(
+            self.workdir, "user", user_id, "computations", computation_id, "charges"
+        )
+
+    def get_user_inputs_path(self, user_id: str, computation_id: str) -> str:
+        """Get path to input directory."""
+        return os.path.join(self.workdir, "user", user_id, "computations", computation_id, "input")
+
     def get_input_path(self, computation_id: str) -> str:
         """Get path to input directory."""
         return os.path.join(self.workdir, computation_id, "input")
@@ -125,3 +139,26 @@ class IOService:
     def get_example_path(self, example_id: str) -> str:
         """Get path to example directory."""
         return os.path.join(os.environ.get("ACC2_EXAMPLES_DIR"), example_id)
+
+    def prepare_inputs(self, user_id: str, computation_id: str, file_hashes: list[str]) -> None:
+        """Prepare input files for computation."""
+
+        inputs_path = self.get_user_inputs_path(user_id, computation_id)
+        self.create_dir(inputs_path)
+
+        files_path = self.get_user_files_path(user_id)
+        for file_hash in file_hashes:
+            file_name = next(
+                (file for file in self.listdir(files_path) if file.split("_", 1)[0] == file_hash),
+                None,
+            )
+
+            if not file_name:
+                self.logger.warn(
+                    f"File with hash {file_hash} not found in {inputs_path}, skipping."
+                )
+                continue
+
+            src_path = os.path.join(files_path, file_name)
+            dst_path = os.path.join(inputs_path, file_name)
+            self.io.symlink(src_path, dst_path)

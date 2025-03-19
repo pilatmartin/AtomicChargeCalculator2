@@ -133,6 +133,64 @@ class ChargeFW2Service:
         }
         return SuitableMethods(methods=methods_with_metadata, parameters=parameters_with_metadata)
 
+    async def get_suitable_methods_new(self, user_id: str, computation_id: str) -> SuitableMethods:
+        """Get suitable methods for charge calculation based on files in the provided directory."""
+
+        try:
+            self.logger.info(f"Getting suitable methods for computation '{computation_id}'")
+            return await self._find_suitable_methods_new(user_id, computation_id)
+        except Exception as e:
+            self.logger.error(
+                f"Error getting suitable methods for computation '{computation_id}': {e}"
+            )
+            raise e
+
+    async def _find_suitable_methods_new(
+        self, user_id: str, computation_id: str
+    ) -> SuitableMethods:
+        """Helper method to find suitable methods for calculation."""
+        suitable_methods = Counter()
+        workdir = self.io.get_user_inputs_path(user_id, computation_id)
+
+        dir_contents = self.io.listdir(workdir)
+        for file in dir_contents:
+            input_file = os.path.join(workdir, file)
+            molecules = await self.read_molecules(input_file)
+            methods: list[tuple[str, list[str]]] = await self._run_in_executor(
+                self.chargefw2.get_suitable_methods, molecules
+            )
+            for method, parameters in methods:
+                if not parameters or len(parameters) == 0:
+                    suitable_methods[(method,)] += 1
+                else:
+                    for p in parameters:
+                        suitable_methods[(method, p)] += 1
+
+        all_valid = [
+            pair for pair in suitable_methods if suitable_methods[pair] == len(dir_contents)
+        ]
+
+        # Remove duplicates from methods
+        tmp = {}
+        for data in all_valid:
+            tmp[data[0]] = None
+
+        methods = list(tmp.keys())
+
+        parameters = defaultdict(list)
+        for pair in all_valid:
+            if len(pair) == 2:
+                parameters[pair[0]].append(pair[1])
+
+        # Add metadata to methods and paremeters
+        all_methods_with_metadata = self.get_available_methods()
+        methods_with_metadata = [m for m in all_methods_with_metadata if m.internal_name in methods]
+        parameters_with_metadata = {
+            method: [Parameters(**(await self.get_parameters_metadata(p))) for p in params]
+            for method, params in parameters.items()
+        }
+        return SuitableMethods(methods=methods_with_metadata, parameters=parameters_with_metadata)
+
     async def get_available_parameters(self, method: str) -> list[Parameters]:
         """Get available parameters for charge calculation method."""
 
@@ -278,13 +336,143 @@ class ChargeFW2Service:
             ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
         """
 
-        calculations = await asyncio.gather(
-            *[self._process_config(computation_id, config) for config in configs],
-            return_exceptions=False,
-        )
+        calculations = [
+            calculation
+            for calculation in await asyncio.gather(
+                *[self._process_config(computation_id, config) for config in configs],
+                return_exceptions=False,
+            )
+            if calculation is not None
+        ]
         _ = self.mmcif_service.write_to_mmcif(computation_id, calculations)
 
         return calculations
+
+    async def calculate_charges_new(
+        self, user_id: str, computation_id: str, file_hashes: list[str], config: CalculationConfig
+    ) -> CalculationResultDto:
+        """Calculate charges for provided files."""
+
+        workdir = self.io.get_user_files_path(user_id)
+        charges_dir = self.io.get_user_charges_path(user_id, computation_id)
+        self.io.create_dir(charges_dir)
+
+        semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
+
+        async def process_file(file_hash: str, config: CalculationConfig) -> CalculationDto | None:
+            file_name = next(
+                (file for file in self.io.listdir(workdir) if file.split("_", 1)[0] == file_hash),
+                None,
+            )
+
+            if file_name is None:
+                self.logger.warn(f"File with hash {file_hash} not found in {workdir}, skipping.")
+                return
+
+            full_path = os.path.join(workdir, file_name)
+            file_name = file_name.split("_", 1)[-1]
+
+            async with semaphore:
+                molecules = await self.read_molecules(
+                    full_path, config.read_hetatm, config.ignore_water, config.permissive_types
+                )
+                charges = await self._run_in_executor(
+                    self.chargefw2.calculate_charges,
+                    molecules,
+                    config.method,
+                    config.parameters,
+                    charges_dir,
+                )
+
+                info = MoleculeSetStats(molecules.info().to_dict())
+                result = CalculationDto(
+                    file=file_name, file_hash=file_hash, info=info, charges=charges
+                )
+
+                return result
+
+        try:
+            # Process all files concurrently
+            calculations = [
+                calculation
+                for calculation in await asyncio.gather(
+                    *[process_file(file_hash, config) for file_hash in file_hashes],
+                    return_exceptions=False,  # TODO: what should happen if only one computation fails?
+                )
+                if calculation is not None
+            ]
+            config_dto = ChargeCalculationConfigDto(
+                method=config.method,
+                parameters=config.parameters,
+                read_hetatm=config.read_hetatm,
+                ignore_water=config.ignore_water,
+                permissive_types=config.permissive_types,
+            )
+
+            return CalculationResultDto(
+                config=config_dto,
+                calculations=calculations,
+            )
+        except Exception as e:
+            self.logger.error(f"Error calculating charges: {traceback.format_exc()}")
+            raise e
+
+    async def calculate_charges_multi_new(
+        self,
+        user_id: str | None,
+        computation_id: str,
+        file_hashes: list[str],
+        configs: list[ChargeCalculationConfigDto],
+    ) -> list[CalculationResultDto]:
+        """Calculate charges for provided files.
+
+        Args:
+            computation_id (str): Computation id
+            configs (list[ChargeCalculationConfig]): List of configurations.
+
+        Returns:
+            ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
+        """
+
+        self.io.prepare_inputs(user_id, computation_id, file_hashes)
+
+        calculations = await asyncio.gather(
+            *[
+                self._process_config_new(user_id, computation_id, file_hashes, config)
+                for config in configs
+            ],
+            return_exceptions=False,
+        )
+        _ = self.mmcif_service.write_to_mmcif_new(user_id, computation_id, calculations)
+
+        return calculations
+
+    async def _process_config_new(
+        self,
+        user_id: str | None,
+        computation_id: str,
+        file_hashes: list[str],
+        config: CalculationConfig,
+    ) -> CalculationResultDto:
+        if not config.method:
+            # No method provided -> use most suitable method and parameters
+            suitable = await self.get_suitable_methods_new(user_id, computation_id)
+
+            if len(suitable.methods) == 0:
+                self.logger.error(
+                    f"No suitable methods found for charge calculation {computation_id}."
+                )
+                raise Exception("No suitable methods found.")
+
+            config.method = suitable.methods[0].internal_name
+            parameters = suitable.parameters.get(config.method, [])
+            config.parameters = parameters[0].internal_name if len(parameters) > 0 else None
+            self.logger.info(
+                f"""No method provided.
+                        Using method '{config.method}' with parameters '{config.parameters}'."""
+            )
+
+        return await self.calculate_charges_new(user_id, computation_id, file_hashes, config)
 
     async def _process_config(
         self, computation_id: str, config: CalculationConfig

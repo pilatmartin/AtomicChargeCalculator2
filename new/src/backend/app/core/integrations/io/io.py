@@ -5,6 +5,7 @@ import os
 import shutil
 
 import aiofiles
+import aiofiles.base
 from dotenv import load_dotenv
 from fastapi import UploadFile
 
@@ -26,11 +27,17 @@ class IOLocal(IOBase):
     def cp(self, path_src: str, path_dst: str) -> str:
         return shutil.copy(path_src, path_dst)
 
+    def symlink(self, path_src: str, path_dst: str) -> str:
+        os.symlink(path_src, path_dst)
+
     def zip(self, path: str, destination: str) -> str:
         return shutil.make_archive(destination, "zip", path)
 
     def listdir(self, directory: str = ".") -> list[str]:
-        return os.listdir(directory)
+        try:
+            return os.listdir(directory)
+        except FileNotFoundError:
+            return []
 
     async def store_upload_file(self, file: UploadFile, directory: str) -> tuple[str, str]:
         tmp_path: str = os.path.join(directory, IOBase.get_unique_filename(file.filename))

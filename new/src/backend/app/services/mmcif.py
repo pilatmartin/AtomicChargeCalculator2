@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 from gemmi import cif
@@ -33,6 +34,28 @@ class MmCIFService:
         molecules = list(data["molecules"])
         for molecule in molecules:
             self._write_molecule_to_mmcif(computation_id, molecule, data)
+
+        return {"molecules": molecules, "configs": configs}
+
+    def write_to_mmcif_new(
+        self, user_id: str, computation_id: str, calculations: list[CalculationResultDto]
+    ) -> dict:
+        """Write charges to mmcif files with names corresponding to the input molecules.
+
+        Args:
+            data (dict): Data to write
+            calculations (list[ChargeCalculationResult]): List of calculations to write.
+
+        Returns:
+            dict: Dictionary with "molecules" and "configs" keys.
+        """
+
+        data = self._transform_calculation_data(calculations)
+
+        configs = data["configs"]
+        molecules = list(data["molecules"])
+        for molecule in molecules:
+            self._write_molecule_to_mmcif_new(user_id, computation_id, molecule, data)
 
         return {"molecules": molecules, "configs": configs}
 
@@ -98,6 +121,49 @@ class MmCIFService:
 
         output_file_path = str(
             pathlib.Path(self.io.get_charges_path(computation_id)) / f"{molecule.lower()}.fw2.cif"
+        )
+
+        document = cif.read_file(output_file_path)
+        block = document.sole_block()
+
+        sb_ncbr_partial_atomic_charges_meta_prefix = "_sb_ncbr_partial_atomic_charges_meta."
+        sb_ncbr_partial_atomic_charges_prefix = "_sb_ncbr_partial_atomic_charges."
+        sb_ncbr_partial_atomic_charges_meta_attributes = ["id", "type", "method"]
+        sb_ncbr_partial_atomic_charges_attributes = ["type_id", "atom_id", "charge"]
+
+        block.find_mmcif_category(sb_ncbr_partial_atomic_charges_meta_prefix).erase()
+        block.find_mmcif_category(sb_ncbr_partial_atomic_charges_prefix).erase()
+
+        metadata_loop = block.init_loop(
+            sb_ncbr_partial_atomic_charges_meta_prefix,
+            sb_ncbr_partial_atomic_charges_meta_attributes,
+        )
+
+        for type_id, config in enumerate(configs):
+            method_name = config["method"]
+            parameters_name = config["parameters"]
+            metadata_loop.add_row(
+                [f"{type_id + 1}", "'empirical'", f"'{method_name}/{parameters_name}'"]
+            )
+
+        charges_loop = block.init_loop(
+            sb_ncbr_partial_atomic_charges_prefix, sb_ncbr_partial_atomic_charges_attributes
+        )
+
+        for type_id, charges in enumerate(charges):
+            for atom_id, charge in enumerate(charges):
+                charges_loop.add_row([f"{type_id + 1}", f"{atom_id + 1}", f"{charge: .4f}"])
+
+        block.write_file(output_file_path)
+
+    def _write_molecule_to_mmcif_new(
+        self, user_id: str, computation_id: str, molecule: str, data: dict
+    ) -> str:
+        configs = data["configs"]
+        charges = data["molecules"][molecule]["charges"]
+
+        output_file_path = os.path.join(
+            self.io.get_user_charges_path(user_id, computation_id), f"{molecule.lower()}.fw2.cif"
         )
 
         document = cif.read_file(output_file_path)
