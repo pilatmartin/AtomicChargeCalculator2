@@ -17,6 +17,9 @@ from core.dependency_injection.container import Container
 from core.exceptions.http import BadRequestError
 
 
+from db.models.moleculeset_stats import AtomTypeCount, MoleculeSetStats
+from services.chargefw2 import ChargeFW2Service
+from services.calculation_storage import CalculationStorageService
 from services.io import IOService
 
 files_router = APIRouter(prefix="/files", tags=["files"])
@@ -66,6 +69,8 @@ async def upload(
     request: Request,
     files: list[UploadFile],
     io: IOService = Depends(Provide[Container.io_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[Any]:
     """Stores the provided files on disk and returns the computation id."""
 
@@ -96,6 +101,21 @@ async def upload(
         io.create_dir(workdir)
 
         files = await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
+
+        for [path, file_hash] in files:
+            info = await chargefw2.info_path(path)
+            storage_service.store_file_info(
+                MoleculeSetStats(
+                    file_hash=file_hash,
+                    total_molecules=info.total_molecules,
+                    total_atoms=info.total_atoms,
+                    atom_type_counts=[
+                        AtomTypeCount(symbol=count.symbol, count=count.count)
+                        for count in info.atom_type_counts
+                    ],
+                ),
+            )
+
         data = [
             {"file": pathlib.Path(name).name.split("_", 1)[-1], "file_hash": file_hash}
             for [name, file_hash] in files

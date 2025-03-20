@@ -358,8 +358,6 @@ class ChargeFW2Service:
         """Calculate charges for provided files."""
 
         workdir = self.io.get_file_storage_path(user_id)
-        charges_dir = self.io.get_charges_path_new(computation_id, user_id)
-        self.io.create_dir(charges_dir)
 
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
 
@@ -373,15 +371,26 @@ class ChargeFW2Service:
                 self.logger.warn(f"File with hash {file_hash} not found in {workdir}, skipping.")
                 return
 
-            full_path = os.path.join(workdir, file_name)
-            file_name = file_name.split("_", 1)[-1]
-
             async with semaphore:
+                charges_dir = self.io.get_charges_path_new(computation_id, file_name, user_id)
+                self.io.create_dir(charges_dir)
+
+                full_path = os.path.join(workdir, file_name)
+                file_name = file_name.split("_", 1)[-1]
+
                 molecules = await self.read_molecules(
                     full_path, config.read_hetatm, config.ignore_water, config.permissive_types
                 )
-                charges = await self._run_in_executor(
-                    self.chargefw2.calculate_charges,
+
+                # TODO: How to make it run in exectuor? Should I?
+                # charges = await self._run_in_executor(
+                #     self.chargefw2.calculate_charges,
+                #     molecules,
+                #     config.method,
+                #     config.parameters,
+                #     charges_dir,
+                # )
+                charges = self.chargefw2.calculate_charges(
                     molecules,
                     config.method,
                     config.parameters,
@@ -527,6 +536,20 @@ class ChargeFW2Service:
             raise e
         finally:
             self.io.remove_workdir("info")
+
+    async def info_path(self, path: str) -> MoleculeSetStats:
+        """Get information about the provided file."""
+
+        try:
+            self.logger.info(f"Getting info for file {path}.")
+
+            molecules = await self.read_molecules(path)
+            info = molecules.info()
+
+            return MoleculeSetStats(info.to_dict())
+        except Exception as e:
+            self.logger.error(f"Error getting info for file {path}: {traceback.format_exc()}")
+            raise e
 
     def get_calculation_molecules(self, path: str) -> list[str]:
         """Returns molecules stored in the provided path.

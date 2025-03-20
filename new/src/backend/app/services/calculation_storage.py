@@ -14,12 +14,14 @@ from core.models.paging import PagedList
 from db.models.calculation.calculation import Calculation
 from db.models.calculation.calculation_config import CalculationConfig
 from db.models.calculation.calculation_set import CalculationSet
+from db.models.moleculeset_stats import MoleculeSetStats
 from db.repositories.calculation_config_repository import CalculationConfigRepository
 from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import (
     CalculationSetFilters,
     CalculationSetRepository,
 )
+from db.repositories.moleculeset_stats_repository import MoleculeSetStatsRepository
 
 
 class CalculationStorageService:
@@ -31,11 +33,13 @@ class CalculationStorageService:
         set_repository: CalculationSetRepository,
         calculation_repository: CalculationRepository,
         config_repository: CalculationConfigRepository,
+        stats_repository: MoleculeSetStatsRepository,
     ):
         self.set_repository = set_repository
         self.set_repository = set_repository
         self.calculation_repository = calculation_repository
         self.config_repository = config_repository
+        self.stats_repository = stats_repository
         self.logger = logger
 
     def store_calculation_set(
@@ -161,5 +165,17 @@ class CalculationStorageService:
         except Exception as e:
             self.logger.error(
                 f"Error storing config to set {config.set_id}: {traceback.format_exc()}"
+            )
+            raise e
+
+    def store_file_info(self, info: MoleculeSetStats) -> MoleculeSetStats:
+        """Store file info to database."""
+
+        try:
+            self.logger.info(f"Storing stats of file with hash '{info.file_hash}'.")
+            return self.stats_repository.store(info)
+        except Exception as e:
+            self.logger.error(
+                f"Error storing stats of file with hash '{info.file_hash}': {traceback.format_exc()}"
             )
             raise e

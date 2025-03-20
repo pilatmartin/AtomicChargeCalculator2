@@ -155,11 +155,14 @@ class IOService:
 
         return path
 
-    def get_charges_path_new(self, computation_id: str, user_id: str | None = None) -> str:
+    def get_charges_path_new(
+        self, computation_id: str, file: str, user_id: str | None = None
+    ) -> str:
         """Get path to charges directory of a provided computation.
 
         Args:
             computation_id (str): Id of the computation.
+            file (str): Name of the file.
             user_id (str | None, optional): Id of the user. Defaults to None.
 
         Returns:
@@ -167,11 +170,9 @@ class IOService:
         """
 
         if user_id is not None:
-            path = os.path.join(
-                self.workdir, "user", user_id, "computations", computation_id, "charges"
-            )
+            path = os.path.join(self.workdir, "user", user_id, "computations", computation_id, file)
         else:
-            path = os.path.join(self.workdir, "guest", "computations", computation_id, "charges")
+            path = os.path.join(self.workdir, "guest", "computations", computation_id, file)
 
         return path
 
