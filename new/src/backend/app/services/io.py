@@ -118,15 +118,62 @@ class IOService:
         """Get path to input directory."""
         return os.path.join(self.workdir, "user", user_id, "files")
 
-    def get_user_charges_path(self, user_id: str, computation_id: str) -> str:
-        """Get path to charges directory."""
-        return os.path.join(
-            self.workdir, "user", user_id, "computations", computation_id, "charges"
-        )
+    def get_file_storage_path(self, user_id: str | None = None) -> str:
+        """Get path to file storage.
 
-    def get_user_inputs_path(self, user_id: str, computation_id: str) -> str:
-        """Get path to input directory."""
-        return os.path.join(self.workdir, "user", user_id, "computations", computation_id, "input")
+        Args:
+            user_id (str | None, optional): Id of user. Defaults to None.
+
+        Returns:
+            str: Path to users file storage if user_id is provided.
+                Path to guest file storage if user_id is None.
+        """
+        if user_id is not None:
+            path = os.path.join(self.workdir, "user", user_id, "files")
+        else:
+            path = os.path.join(self.workdir, "guest", "files")
+
+        return path
+
+    def get_inputs_path(self, computation_id: str, user_id: str | None = None) -> str:
+        """Get path to inputs of a provided computation.
+
+        Args:
+            computation_id (str): Id of computation.
+            user_id (str | None, optional): Id of user. Defaults to None.
+
+        Returns:
+            str: Returns path to input of a given (users/guest) computation.
+        """
+
+        if user_id is not None:
+            path = os.path.join(
+                self.workdir, "user", user_id, "computations", computation_id, "input"
+            )
+        else:
+            path = os.path.join(self.workdir, "guest", "computations", computation_id, "input")
+
+        return path
+
+    def get_charges_path_new(self, computation_id: str, user_id: str | None = None) -> str:
+        """Get path to charges directory of a provided computation.
+
+        Args:
+            computation_id (str): Id of the computation.
+            user_id (str | None, optional): Id of the user. Defaults to None.
+
+        Returns:
+            str: Path to charges directory of a given (users/guest) computation.
+        """
+
+        if user_id is not None:
+            path = os.path.join(
+                self.workdir, "user", user_id, "computations", computation_id, "charges"
+            )
+        else:
+            path = os.path.join(self.workdir, "guest", "computations", computation_id, "charges")
+
+        return path
 
     def get_input_path(self, computation_id: str) -> str:
         """Get path to input directory."""
@@ -140,13 +187,16 @@ class IOService:
         """Get path to example directory."""
         return os.path.join(os.environ.get("ACC2_EXAMPLES_DIR"), example_id)
 
-    def prepare_inputs(self, user_id: str, computation_id: str, file_hashes: list[str]) -> None:
+    def prepare_inputs(
+        self, user_id: str | None, computation_id: str, file_hashes: list[str]
+    ) -> None:
         """Prepare input files for computation."""
 
-        inputs_path = self.get_user_inputs_path(user_id, computation_id)
+        inputs_path = self.get_inputs_path(computation_id, user_id)
+        files_path = self.get_file_storage_path(user_id)
         self.create_dir(inputs_path)
+        self.create_dir(files_path)
 
-        files_path = self.get_user_files_path(user_id)
         for file_hash in file_hashes:
             file_name = next(
                 (file for file in self.listdir(files_path) if file.split("_", 1)[0] == file_hash),
@@ -161,4 +211,9 @@ class IOService:
 
             src_path = os.path.join(files_path, file_name)
             dst_path = os.path.join(inputs_path, file_name)
-            self.io.symlink(src_path, dst_path)
+            try:
+                self.io.symlink(src_path, dst_path)
+            except Exception as e:
+                self.logger.warn(
+                    f"Unable to create symlink from {src_path} to {dst_path}: {str(e)}"
+                )

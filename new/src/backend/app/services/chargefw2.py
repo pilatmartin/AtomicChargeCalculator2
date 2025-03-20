@@ -150,7 +150,7 @@ class ChargeFW2Service:
     ) -> SuitableMethods:
         """Helper method to find suitable methods for calculation."""
         suitable_methods = Counter()
-        workdir = self.io.get_user_inputs_path(user_id, computation_id)
+        workdir = self.io.get_inputs_path(computation_id, user_id)
 
         dir_contents = self.io.listdir(workdir)
         for file in dir_contents:
@@ -349,12 +349,16 @@ class ChargeFW2Service:
         return calculations
 
     async def calculate_charges_new(
-        self, user_id: str, computation_id: str, file_hashes: list[str], config: CalculationConfig
+        self,
+        user_id: str,
+        computation_id: str | None,
+        file_hashes: list[str],
+        config: CalculationConfig,
     ) -> CalculationResultDto:
         """Calculate charges for provided files."""
 
-        workdir = self.io.get_user_files_path(user_id)
-        charges_dir = self.io.get_user_charges_path(user_id, computation_id)
+        workdir = self.io.get_file_storage_path(user_id)
+        charges_dir = self.io.get_charges_path_new(computation_id, user_id)
         self.io.create_dir(charges_dir)
 
         semaphore = asyncio.Semaphore(4)  # limit to 4 concurrent calculations
@@ -431,7 +435,8 @@ class ChargeFW2Service:
             configs (list[ChargeCalculationConfig]): List of configurations.
 
         Returns:
-            ChargeCalculationResult: List of successful calculations. Failed calculations are skipped.
+            ChargeCalculationResult: List of successful calculations.
+                Failed calculations are skipped.
         """
 
         self.io.prepare_inputs(user_id, computation_id, file_hashes)

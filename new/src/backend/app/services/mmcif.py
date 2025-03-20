@@ -38,7 +38,7 @@ class MmCIFService:
         return {"molecules": molecules, "configs": configs}
 
     def write_to_mmcif_new(
-        self, user_id: str, computation_id: str, calculations: list[CalculationResultDto]
+        self, user_id: str | None, computation_id: str, calculations: list[CalculationResultDto]
     ) -> dict:
         """Write charges to mmcif files with names corresponding to the input molecules.
 
@@ -157,14 +157,13 @@ class MmCIFService:
         block.write_file(output_file_path)
 
     def _write_molecule_to_mmcif_new(
-        self, user_id: str, computation_id: str, molecule: str, data: dict
+        self, user_id: str | None, computation_id: str, molecule: str, data: dict
     ) -> str:
         configs = data["configs"]
         charges = data["molecules"][molecule]["charges"]
 
-        output_file_path = os.path.join(
-            self.io.get_user_charges_path(user_id, computation_id), f"{molecule.lower()}.fw2.cif"
-        )
+        charges_path = self.io.get_charges_path_new(computation_id, user_id)
+        output_file_path = os.path.join(charges_path, f"{molecule.lower()}.fw2.cif")
 
         document = cif.read_file(output_file_path)
         block = document.sole_block()

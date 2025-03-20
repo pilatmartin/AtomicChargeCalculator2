@@ -27,7 +27,7 @@ class IOLocal(IOBase):
     def cp(self, path_src: str, path_dst: str) -> str:
         return shutil.copy(path_src, path_dst)
 
-    def symlink(self, path_src: str, path_dst: str) -> str:
+    def symlink(self, path_src: str, path_dst: str) -> None:
         os.symlink(path_src, path_dst)
 
     def zip(self, path: str, destination: str) -> str:
