@@ -4,9 +4,8 @@ import asyncio
 import traceback
 import uuid
 
-import pathlib
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 from fastapi import Depends, File, HTTPException, Path, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
@@ -35,10 +34,7 @@ from services.chargefw2 import ChargeFW2Service
 charges_router = APIRouter(prefix="/charges", tags=["charges"])
 
 
-@charges_router.get(
-    "/methods",
-    tags=["methods"],
-)
+@charges_router.get("/methods")
 @inject
 async def available_methods(
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
@@ -55,7 +51,7 @@ async def available_methods(
         ) from e
 
 
-@charges_router.post("/methods", tags=["methods"])
+@charges_router.post("/methods")
 @inject
 async def suitable_methods(
     computation_id: str, chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service])
@@ -70,7 +66,7 @@ async def suitable_methods(
         ) from e
 
 
-@charges_router.get("/parameters/{method_name}", tags=["parameters"])
+@charges_router.get("/parameters/{method_name}")
 @inject
 async def available_parameters(
     method_name: Annotated[
@@ -103,7 +99,7 @@ async def available_parameters(
         ) from e
 
 
-@charges_router.post("/info", tags=["info"])
+@charges_router.post("/info")
 @inject
 async def info(
     file: Annotated[UploadFile, File(description="File for which to get information.")],
@@ -123,7 +119,7 @@ async def info(
         ) from e
 
 
-@charges_router.post("/{computation_id}/calculate", tags=["calculate"])
+@charges_router.post("/{computation_id}/calculate")
 @inject
 async def calculate_charges(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
@@ -162,7 +158,6 @@ async def calculate_charges(
 
 @charges_router.post(
     "/setup",
-    tags=["setup"],
     description=f"""Stores the provided files on disk and returns the computation id. 
         Allowed file types are {", ".join(ALLOWED_FILE_TYPES)}.""",
 )
@@ -214,106 +209,13 @@ async def setup(
         ) from e
 
 
-@charges_router.post(
-    "/upload",
-    tags=["upload"],
-    description=f"""Stores the provided files on disk and returns their ids. 
-        Allowed file types are {", ".join(ALLOWED_FILE_TYPES)}.""",
-)
-@inject
-async def upload(
-    request: Request,
-    files: list[UploadFile],
-    io: IOService = Depends(Provide[Container.io_service]),
-) -> Response[Any]:
-    """Stores the provided files on disk and returns the computation id."""
-
-    def is_ext_valid(filename: str) -> bool:
-        parts = filename.rsplit(".", 1)
-        ext = parts[-1]
-
-        # has extension and is extension allowed
-        return len(parts) == 2 and ext in ALLOWED_FILE_TYPES
-
-    if len(files) == 0:
-        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
-
-    if sum(file.size for file in files) > MAX_SETUP_FILES_SIZE:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum upload size is 250MB."
-        )
-
-    if not all(is_ext_valid(file.filename) for file in files):
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
-        )
-
-    user_id = str(request.state.user.id) if request.state.user is not None else None
-    computation_id = str(uuid.uuid4())
-
-    try:
-        if user_id is not None:
-            workdir = io.get_user_files_path(user_id)
-        else:
-            workdir = io.get_input_path(computation_id)
-
-        io.create_dir(workdir)
-
-        files = await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
-        data = [
-            {"file": pathlib.Path(name).name.split("_", 1)[-1], "file_hash": file_hash}
-            for [name, file_hash] in files
-        ]
-
-        return Response(data=data)
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error uploading files.",
-        ) from e
-
-
-@charges_router.get("/files", tags=["files"])
-@inject
-async def get_files(
-    request: Request, io: IOService = Depends(Provide[Container.io_service])
-) -> Response:
-    """Returns the list of files uploaded by the user.."""
-
-    user_id = str(request.state.user.id) if request.state.user is not None else None
-
-    if user_id is None:
-        raise BadRequestError(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be logged in to get files.",
-        )
-
-    try:
-        workdir = io.get_user_files_path(user_id)
-
-        files = [pathlib.Path(name).name.split("_", 1) for name in io.listdir(workdir)]
-
-        data = [
-            {"file": pathlib.Path(name).name.split("_", 1)[-1], "file_hash": file_hash}
-            for [name, file_hash] in files
-        ]
-
-        return Response(data=data)
-    except Exception as e:
-        traceback.print_exc()
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error getting files.",
-        ) from e
-
-
-@charges_router.post("/calculate-new", tags=["calculate"])
+@charges_router.post("/calculate-new")
 @inject
 async def calculate_charges_new(
     request: Request,
     configs: list[ChargeCalculationConfigDto],
     file_hashes: list[str],
+    computation_id: str | None = None,
     response_format: Annotated[
         Literal["charges", "none"], Query(description="Output format.")
     ] = "charges",
@@ -335,7 +237,7 @@ async def calculate_charges_new(
     # if storage_service.get_calculation_set(computation_id) is None:
     #     raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
 
-    computation_id = str(uuid.uuid4())
+    computation_id = computation_id or str(uuid.uuid4())
 
     try:
         calculations = await chargefw2.calculate_charges_multi_new(
@@ -353,7 +255,7 @@ async def calculate_charges_new(
         ) from e
 
 
-@charges_router.get("/{computation_id}/mmcif", tags=["mmcif"])
+@charges_router.get("/{computation_id}/mmcif")
 @inject
 async def get_mmcif(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
@@ -376,7 +278,7 @@ async def get_mmcif(
         ) from e
 
 
-@charges_router.get("/examples/{example_id}/mmcif", tags=["examples", "mmcif"])
+@charges_router.get("/examples/{example_id}/mmcif")
 @inject
 async def get_example_mmcif(
     example_id: Annotated[str, Path(description="ID of the example.", example="phenols")],
@@ -400,7 +302,7 @@ async def get_example_mmcif(
         ) from e
 
 
-@charges_router.get("/{computation_id}/molecules", tags=["molecules"])
+@charges_router.get("/{computation_id}/molecules")
 @inject
 async def get_molecules(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
@@ -421,7 +323,7 @@ async def get_molecules(
         ) from e
 
 
-@charges_router.get("/examples/{example_id}/molecules", tags=["examples", "molecules"])
+@charges_router.get("/examples/{example_id}/molecules")
 @inject
 async def get_example_molecules(
     example_id: Annotated[str, Path(description="Id of the example.", example="phenols")],
@@ -442,7 +344,7 @@ async def get_example_molecules(
         ) from e
 
 
-@charges_router.get("/calculations", tags=["calculations"])
+@charges_router.get("/calculations")
 @inject
 async def get_calculations(
     request: Request,
@@ -473,7 +375,7 @@ async def get_calculations(
         ) from e
 
 
-@charges_router.get("/{computation_id}/download", tags=["download"])
+@charges_router.get("/{computation_id}/download")
 @inject
 async def download_charges(
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
