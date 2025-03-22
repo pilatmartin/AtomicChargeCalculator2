@@ -109,8 +109,7 @@ class MmCIFService:
             for calculation_part in calculation.calculations:
                 for molecule, charges in calculation_part.charges.items():
                     if molecule not in transformed["molecules"]:
-                        file = f"{calculation_part.file_hash}_{calculation_part.file}"
-                        transformed["molecules"][molecule] = {"charges": [], "file": file}
+                        transformed["molecules"][molecule] = {"charges": []}
 
                     transformed["molecules"][molecule]["charges"].append(charges)
 
@@ -121,8 +120,7 @@ class MmCIFService:
         charges = data["molecules"][molecule]["charges"]
 
         output_file_path = str(
-            pathlib.Path(self.io.get_charges_path_new(computation_id))
-            / f"{molecule.lower()}.fw2.cif"
+            pathlib.Path(self.io.get_charges_path(computation_id)) / f"{molecule.lower()}.fw2.cif"
         )
 
         document = cif.read_file(output_file_path)
@@ -163,9 +161,8 @@ class MmCIFService:
     ) -> str:
         configs = data["configs"]
         charges = data["molecules"][molecule]["charges"]
-        file = data["molecules"][molecule]["file"]
 
-        charges_path = self.io.get_charges_path_new(computation_id, file, user_id)
+        charges_path = self.io.get_charges_path_new(computation_id, user_id)
         output_file_path = os.path.join(charges_path, f"{molecule.lower()}.fw2.cif")
 
         document = cif.read_file(output_file_path)

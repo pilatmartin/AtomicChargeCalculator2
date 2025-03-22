@@ -41,7 +41,7 @@ async def get_files(
         )
 
     try:
-        workdir = io.get_user_files_path(user_id)
+        workdir = io.get_file_storage_path(user_id)
 
         files = [pathlib.Path(name).name.split("_", 1) for name in io.listdir(workdir)]
 
@@ -123,6 +123,7 @@ async def upload(
 
         return Response(data=data)
     except Exception as e:
+        traceback.print_exc()
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error uploading files.",

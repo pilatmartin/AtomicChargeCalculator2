@@ -7,6 +7,7 @@ import traceback
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
+from typing import Tuple
 
 
 from fastapi import UploadFile
@@ -17,6 +18,7 @@ from chargefw2 import Molecules
 from core.integrations.chargefw2.base import ChargeFW2Base
 from core.logging.base import LoggerBase
 from core.models.calculation import (
+    CalculationConfigDto,
     CalculationDto,
     CalculationsFilters,
     ChargeCalculationConfigDto,
@@ -324,7 +326,7 @@ class ChargeFW2Service:
             raise e
 
     async def calculate_charges_multi(
-        self, computation_id: str, configs: list[ChargeCalculationConfigDto]
+        self, computation_id: str, configs: list[CalculationConfigDto]
     ) -> list[CalculationResultDto]:
         """Calculate charges for provided files.
 
@@ -372,7 +374,7 @@ class ChargeFW2Service:
                 return
 
             async with semaphore:
-                charges_dir = self.io.get_charges_path_new(computation_id, file_name, user_id)
+                charges_dir = self.io.get_charges_path_new(computation_id, user_id)
                 self.io.create_dir(charges_dir)
 
                 full_path = os.path.join(workdir, file_name)
@@ -382,15 +384,8 @@ class ChargeFW2Service:
                     full_path, config.read_hetatm, config.ignore_water, config.permissive_types
                 )
 
-                # TODO: How to make it run in exectuor? Should I?
-                # charges = await self._run_in_executor(
-                #     self.chargefw2.calculate_charges,
-                #     molecules,
-                #     config.method,
-                #     config.parameters,
-                #     charges_dir,
-                # )
-                charges = self.chargefw2.calculate_charges(
+                charges = await self._run_in_executor(
+                    self.chargefw2.calculate_charges,
                     molecules,
                     config.method,
                     config.parameters,
@@ -432,32 +427,31 @@ class ChargeFW2Service:
 
     async def calculate_charges_multi_new(
         self,
-        user_id: str | None,
         computation_id: str,
-        file_hashes: list[str],
-        configs: list[ChargeCalculationConfigDto],
+        data: Tuple[CalculationConfigDto, list[str]],
+        user_id: str | None,
     ) -> list[CalculationResultDto]:
         """Calculate charges for provided files.
 
         Args:
-            computation_id (str): Computation id
-            configs (list[ChargeCalculationConfig]): List of configurations.
+            computation_id (str): Computation id.
+            data (Tuple[ChargeCalculationConfigDto, list[str]]): Dictionary of configs and file_hashes.
+            user_id (str): User id making the calculation.
 
         Returns:
             ChargeCalculationResult: List of successful calculations.
                 Failed calculations are skipped.
         """
 
-        self.io.prepare_inputs(user_id, computation_id, file_hashes)
-
         calculations = await asyncio.gather(
             *[
                 self._process_config_new(user_id, computation_id, file_hashes, config)
-                for config in configs
+                for config, file_hashes in data.items()
             ],
             return_exceptions=False,
         )
-        _ = self.mmcif_service.write_to_mmcif_new(user_id, computation_id, calculations)
+
+        # await self.io.store_configs(user_id, computation_id, configs)
 
         return calculations
 
@@ -466,7 +460,7 @@ class ChargeFW2Service:
         user_id: str | None,
         computation_id: str,
         file_hashes: list[str],
-        config: CalculationConfig,
+        config: CalculationConfigDto,
     ) -> CalculationResultDto:
         if not config.method:
             # No method provided -> use most suitable method and parameters
@@ -489,7 +483,7 @@ class ChargeFW2Service:
         return await self.calculate_charges_new(user_id, computation_id, file_hashes, config)
 
     async def _process_config(
-        self, computation_id: str, config: CalculationConfig
+        self, computation_id: str, config: CalculationConfigDto
     ) -> CalculationResultDto:
         if not config.method:
             # No method provided -> use most suitable method and parameters

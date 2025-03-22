@@ -9,8 +9,10 @@ from core.models.calculation import (
     CalculationSetDto,
     CalculationSetPreviewDto,
     CalculationsFilters,
+    ChargeCalculationConfigDto,
 )
 from core.models.paging import PagedList
+from core.models.molecule_info import MoleculeSetStats as MoleculeInfo
 from db.models.calculation.calculation import Calculation
 from db.models.calculation.calculation_config import CalculationConfig
 from db.models.calculation.calculation_set import CalculationSet
@@ -111,6 +113,20 @@ class CalculationStorageService:
     ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
 
+        def get_info(file_hash: str) -> MoleculeInfo | None:
+            info = self.stats_repository.get(file_hash)
+
+            if info is None:
+                return None
+
+            info_dict = {
+                "total_molecules": info.total_molecules,
+                "total_atoms": info.total_atoms,
+                "atom_type_counts": [vars(count) for count in info.atom_type_counts],
+            }
+
+            return MoleculeInfo(info_dict)
+
         try:
             self.logger.info("Getting calculations from database.")
             calculations_list = self.set_repository.get_all(filters)
@@ -119,7 +135,7 @@ class CalculationStorageService:
                     {
                         "id": calculation_set.id,
                         "files": {
-                            calculation.file: calculation.info
+                            calculation.file: get_info(calculation.file_hash)
                             for calculation in set(calculation_set.calculations)
                         },
                         "configs": calculation_set.configs,
@@ -158,16 +174,6 @@ class CalculationStorageService:
             )
             raise e
 
-    def store_config(self, config: CalculationConfig) -> CalculationConfig:
-        try:
-            self.logger.info(f"Storing config to set {config.set_id}.")
-            return self.config_repository.store(config)
-        except Exception as e:
-            self.logger.error(
-                f"Error storing config to set {config.set_id}: {traceback.format_exc()}"
-            )
-            raise e
-
     def store_file_info(self, info: MoleculeSetStats) -> MoleculeSetStats:
         """Store file info to database."""
 
@@ -177,5 +183,129 @@ class CalculationStorageService:
         except Exception as e:
             self.logger.error(
                 f"Error storing stats of file with hash '{info.file_hash}': {traceback.format_exc()}"
+            )
+            raise e
+
+    def store_calculation_results(
+        self, computation_id: str, results: list[CalculationResultDto], user_id: str | None
+    ) -> None:
+        """Store calculation results to database."""
+
+        unique_configs = {}
+
+        existing_calculation_set = self.set_repository.get(computation_id)
+
+        if existing_calculation_set:
+            calculation_set = existing_calculation_set
+        else:
+            calculation_set = CalculationSet(id=computation_id, user_id=user_id)
+
+        for result in results:
+            config_key = (
+                result.config.method,
+                result.config.parameters,
+                result.config.read_hetatm,
+                result.config.ignore_water,
+                result.config.permissive_types,
+            )
+
+            config = CalculationConfig(
+                method=result.config.method,
+                parameters=result.config.parameters,
+                read_hetatm=result.config.read_hetatm,
+                ignore_water=result.config.ignore_water,
+                permissive_types=result.config.permissive_types,
+                set_id=computation_id,
+            )
+
+            config_exists = self.config_repository.get(computation_id, config)
+
+            if config_exists is None:
+                unique_configs[config_key] = config
+                result.config = config
+            else:
+                result.config = config_exists
+
+            for calculation in result.calculations:
+                calculation_set.calculations.append(
+                    Calculation(
+                        file=calculation.file,
+                        file_hash=calculation.file_hash,
+                        charges=calculation.charges,
+                        config=result.config,
+                        set_id=computation_id,
+                    )
+                )
+
+        try:
+            self.logger.info(f"Storing calculation results for computation {computation_id}.")
+            self.set_repository.store(calculation_set)
+        except Exception as e:
+            self.logger.error(
+                f"Error storing calculation results for computation {computation_id}: {traceback.format_exc()}"
+            )
+            raise e
+
+    def filter_existing_calculations(
+        self, computation_id: str, file_hashes: list[str], configs: list[ChargeCalculationConfigDto]
+    ) -> dict[str, list[ChargeCalculationConfigDto]]:
+        """Returns a list of hashes and configs that are not in the database."""
+
+        result = {}
+
+        try:
+            self.logger.info("Filtering existing calculations.")
+
+            for config in configs:
+                for file_hash in file_hashes:
+                    filters = CalculationsFilters(
+                        hash=file_hash,
+                        method=config.method,
+                        parameters=config.parameters,
+                        read_hetatm=config.read_hetatm,
+                        ignore_water=config.ignore_water,
+                        permissive_types=config.permissive_types,
+                    )
+
+                    if not self.calculation_repository.get(computation_id, filters):
+                        if config not in result:
+                            result[config] = []
+
+                        result[config].append(file_hash)
+                    else:
+                        self.logger.info("Existing calculation found for file, skipping.")
+
+            return result
+        except Exception as e:
+            self.logger.error(f"Error filtering existing calculations: {traceback.format_exc()}")
+            raise e
+
+    def get_calculation_results(self, computation_id: str) -> list[CalculationResultDto]:
+        """Get calculation results from database."""
+
+        try:
+            self.logger.info(f"Getting calculation results for computation {computation_id}.")
+            calculation_set = self.set_repository.get(computation_id)
+
+            if not calculation_set:
+                return []
+
+            result = [
+                CalculationResultDto(
+                    config=CalculationConfigDto.model_validate(config),
+                    calculations=[
+                        CalculationDto.model_validate(calculation)
+                        for calculation in calculation_set.calculations
+                        if calculation.config == config
+                    ],
+                )
+                for config in calculation_set.configs
+            ]
+
+            return result
+
+        except Exception as e:
+            self.logger.error(
+                f"Error getting calculation results for computation {computation_id}: {traceback.format_exc()}"
             )
             raise e

@@ -68,5 +68,18 @@ class IOLocal(IOBase):
         async with aiofiles.open(path, "w") as out_file:
             await out_file.write(content)
 
+    async def read_file(self, path: str) -> str:
+        """Reads content from a file.
+
+        Args:
+            path (str): Path to the file.
+
+        Returns:
+            str: Content of the file.
+        """
+
+        async with aiofiles.open(path, "r") as in_file:
+            return await in_file.read()
+
     def path_exists(self, path: str) -> bool:
         return os.path.exists(path)

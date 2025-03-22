@@ -15,7 +15,11 @@ from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
-from core.models.calculation import CalculationSetPreviewDto, ChargeCalculationConfigDto
+from core.models.calculation import (
+    CalculationSetPreviewDto,
+    ChargeCalculationConfigDto,
+    CalculationConfigDto,
+)
 from core.models.method import Method
 from core.models.molecule_info import MoleculeSetStats
 from core.models.paging import PagedList
@@ -213,14 +217,16 @@ async def setup(
 @inject
 async def calculate_charges_new(
     request: Request,
-    configs: list[ChargeCalculationConfigDto],
+    configs: list[CalculationConfigDto],
     file_hashes: list[str],
     computation_id: str | None = None,
     response_format: Annotated[
         Literal["charges", "none"], Query(description="Output format.")
     ] = "charges",
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-    # storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+    mmcif_service: MmCIFService = Depends(Provide[Container.mmcif_service]),
+    io_service: IOService = Depends(Provide[Container.io_service]),
 ):
     """
     Calculates partial atomic charges for files in the provided directory.
@@ -232,17 +238,34 @@ async def calculate_charges_new(
 
     if configs is None or len(configs) == 0:
         # get most suitable when no config is provided
-        configs = [ChargeCalculationConfigDto()]
+        # TODO: calling this endpoint multiple times without config inserts the most suitable one into database
+        #  and cache (db) is not being used
+        configs = [CalculationConfigDto()]
 
-    # if storage_service.get_calculation_set(computation_id) is None:
-    #     raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
+    if computation_id is not None and storage_service.get_calculation_set(computation_id) is None:
+        raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
 
     computation_id = computation_id or str(uuid.uuid4())
 
     try:
+        io_service.prepare_inputs(user_id, computation_id, file_hashes)
+
+        if user_id is not None:
+            filtered = storage_service.filter_existing_calculations(
+                computation_id, file_hashes, configs
+            )
+        else:
+            filtered = {config: list(file_hashes) for config in configs}
+
         calculations = await chargefw2.calculate_charges_multi_new(
-            user_id, computation_id, file_hashes, configs
+            computation_id, filtered, user_id
         )
+
+        if user_id is not None:
+            storage_service.store_calculation_results(computation_id, calculations, user_id)
+            calculations = storage_service.get_calculation_results(computation_id)
+
+        _ = mmcif_service.write_to_mmcif_new(user_id, computation_id, calculations)
 
         if response_format == "none":
             return Response(data=None)
@@ -396,4 +419,38 @@ async def download_charges(
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading charges."
+        ) from e
+
+
+@charges_router.get("/calculations-new")
+@inject
+async def get_calculations_new(
+    request: Request,
+    page: Annotated[int, Query(description="Page number.")] = 1,
+    page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
+    order_by: Annotated[Literal["created_at"], Query(description="Order by field.")] = "created_at",
+    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
+    io: IOService = Depends(Provide[Container.io_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+) -> Response:
+    """Returns all calculations stored in the database."""
+    user = request.state.user
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You need to be logged in to get calculations.",
+        )
+
+    try:
+        filters = CalculationSetFilters(
+            order=order, order_by=order_by, page=page, page_size=page_size, user_id=str(user.id)
+        )
+        # calculations = await io.get_calculations(filters)
+        idk = storage_service.get_calculations(filters)
+        return Response(data=idk)
+    except Exception as e:
+        traceback.print_exc()
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
         ) from e

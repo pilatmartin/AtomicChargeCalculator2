@@ -1,5 +1,7 @@
 """Service for handling file operations."""
 
+from dataclasses import asdict
+import json
 import os
 from pathlib import Path
 
@@ -8,8 +10,9 @@ from fastapi import UploadFile
 
 from core.logging.base import LoggerBase
 from core.integrations.io.base import IOBase
+from core.models.calculation import ChargeCalculationConfigDto
 from db.repositories.calculation_set_repository import CalculationSetFilters
-from core.models.calculation import CalculationConfigDto
+from api.v1.constants import CHARGES_OUTPUT_EXTENSION
 
 
 load_dotenv()
@@ -188,7 +191,7 @@ class IOService:
         else:
             path = self.workdir / "guest" / "computations" / computation_id / "charges"
 
-        return path
+        return str(path)
 
     def get_input_path(self, computation_id: str) -> str:
         """Get path to input directory."""
@@ -235,3 +238,61 @@ class IOService:
                 self.logger.warn(
                     f"Unable to create symlink from {src_path} to {dst_path}: {str(e)}"
                 )
+
+    async def get_calculations(self, filters: CalculationSetFilters) -> list[dict]:
+        """Get calculations based on filters.
+
+        Args:
+            filters (CalculationSetFilters): Filters to apply.
+
+        Returns:
+            str: List of existing calculations.
+        """
+
+        path = self.workdir / "user" / filters.user_id / "computations"
+
+        if not self.io.path_exists(str(path)):
+            return []
+
+        calculations = []
+
+        for computation_id in self.listdir(str(path)):
+            computation_path = path / computation_id
+            files_path = computation_path / "input"
+            configs_path = computation_path / "configs.json"
+            charges_path = computation_path / "charges"
+
+            files = [file.split("_", 1)[-1] for file in self.io.listdir(str(files_path))]
+            configs = json.loads(await self.io.read_file(str(configs_path)))
+            molecules = [
+                charge.replace(CHARGES_OUTPUT_EXTENSION, "")
+                for charge in self.io.listdir(str(charges_path))
+                if charge.endswith(CHARGES_OUTPUT_EXTENSION)
+            ]
+
+            calculations.append(
+                {
+                    "files": files,
+                    "configs": configs,
+                    "molecules": molecules,
+                }
+            )
+
+        return calculations
+
+    async def store_configs(
+        self, user_id: str, computation_id: str, configs: list[ChargeCalculationConfigDto]
+    ) -> None:
+        """Store configs for computation to a json file."""
+
+        self.logger.info(f"Storing configs for computation. {computation_id}")
+
+        try:
+            path = self.workdir / "user" / user_id / "computations" / computation_id
+            config_path = str(path / "configs.json")
+            await self.io.write_file(
+                config_path, json.dumps([asdict(config) for config in configs], indent=4)
+            )
+        except Exception as e:
+            self.logger.error(f"Unable to store configs: {e}")
+            raise e

@@ -64,13 +64,14 @@ class CalculationSetRepository:
 
         statement = (
             select(CalculationSet)
-            .options(joinedload(CalculationSet.calculations))
-            .options(joinedload(CalculationSet.configs))
+            .options(joinedload(CalculationSet.calculations), joinedload(CalculationSet.configs))
+            .execution_options(populate_existing=True)
             .where(CalculationSet.id == calculation_id)
         )
 
         with self.session_manager.session() as session:
             calculation_set = (session.execute(statement)).unique().scalars(CalculationSet).first()
+            session.expunge(calculation_set)
 
             return calculation_set
 
@@ -92,7 +93,7 @@ class CalculationSetRepository:
             session.delete(calculation_set)
             session.commit()
 
-    def store(self, calculation_set: CalculationSet) -> CalculationSet:
+    def store(self, calculation_set: CalculationSet) -> None:
         """Store a single calculation set in the database.
 
         Args:
@@ -103,11 +104,8 @@ class CalculationSetRepository:
         """
 
         with self.session_manager.session() as session:
-            session.add(calculation_set)
+            session.merge(calculation_set)
             session.commit()
-            session.refresh(calculation_set)
-
-            return calculation_set
 
     def _paginate(self, statement: Select, page: int, page_size: int) -> PagedList[CalculationSet]:
         total_statement = select(func.count()).select_from(statement)

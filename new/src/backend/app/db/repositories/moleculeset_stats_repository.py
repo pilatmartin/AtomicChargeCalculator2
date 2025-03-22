@@ -1,6 +1,7 @@
 """This module provides a repository for calculation configs."""
 
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 
 from db.database import SessionManager
@@ -24,7 +25,12 @@ class MoleculeSetStatsRepository:
             MoleculeSetStats | None: Information about the file or None if not found.
         """
 
-        statement = select(MoleculeSetStats).where(MoleculeSetStats.file_hash == file_hash)
+        statement = (
+            select(MoleculeSetStats)
+            .options(joinedload(MoleculeSetStats.atom_type_counts))
+            .execution_options(populate_existing=True)
+            .where(MoleculeSetStats.file_hash == file_hash)
+        )
 
         with self.session_manager.session() as session:
             info = (session.execute(statement)).scalars().first()
