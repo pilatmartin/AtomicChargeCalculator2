@@ -57,5 +57,16 @@ class IOLocal(IOBase):
 
         return new_filename, file_hash
 
+    async def write_file(self, path: str, content: str) -> None:
+        """Writes content to a file.
+
+        Args:
+            path (str): Path to the file.
+            content (str): Content to write to the file.
+        """
+
+        async with aiofiles.open(path, "w") as out_file:
+            await out_file.write(content)
+
     def path_exists(self, path: str) -> bool:
         return os.path.exists(path)
