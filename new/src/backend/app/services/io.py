@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Tuple
 
 from dotenv import load_dotenv
 from fastapi import UploadFile
@@ -75,7 +76,7 @@ class IOService:
                 file_path = str(Path(directory) / file)
 
                 if extension in ["pqr", "txt", "mol2"]:
-                    new_name = file.split("_", 1)[-1]  # removing hash from filename
+                    new_name = self.parse_filename(file)[-1]  # removing hash from filename
                     self.io.cp(file_path, str(Path(archive_dir) / extension / new_name))
                 elif extension == "cif":
                     self.io.cp(file_path, str(Path(archive_dir) / extension))
@@ -183,7 +184,11 @@ class IOService:
 
         for file_hash in file_hashes:
             file_name = next(
-                (file for file in self.listdir(files_path) if file.split("_", 1)[0] == file_hash),
+                (
+                    file
+                    for file in self.listdir(files_path)
+                    if self.parse_filename(file)[0] == file_hash
+                ),
                 None,
             )
 
@@ -221,3 +226,50 @@ class IOService:
         except Exception as e:
             self.logger.error(f"Unable to store configs: {e}")
             raise e
+
+    def get_filepath(self, file_hash: str, user_id: str | None) -> str | None:
+        """Get path to file with provided hash.
+
+        Args:
+            file_hash (str): File hash.
+            user_id (str | None): User id.
+
+        Returns:
+            str: Path to file.
+        """
+
+        try:
+            path = Path(self.get_file_storage_path(user_id))
+            for file in self.listdir(str(path)):
+                curr_hash, _ = self.parse_filename(file)
+                if curr_hash == file_hash:
+                    return str(path / file)
+
+            return None
+        except Exception as e:
+            self.logger.error(f"Unable to get file path: {e}")
+            raise e
+
+    def parse_filename(self, filename: str) -> Tuple[str, str]:
+        """Parse filename to get file hash and name.
+
+        Args:
+            filename (str): Filename in format <sha256_hash>_<file_name>.
+
+        Raises:
+            ValueError: If filename is not in the correct format.
+
+        Returns:
+            Tuple[str, str]: Tuple with file hash and name.
+        """
+
+        sha256_hash_length = 64
+        parts = filename.split("_", 1)
+
+        if (len(parts) != 2) or (len(parts[0]) != sha256_hash_length):
+            self.logger.error(f"Invalid filename format: {filename}")
+            raise ValueError("Invalid filename format.")
+
+        file_hash, file_name = parts
+
+        return file_hash, file_name

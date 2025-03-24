@@ -96,7 +96,7 @@ class ChargeFW2Service:
             self.logger.info(f"Getting suitable methods for computation '{computation_id}'")
 
             workdir = self.io.get_inputs_path(computation_id, user_id)
-            file_hashes = [file.split("_", 1)[0] for file in self.io.listdir(workdir)]
+            file_hashes = [self.io.parse_filename(file) for file in self.io.listdir(workdir)]
 
             return await self._find_suitable_methods(file_hashes, user_id)
         except Exception as e:
@@ -114,7 +114,9 @@ class ChargeFW2Service:
 
         dir_contents = self.io.listdir(workdir)
         for file_hash in file_hashes:
-            file = next((f for f in dir_contents if f.split("_", 1)[0] == file_hash), None)
+            file = next(
+                (f for f in dir_contents if self.io.parse_filename(f)[0] == file_hash), None
+            )
             if file is None:
                 self.logger.warn(f"File with hash {file_hash} not found in {workdir}, skipping.")
                 continue
@@ -218,7 +220,11 @@ class ChargeFW2Service:
 
         async def process_file(file_hash: str, config: CalculationConfig) -> CalculationDto | None:
             file_name = next(
-                (file for file in self.io.listdir(workdir) if file.split("_", 1)[0] == file_hash),
+                (
+                    file
+                    for file in self.io.listdir(workdir)
+                    if self.io.parse_filename(file)[0] == file_hash
+                ),
                 None,
             )
 
@@ -231,7 +237,7 @@ class ChargeFW2Service:
                 self.io.create_dir(charges_dir)
 
                 full_path = os.path.join(workdir, file_name)
-                file_name = file_name.split("_", 1)[-1]
+                file_name = self.io.parse_filename(file_name)[1]
 
                 molecules = await self.read_molecules(
                     full_path, config.read_hetatm, config.ignore_water, config.permissive_types
@@ -336,7 +342,7 @@ class ChargeFW2Service:
 
         return await self._calculate_charges(user_id, computation_id, file_hashes, config)
 
-    async def info_path(self, path: str) -> MoleculeSetStats:
+    async def info(self, path: str) -> MoleculeSetStats:
         """Get information about the provided file."""
 
         try:

@@ -42,14 +42,9 @@ async def get_files(
 
     try:
         workdir = io.get_file_storage_path(user_id)
+        files = [io.parse_filename(pathlib.Path(name).name) for name in io.listdir(workdir)]
 
-        files = [pathlib.Path(name).name.split("_", 1) for name in io.listdir(workdir)]
-
-        data = [
-            {"file": pathlib.Path(name).name.split("_", 1)[-1], "file_hash": file_hash}
-            for [name, file_hash] in files
-        ]
-
+        data = [{"file": name, "file_hash": file_hash} for [file_hash, name] in files]
         return Response(data=data)
     except Exception as e:
         traceback.print_exc()
@@ -105,7 +100,7 @@ async def upload(
         files = await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
 
         for [path, file_hash] in files:
-            info = await chargefw2.info_path(path)
+            info = await chargefw2.info(path)
             storage_service.store_file_info(
                 MoleculeSetStats(
                     file_hash=file_hash,
@@ -119,7 +114,7 @@ async def upload(
             )
 
         data = [
-            {"file": pathlib.Path(name).name.split("_", 1)[-1], "file_hash": file_hash}
+            {"file": io.parse_filename(pathlib.Path(name).name)[1], "file_hash": file_hash}
             for [name, file_hash] in files
         ]
 
