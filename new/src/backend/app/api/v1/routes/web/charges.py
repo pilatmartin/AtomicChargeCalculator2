@@ -312,33 +312,6 @@ async def get_example_molecules(
         ) from e
 
 
-@charges_router.get("/{computation_id}/download")
-@inject
-async def download_charges(
-    request: Request,
-    computation_id: Annotated[str, Path(description="UUID of the computation.")],
-    io: IOService = Depends(Provide[Container.io_service]),
-) -> FileResponse:
-    """Returns a zip file with all charges for the provided computation."""
-
-    user_id = request.state.user.id if request.state.user is not None else None
-
-    try:
-        charges_path = io.get_charges_path(computation_id, user_id)
-        if not io.path_exists(charges_path):
-            raise FileNotFoundError()
-
-        archive_path = io.zip_charges(charges_path)
-
-        return FileResponse(path=archive_path, media_type="application/zip")
-    except FileNotFoundError as e:
-        raise NotFoundError(detail=f"Computation '{computation_id}' not found.") from e
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading charges."
-        ) from e
-
-
 @charges_router.get("/calculations")
 @inject
 async def get_calculations(
