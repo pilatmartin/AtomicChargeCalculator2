@@ -1,6 +1,5 @@
 """Charge calculation routes."""
 
-import traceback
 import uuid
 
 
@@ -199,6 +198,7 @@ async def calculate_charges(
                 computation_id, file_hashes, configs
             )
         else:
+            # calculate all if not logged in
             filtered = {config: list(file_hashes) for config in configs}
 
         calculations = await chargefw2.calculate_charges_multi(computation_id, filtered, user_id)
@@ -214,12 +214,12 @@ async def calculate_charges(
 
         return Response(data=calculations)
     except Exception as e:
-        traceback.print_exc()
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
         ) from e
 
 
+# chemical/x-cif
 @charges_router.get("/{computation_id}/mmcif")
 @inject
 async def get_mmcif(
@@ -365,7 +365,6 @@ async def get_calculations(
         calculations = storage_service.get_calculations(filters)
         return Response(data=calculations)
     except Exception as e:
-        traceback.print_exc()
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
         ) from e
