@@ -5,7 +5,7 @@ import uuid
 
 
 from typing import Annotated, Literal
-from fastapi import Depends, File, HTTPException, Path, Query, Request, UploadFile, status
+from fastapi import Depends, File, HTTPException, Path, Query, Request, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
@@ -128,17 +128,29 @@ async def available_parameters(
 @charges_router.post("/info")
 @inject
 async def info(
-    file: Annotated[UploadFile, File(description="File for which to get information.")],
+    request: Request,
+    file_hash: Annotated[str, File(description="Hash of a file for which to get information.")],
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+    io_service: IOService = Depends(Provide[Container.io_service]),
 ) -> Response[MoleculeSetStats]:
     """
     Returns information about the provided file.
     Number of molecules, total atoms and individual atoms.
     """
 
+    user_id = request.state.user.id if request.state.user is not None else None
+
     try:
-        info_data = await chargefw2.info(file)
+        filepath = io_service.get_filepath(file_hash, user_id)
+
+        if filepath is None:
+            raise FileNotFoundError()
+
+        info_data = await chargefw2.info(filepath)
+
         return Response(data=info_data)
+    except FileNotFoundError as e:
+        raise NotFoundError(detail="File not found.") from e
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting file information."
