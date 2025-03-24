@@ -1,6 +1,5 @@
 """Charge calculation routes."""
 
-import asyncio
 import traceback
 import uuid
 
@@ -11,20 +10,17 @@ from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
 
-from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
 from core.models.calculation import (
-    CalculationSetPreviewDto,
-    ChargeCalculationConfigDto,
     CalculationConfigDto,
+    CalculationSetPreviewDto,
 )
 from core.models.method import Method
 from core.models.molecule_info import MoleculeSetStats
 from core.models.paging import PagedList
 from core.models.parameters import Parameters
-from core.models.setup import Setup
 from core.models.suitable_methods import SuitableMethods
 from core.exceptions.http import BadRequestError, NotFoundError
 
@@ -58,11 +54,37 @@ async def available_methods(
 @charges_router.post("/methods")
 @inject
 async def suitable_methods(
-    computation_id: str, chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service])
+    request: Request,
+    file_hashes: list[str],
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[SuitableMethods]:
     """Returns suitable methods for the provided computation."""
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
     try:
-        data = await chargefw2.get_suitable_methods(computation_id)
+        data = await chargefw2.get_suitable_methods(file_hashes, user_id)
+        return Response(data=data)
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting suitable methods."
+        ) from e
+
+
+@charges_router.post("/{computation_id}/methods")
+@inject
+async def computation_suitable_methods(
+    request: Request,
+    computation_id: Annotated[str, Path(description="UUID of the computation.")],
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+) -> Response[SuitableMethods]:
+    """Returns suitable methods for the provided computation."""
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    try:
+        data = await chargefw2.get_computation_suitable_methods(
+            computation_id,
+            user_id,
+        )
         return Response(data=data)
     except Exception as e:
         raise BadRequestError(
@@ -123,99 +145,9 @@ async def info(
         ) from e
 
 
-@charges_router.post("/{computation_id}/calculate")
+@charges_router.post("/calculate")
 @inject
 async def calculate_charges(
-    computation_id: Annotated[str, Path(description="UUID of the computation.")],
-    configs: list[ChargeCalculationConfigDto],
-    response_format: Annotated[
-        Literal["charges", "none"], Query(description="Output format.")
-    ] = "charges",
-    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
-):
-    """
-    Calculates partial atomic charges for files in the provided directory.
-    Returns a list of dictionaries with charges (decimal numbers).
-    If no config is provided, the most suitable method and its parameters will be used.
-    """
-
-    if configs is None or len(configs) == 0:
-        # get most suitable when no config is provided
-        configs = [ChargeCalculationConfigDto()]
-
-    if storage_service.get_calculation_set(computation_id) is None:
-        raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
-
-    try:
-        calculations = await chargefw2.calculate_charges_multi(computation_id, configs)
-
-        if response_format == "none":
-            return Response(data=None)
-
-        return Response(data=calculations)
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
-        ) from e
-
-
-@charges_router.post(
-    "/setup",
-    description=f"""Stores the provided files on disk and returns the computation id. 
-        Allowed file types are {", ".join(ALLOWED_FILE_TYPES)}.""",
-)
-@inject
-async def setup(
-    request: Request,
-    files: list[UploadFile],
-    io: IOService = Depends(Provide[Container.io_service]),
-    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
-) -> Response[Setup]:
-    """Stores the provided files on disk and returns the computation id."""
-
-    def is_ext_valid(filename: str) -> bool:
-        parts = filename.rsplit(".", 1)
-        ext = parts[-1]
-
-        # has extension and is extension allowed
-        return len(parts) == 2 and ext in ALLOWED_FILE_TYPES
-
-    if len(files) == 0:
-        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
-
-    if sum(file.size for file in files) > MAX_SETUP_FILES_SIZE:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum upload size is 250MB."
-        )
-
-    if not all(is_ext_valid(file.filename) for file in files):
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
-        )
-
-    user_id = request.state.user.id if request.state.user is not None else None
-
-    try:
-        computation_id = str(uuid.uuid4())
-        workdir = io.get_input_path(computation_id)
-        io.create_dir(workdir)
-        await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
-        storage_service.store_calculation_set(computation_id, user_id, [])
-
-        return Response(data={"computationId": computation_id})
-    except Exception as e:
-        io.remove_workdir(computation_id)
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error uploading files.",
-        ) from e
-
-
-@charges_router.post("/calculate-new")
-@inject
-async def calculate_charges_new(
     request: Request,
     configs: list[CalculationConfigDto],
     file_hashes: list[str],
@@ -257,15 +189,13 @@ async def calculate_charges_new(
         else:
             filtered = {config: list(file_hashes) for config in configs}
 
-        calculations = await chargefw2.calculate_charges_multi_new(
-            computation_id, filtered, user_id
-        )
+        calculations = await chargefw2.calculate_charges_multi(computation_id, filtered, user_id)
 
         if user_id is not None:
             storage_service.store_calculation_results(computation_id, calculations, user_id)
             calculations = storage_service.get_calculation_results(computation_id)
 
-        _ = mmcif_service.write_to_mmcif_new(user_id, computation_id, calculations)
+        _ = mmcif_service.write_to_mmcif(user_id, computation_id, calculations)
 
         if response_format == "none":
             return Response(data=None)
@@ -328,13 +258,16 @@ async def get_example_mmcif(
 @charges_router.get("/{computation_id}/molecules")
 @inject
 async def get_molecules(
+    request: Request,
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
     io: IOService = Depends(Provide[Container.io_service]),
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[list[str]]:
     """Returns the list of molecules in the provided computation."""
+    user_id = request.state.user.id if request.state.user is not None else None
+
     try:
-        charges_path = io.get_charges_path(computation_id)
+        charges_path = io.get_charges_path(computation_id, user_id)
         molecules = chargefw2.get_calculation_molecules(charges_path)
         return Response(data=sorted(molecules))
     except FileNotFoundError as e:
@@ -367,47 +300,19 @@ async def get_example_molecules(
         ) from e
 
 
-@charges_router.get("/calculations")
-@inject
-async def get_calculations(
-    request: Request,
-    page: Annotated[int, Query(description="Page number.")] = 1,
-    page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
-    order_by: Annotated[Literal["created_at"], Query(description="Order by field.")] = "created_at",
-    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
-    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
-) -> Response[PagedList[CalculationSetPreviewDto]]:
-    """Returns all calculations stored in the database."""
-    user = request.state.user
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You need to be logged in to get calculations.",
-        )
-
-    try:
-        filters = CalculationSetFilters(
-            order=order, order_by=order_by, page=page, page_size=page_size, user_id=user.id
-        )
-        calculations = storage_service.get_calculations(filters)
-        return Response(data=calculations)
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
-        ) from e
-
-
 @charges_router.get("/{computation_id}/download")
 @inject
 async def download_charges(
+    request: Request,
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
     io: IOService = Depends(Provide[Container.io_service]),
 ) -> FileResponse:
     """Returns a zip file with all charges for the provided computation."""
 
+    user_id = request.state.user.id if request.state.user is not None else None
+
     try:
-        charges_path = io.get_charges_path(computation_id)
+        charges_path = io.get_charges_path(computation_id, user_id)
         if not io.path_exists(charges_path):
             raise FileNotFoundError()
 
@@ -422,21 +327,20 @@ async def download_charges(
         ) from e
 
 
-@charges_router.get("/calculations-new")
+@charges_router.get("/calculations")
 @inject
-async def get_calculations_new(
+async def get_calculations(
     request: Request,
     page: Annotated[int, Query(description="Page number.")] = 1,
     page_size: Annotated[int, Query(description="Number of items per page.")] = 10,
     order_by: Annotated[Literal["created_at"], Query(description="Order by field.")] = "created_at",
     order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
-    io: IOService = Depends(Provide[Container.io_service]),
     storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
-) -> Response:
+) -> Response[PagedList[CalculationSetPreviewDto]]:
     """Returns all calculations stored in the database."""
-    user = request.state.user
+    user_id = str(request.state.user.id) if request.state.user is not None else None
 
-    if not user:
+    if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You need to be logged in to get calculations.",
@@ -444,11 +348,10 @@ async def get_calculations_new(
 
     try:
         filters = CalculationSetFilters(
-            order=order, order_by=order_by, page=page, page_size=page_size, user_id=str(user.id)
+            order=order, order_by=order_by, page=page, page_size=page_size, user_id=user_id
         )
-        # calculations = await io.get_calculations(filters)
-        idk = storage_service.get_calculations(filters)
-        return Response(data=idk)
+        calculations = storage_service.get_calculations(filters)
+        return Response(data=calculations)
     except Exception as e:
         traceback.print_exc()
         raise BadRequestError(

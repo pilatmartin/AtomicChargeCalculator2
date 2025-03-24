@@ -1,5 +1,4 @@
 import traceback
-from dataclasses import asdict
 
 from core.logging.base import LoggerBase
 from core.models.calculation import (
@@ -44,76 +43,14 @@ class CalculationStorageService:
         self.stats_repository = stats_repository
         self.logger = logger
 
-    def store_calculation_set(
-        self, computation_id: str, user_id: str | None, data: list[CalculationResultDto]
-    ) -> CalculationSetDto:
-        """Store calculation set to database."""
-
-        self.logger.info(f"Storing calculation set {computation_id}.")
-
-        try:
-            calculations: list[Calculation] = [
-                Calculation(
-                    file=calculation.file,
-                    file_hash=calculation.file_hash,
-                    charges=calculation.charges,
-                )
-                for result in data
-                for calculation in result.calculations
-            ]
-
-            configs: list[CalculationConfig] = [
-                CalculationConfig(**asdict(result.config)) for result in data
-            ]
-
-            calculation_set_to_store = CalculationSet(
-                id=computation_id, calculations=calculations, configs=configs, user_id=user_id
-            )
-
-            calculation_set = self.set_repository.store(calculation_set_to_store)
-            return CalculationSetDto(
-                id=calculation_set.id,
-                calculations=[CalculationDto.model_validate(calc) for calc in calculations],
-                configs=[CalculationConfigDto.model_validate(config) for config in configs],
-            )
-        except Exception as e:
-            self.logger.error(
-                f"Error storing calculation set {computation_id}: {traceback.format_exc()}"
-            )
-            raise e
-
-    def delete_calculation_set(self, computation_id: str) -> None:
-        """Delete calculation set from database."""
-
-        try:
-            self.logger.info(f"Deleting calculation set {computation_id}.")
-            self.set_repository.delete(computation_id)
-        except Exception as e:
-            self.logger.error(
-                f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
-            )
-            raise e
-
-    def get_calculation(
-        self, computation_id: str, filters: CalculationsFilters
-    ) -> CalculationDto | None:
-        """Get calculation from database based on filters."""
-
-        try:
-            self.logger.info("Getting calculation from database.")
-            calculation = self.calculation_repository.get(computation_id, filters)
-
-            return CalculationDto.model_validate(calculation) if calculation is not None else None
-        except Exception as e:
-            self.logger.error(f"Error getting calculation from database: {traceback.format_exc()}")
-            raise e
-
     def get_calculations(
         self, filters: CalculationSetFilters
     ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
 
         def get_info(file_hash: str) -> MoleculeInfo | None:
+            # Getting info manually due to lazy loading issue
+
             info = self.stats_repository.get(file_hash)
 
             if info is None:
@@ -150,7 +87,7 @@ class CalculationStorageService:
             self.logger.error(f"Error getting calculations from database: {traceback.format_exc()}")
             raise e
 
-    def get_calculation_set(self, computation_id: str) -> CalculationSetDto:
+    def get_calculation_set(self, computation_id: str) -> CalculationSetDto | None:
         """Get calculation set from database."""
 
         try:
@@ -159,18 +96,6 @@ class CalculationStorageService:
         except Exception as e:
             self.logger.error(
                 f"Error getting calculation set {computation_id}: {traceback.format_exc()}"
-            )
-            raise e
-
-    def store_calculation(self, calculation: Calculation) -> Calculation:
-        """Store calculation to database."""
-
-        try:
-            self.logger.info(f"Storing calculation to set {calculation.set_id}.")
-            return self.calculation_repository.store(calculation)
-        except Exception as e:
-            self.logger.error(
-                f"Error storing calculation to set {calculation.set_id}: {traceback.format_exc()}"
             )
             raise e
 
@@ -267,7 +192,8 @@ class CalculationStorageService:
                         permissive_types=config.permissive_types,
                     )
 
-                    if not self.calculation_repository.get(computation_id, filters):
+                    existing_calculation = self.calculation_repository.get(computation_id, filters)
+                    if existing_calculation is None:
                         if config not in result:
                             result[config] = []
 

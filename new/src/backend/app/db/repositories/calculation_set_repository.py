@@ -11,6 +11,7 @@ from core.models.paging import PagedList, PagingFilters
 
 from db.database import SessionManager
 from db.models.calculation.calculation_set import CalculationSet
+from db.models.calculation.calculation import Calculation
 
 
 @dataclass
@@ -64,16 +65,18 @@ class CalculationSetRepository:
 
         statement = (
             select(CalculationSet)
-            .options(joinedload(CalculationSet.calculations), joinedload(CalculationSet.configs))
+            .options(
+                joinedload(CalculationSet.calculations).joinedload(Calculation.config),
+                joinedload(CalculationSet.configs),
+            )
             .execution_options(populate_existing=True)
             .where(CalculationSet.id == calculation_id)
         )
 
         with self.session_manager.session() as session:
             calculation_set = (session.execute(statement)).unique().scalars(CalculationSet).first()
-            session.expunge(calculation_set)
 
-            return calculation_set
+        return calculation_set
 
     def delete(self, calculation_id: str) -> None:
         """Delete a single previous calculation by id.

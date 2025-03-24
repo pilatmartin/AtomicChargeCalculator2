@@ -25,7 +25,7 @@ from services.io import IOService
 files_router = APIRouter(prefix="/files", tags=["files"])
 
 
-@files_router.get("/")
+@files_router.get(path="")
 @inject
 async def get_files(
     request: Request, io: IOService = Depends(Provide[Container.io_service])
@@ -73,6 +73,8 @@ async def upload(
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[Any]:
     """Stores the provided files on disk and returns the computation id."""
+
+    # TODO: add quota check
 
     def is_ext_valid(filename: str) -> bool:
         parts = filename.rsplit(".", 1)
