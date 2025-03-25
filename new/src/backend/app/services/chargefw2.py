@@ -96,7 +96,7 @@ class ChargeFW2Service:
             self.logger.info(f"Getting suitable methods for computation '{computation_id}'")
 
             workdir = self.io.get_inputs_path(computation_id, user_id)
-            file_hashes = [self.io.parse_filename(file) for file in self.io.listdir(workdir)]
+            file_hashes = [self.io.parse_filename(file)[0] for file in self.io.listdir(workdir)]
 
             return await self._find_suitable_methods(file_hashes, user_id)
         except Exception as e:
@@ -259,7 +259,6 @@ class ChargeFW2Service:
                 return result
 
         try:
-            # Process all files concurrently
             calculations = [
                 calculation
                 for calculation in await asyncio.gather(

@@ -137,7 +137,7 @@ async def download_charges(
 ) -> FileResponse:
     """Returns a zip file with all charges for the provided computation."""
 
-    user_id = request.state.user.id if request.state.user is not None else None
+    user_id = str(request.state.user.id) if request.state.user is not None else None
 
     try:
         charges_path = io.get_charges_path(computation_id, user_id)

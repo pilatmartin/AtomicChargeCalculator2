@@ -137,7 +137,7 @@ async def info(
     Number of molecules, total atoms and individual atoms.
     """
 
-    user_id = request.state.user.id if request.state.user is not None else None
+    user_id = str(request.state.user.id) if request.state.user is not None else None
 
     try:
         filepath = io_service.get_filepath(file_hash, user_id)
@@ -185,13 +185,28 @@ async def calculate_charges(
         #  and cache (db) is not being used
         configs = [CalculationConfigDto()]
 
-    if computation_id is not None and storage_service.get_calculation_set(computation_id) is None:
-        raise NotFoundError(detail=f"Computation '{computation_id}' not found.")
-
     computation_id = computation_id or str(uuid.uuid4())
+
+    if (
+        file_hashes is None
+        or len(file_hashes) == 0
+        and storage_service.get_calculation_set(computation_id) is None
+    ):
+        # if no file hashes provided and computation has not been set up
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No file hashes provided.",
+        )
 
     try:
         io_service.prepare_inputs(user_id, computation_id, file_hashes)
+
+        if file_hashes is None or len(file_hashes) == 0:
+            # get all files if none provided and computation has already been set up
+            inputs_path = io_service.get_inputs_path(computation_id, user_id)
+            file_hashes = [
+                io_service.parse_filename(file)[0] for file in io_service.listdir(inputs_path)
+            ]
 
         if user_id is not None:
             filtered = storage_service.filter_existing_calculations(
@@ -210,7 +225,7 @@ async def calculate_charges(
         _ = mmcif_service.write_to_mmcif(user_id, computation_id, calculations)
 
         if response_format == "none":
-            return Response(data=None)
+            return Response(data=computation_id)
 
         return Response(data=calculations)
     except Exception as e:
@@ -219,19 +234,51 @@ async def calculate_charges(
         ) from e
 
 
+@charges_router.post("/setup")
+@inject
+async def setup(
+    request: Request,
+    file_hashes: list[str],
+    io_service: IOService = Depends(Provide[Container.io_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+):
+    """Prepares input for computation so it can be run later."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+    computation_id = str(uuid.uuid4())
+
+    try:
+        io_service.prepare_inputs(user_id, computation_id, file_hashes)
+        storage_service.store_calculation_results(computation_id, [], user_id)
+        return Response(data=computation_id)
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error setting up calculation.."
+        ) from e
+
+
 # chemical/x-cif
 @charges_router.get("/{computation_id}/mmcif")
 @inject
 async def get_mmcif(
+    request: Request,
     computation_id: Annotated[str, Path(description="UUID of the computation.")],
     molecule: Annotated[str | None, Query(description="Molecule name.")] = None,
     io: IOService = Depends(Provide[Container.io_service]),
     mmcif_service: MmCIFService = Depends(Provide[Container.mmcif_service]),
+    set_repository: CalculationStorageService = Depends(Provide[Container.storage_service]),
 ) -> FileResponse:
     """Returns a mmcif file for the provided molecule in the computation."""
 
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    # this is a workaround because molstar is not able to send cookies when fetching mmcif
+    set_exists = set_repository.get_calculation_set(computation_id)
+    if set_exists is not None and set_exists.user_id is not None:
+        user_id = str(set_exists.user_id)
+
     try:
-        charges_path = io.get_charges_path(computation_id)
+        charges_path = io.get_charges_path(computation_id, user_id)
         mmcif_path = mmcif_service.get_molecule_mmcif(charges_path, molecule)
         return FileResponse(path=mmcif_path)
     except FileNotFoundError as e:
@@ -276,7 +323,7 @@ async def get_molecules(
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
 ) -> Response[list[str]]:
     """Returns the list of molecules in the provided computation."""
-    user_id = request.state.user.id if request.state.user is not None else None
+    user_id = str(request.state.user.id) if request.state.user is not None else None
 
     try:
         charges_path = io.get_charges_path(computation_id, user_id)
