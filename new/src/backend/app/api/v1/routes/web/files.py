@@ -18,7 +18,6 @@ from core.dependency_injection.container import Container
 from core.exceptions.http import BadRequestError, NotFoundError
 
 
-from db.models.moleculeset_stats import AtomTypeCount, MoleculeSetStats
 from services.chargefw2 import ChargeFW2Service
 from services.calculation_storage import CalculationStorageService
 from services.io import IOService
@@ -110,25 +109,17 @@ async def upload(
         workdir = io.get_file_storage_path(user_id)
         io.create_dir(workdir)
 
-        files = await asyncio.gather(*[io.store_upload_file(file, workdir) for file in files])
+        stored_files = await asyncio.gather(
+            *[io.store_upload_file(file, workdir) for file in files]
+        )
 
-        for [path, file_hash] in files:
+        for [path, file_hash] in stored_files:
             info = await chargefw2.info(path)
-            storage_service.store_file_info(
-                MoleculeSetStats(
-                    file_hash=file_hash,
-                    total_molecules=info.total_molecules,
-                    total_atoms=info.total_atoms,
-                    atom_type_counts=[
-                        AtomTypeCount(symbol=count.symbol, count=count.count)
-                        for count in info.atom_type_counts
-                    ],
-                ),
-            )
+            storage_service.store_file_info(file_hash, info)
 
         data = [
             {"file": io.parse_filename(pathlib.Path(name).name)[1], "file_hash": file_hash}
-            for [name, file_hash] in files
+            for [name, file_hash] in stored_files
         ]
 
         return Response(data=data)
