@@ -1,6 +1,6 @@
 import { api } from "../base";
 import { ApiResponse } from "../types";
-import { UploadResponse } from "./types";
+import { QuotaResponse, UploadResponse } from "./types";
 
 export const upload = async (files: FileList): Promise<UploadResponse> => {
   const formData = new FormData();
@@ -37,4 +37,14 @@ export const downloadCalculation = async (
   }
 
   return response.data;
+};
+
+export const getQuota = async (): Promise<QuotaResponse> => {
+  const response = await api.get<ApiResponse<QuotaResponse>>("/files/quota");
+
+  if (!response.data.success) {
+    throw new Error(response.data.message);
+  }
+
+  return response.data.data;
 };

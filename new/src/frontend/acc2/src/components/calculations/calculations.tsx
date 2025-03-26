@@ -17,10 +17,13 @@ import { SelectValue } from "@radix-ui/react-select";
 import { Button } from "../ui/button";
 import { ArrowDownZA, ArrowUpZA } from "lucide-react";
 import { Busy } from "../ui/busy";
+import { useQuotaQuery } from "@acc2/hooks/queries/use-quota-query";
+import { QuotaProgress } from "../shared/quotaProgress";
 
 export const Calculations = () => {
   const calculationMutation = useCalculationsMutation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { data: quota, isPending: isQuotaPending } = useQuotaQuery();
 
   const [filters, setFilters] = useState<CalculationsFilters>(() => {
     const directionParam = searchParams.get("order") ?? "";
@@ -66,11 +69,19 @@ export const Calculations = () => {
   }, [filters]);
 
   return (
-    <main className="min-h-main w-full max-w-content mx-auto flex flex-col p-4 relative">
-      <Busy isBusy={calculationMutation.isPending}>Loading Calculations</Busy>
+    <main className="min-h-main w-full max-w-content mx-auto flex flex-col p-4">
+      <Busy isBusy={calculationMutation.isPending || isQuotaPending}>
+        Loading Calculations
+      </Busy>
       <h2 className="text-3xl text-primary font-bold mb-2 md:text-5xl">
         Calculations
       </h2>
+
+      <div className="w-full flex items-center gap-4">
+        {quota && (
+          <QuotaProgress quota={quota.quota} usedSpace={quota.usedSpace} />
+        )}
+      </div>
 
       <div className="my-2 flex justify-end items-center gap-2">
         <Select
