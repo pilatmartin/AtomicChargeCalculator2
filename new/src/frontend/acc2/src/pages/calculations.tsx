@@ -16,7 +16,7 @@ export const CalculationsPage = () => {
       toast.error("You need to login to view calculations.");
       navigate("/");
     }
-  }, [loading]);
+  }, [loading, isAuthenticated, navigate]);
 
   return <Calculations />;
 };
