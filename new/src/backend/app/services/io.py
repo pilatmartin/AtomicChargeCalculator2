@@ -21,6 +21,8 @@ class IOService:
 
     workdir = Path(os.environ.get("ACC2_DATA_DIR"))
     examples_dir = Path(os.environ.get("ACC2_EXAMPLES_DIR"))
+    quota = int(os.environ.get("ACC2_USER_STORAGE_QUOTA_BYTES"))
+    max_file_size = int(os.environ.get("ACC2_MAX_FILE_SIZE_BYTES"))
 
     def __init__(self, io: IOBase, logger: LoggerBase):
         self.io = io
@@ -94,6 +96,12 @@ class IOService:
         """Check if path exists."""
 
         return self.io.path_exists(path)
+
+    def get_user_storage_path(self, user_id: str) -> str:
+        """Get path to user storage."""
+
+        path = self.workdir / "user" / user_id
+        return str(path)
 
     def get_file_storage_path(self, user_id: str | None = None) -> str:
         """Get path to file storage.
@@ -273,3 +281,19 @@ class IOService:
         file_hash, file_name = parts
 
         return file_hash, file_name
+
+    def get_quota(self, user_id: str) -> Tuple[int, int, int]:
+        """Get user storage quota.
+
+        Args:
+            user_id (str): User id.
+
+        Returns:
+            Tuple[int, int, int]: Tuple with used space, available space and quota.
+        """
+
+        user_dir = Path(self.get_user_storage_path(user_id))
+        used_space = sum(p.stat().st_size for p in Path(user_dir).rglob("*"))
+        available_space = self.quota - used_space
+
+        return used_space, available_space, self.quota

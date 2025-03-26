@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
 
-from api.v1.constants import ALLOWED_FILE_TYPES, MAX_SETUP_FILES_SIZE
+from api.v1.constants import ALLOWED_FILE_TYPES
 from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
@@ -57,8 +57,8 @@ async def get_files(
 
 @files_router.post(
     "/upload",
-    description=f"""Stores the provided files on disk and returns their ids. 
-        Allowed file types are {", ".join(ALLOWED_FILE_TYPES)}.""",
+    description="Stores the provided files on disk and returns their ids. "
+    + f"Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}.",
 )
 @inject
 async def upload(
@@ -70,8 +70,6 @@ async def upload(
 ) -> Response[Any]:
     """Stores the provided files on disk and returns the computation id."""
 
-    # TODO: add quota check
-
     def is_ext_valid(filename: str) -> bool:
         parts = filename.rsplit(".", 1)
         ext = parts[-1]
@@ -82,10 +80,25 @@ async def upload(
     if len(files) == 0:
         raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
 
-    if sum(file.size for file in files) > MAX_SETUP_FILES_SIZE:
+    if any(file.size > io.max_file_size for file in files):
+        max_file_size_mb = io.max_file_size / 1024 / 1024
         raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum upload size is 250MB."
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Unable to upload files. One or more files are too large. "
+            + f"Maximum allowed size is {max_file_size_mb} MB.",
         )
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    if user_id is not None:
+        _, available, _ = io.get_quota(user_id)
+        if sum(file.size for file in files) > available:
+            quota_mb = io.quota / 1024 / 1024
+            raise BadRequestError(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Unable to upload files. Quota exceeded. "
+                + f"Maximum storage space is {quota_mb} MB.",
+            )
 
     if not all(is_ext_valid(file.filename) for file in files):
         raise BadRequestError(
@@ -93,7 +106,6 @@ async def upload(
             detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
         )
 
-    user_id = str(request.state.user.id) if request.state.user is not None else None
     try:
         workdir = io.get_file_storage_path(user_id)
         io.create_dir(workdir)
@@ -152,4 +164,30 @@ async def download_charges(
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading charges."
+        ) from e
+
+
+@files_router.get("/quota")
+@inject
+async def get_quota(
+    request: Request,
+    io: IOService = Depends(Provide[Container.io_service]),
+) -> Response[dict]:
+    """Returns the quota of the user."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    if user_id is None:
+        raise BadRequestError(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be logged in to see quota.",
+        )
+
+    try:
+        used, available, quota = io.get_quota(user_id)
+        return Response(data={"usedSpace": used, "availableSpace": available, "quota": quota})
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error getting files.",
         ) from e
