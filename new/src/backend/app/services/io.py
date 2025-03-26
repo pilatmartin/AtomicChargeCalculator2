@@ -293,7 +293,9 @@ class IOService:
         """
 
         user_dir = Path(self.get_user_storage_path(user_id))
-        used_space = sum(p.stat().st_size for p in Path(user_dir).rglob("*"))
+
+        # Checking if path exsits since broken symlinks throw an error
+        used_space = sum(p.stat().st_size if p.exists() else 0 for p in Path(user_dir).rglob("*"))
         available_space = self.quota - used_space
 
         return used_space, available_space, self.quota
