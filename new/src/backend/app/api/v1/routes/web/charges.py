@@ -224,6 +224,9 @@ async def calculate_charges(
 
         _ = mmcif_service.write_to_mmcif(user_id, computation_id, calculations)
 
+        if user_id is None:
+            io_service.free_guest_compute_space()
+
         if response_format == "none":
             return Response(data=computation_id)
 

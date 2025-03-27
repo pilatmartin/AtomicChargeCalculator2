@@ -24,7 +24,7 @@ class IOService:
 
     user_quota = int(os.environ.get("ACC2_USER_STORAGE_QUOTA_BYTES"))
     guest_file_quota = int(os.environ.get("ACC2_GUEST_FILE_STORAGE_QUOTA_BYTES"))
-    guest_computation_quota = int(os.environ.get("ACC2_GUEST_COMPUTE_STORAGE_QUOTA_BYTES"))
+    guest_compute_quota = int(os.environ.get("ACC2_GUEST_COMPUTE_STORAGE_QUOTA_BYTES"))
 
     max_file_size = int(os.environ.get("ACC2_MAX_FILE_SIZE_BYTES"))
 
@@ -125,6 +125,23 @@ class IOService:
             path = self.workdir / "user" / user_id / "files"
         else:
             path = self.workdir / "guest" / "files"
+
+        return str(path)
+
+    def get_computations_path(self, user_id: str | None = None) -> str:
+        """Get path to computations directory.
+
+        Args:
+            user_id (str | None, optional): Id of user. Defaults to None.
+
+        Returns:
+            str: Returns path to computations directory of a given (users/guest) user.
+        """
+
+        if user_id is not None:
+            path = self.workdir / "user" / user_id / "computations"
+        else:
+            path = self.workdir / "guest" / "computations"
 
         return str(path)
 
@@ -278,7 +295,14 @@ class IOService:
         self.logger.info(f"Freeing {amount_to_free} bytes of guest file space.")
 
         available_to_free = self.io.dir_size(path)
+        has_to_free = self.guest_file_quota - available_to_free < amount_to_free
+
+        if not has_to_free:
+            self.logger.info("Guest file space is sufficient. No need to free space.")
+            return
+
         if available_to_free < amount_to_free:
+            # This case should not happen as max allowed file size is checked beforehand
             self.logger.error(
                 f"Unable to free {amount_to_free} bytes of guest file space. "
                 + f"Only {available_to_free} bytes available."
@@ -296,6 +320,35 @@ class IOService:
                 self.io.rm(file_path)
             except Exception as e:
                 self.logger.error(f"Unable to delete file {file_path}: {e}")
+                raise e
+
+    def free_guest_compute_space(self) -> None:
+        """Removes old computations to free guest compute space, if it exceeds the quota."""
+
+        path = self.get_computations_path()
+
+        available_to_free = self.io.dir_size(path)
+        amount_to_free = available_to_free - self.guest_compute_quota
+
+        if amount_to_free <= 0:
+            self.logger.info("Guest compute space is sufficient. No need to free space.")
+            return
+
+        self.logger.info(f"Freeing {amount_to_free} bytes of guest compute space.")
+
+        computations = sorted(
+            self.listdir(path), key=lambda x: self.io.last_modified(str(Path(path) / x))
+        )
+
+        while amount_to_free > 0 and len(computations) > 0:
+            computation = computations.pop(0)
+            computation_path = str(Path(path) / computation)
+
+            try:
+                amount_to_free -= self.io.dir_size(computation_path)
+                self.io.rmdir(computation_path)
+            except Exception as e:
+                self.logger.error(f"Unable to delete computation {computation_path}: {e}")
                 raise e
 
     def parse_filename(self, filename: str) -> Tuple[str, str]:
@@ -333,7 +386,7 @@ class IOService:
         """
 
         storage_dir = Path(self.get_storage_path(user_id))
-        quota = self.user_quota if user_id else self.guest_file_quota + self.guest_computation_quota
+        quota = self.user_quota if user_id else self.guest_file_quota + self.guest_compute_quota
 
         used_space = self.io.dir_size(storage_dir)
         available_space = quota - used_space

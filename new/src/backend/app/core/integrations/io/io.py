@@ -39,19 +39,19 @@ class IOLocal(IOBase):
     def last_modified(self, path: str) -> datetime.datetime:
         path = pathlib.Path(path)
         if path.exists():
-            timestamp = path.stat().st_mtime
+            timestamp = path.lstat().st_mtime
             return datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
 
         return 0.0
 
     def dir_size(self, path: str) -> int:
         # Also checking if path exsits since broken symlinks will throw an error
-        return sum(p.stat().st_size if p.exists() else 0 for p in pathlib.Path(path).rglob("*"))
+        return sum(p.lstat().st_size if p.exists() else 0 for p in pathlib.Path(path).rglob("*"))
 
     def file_size(self, path: str) -> int:
         # Also checking if path exsits since broken symlinks will throw an error
         path = pathlib.Path(path)
-        return path.stat().st_size if path.exists() else 0
+        return path.lstat().st_size if path.exists() else 0
 
     def zip(self, path: str, destination: str) -> str:
         return shutil.make_archive(destination, "zip", path)
