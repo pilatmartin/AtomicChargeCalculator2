@@ -98,6 +98,11 @@ async def upload(
                 detail="Unable to upload files. Quota exceeded. "
                 + f"Maximum storage space is {quota_mb} MB.",
             )
+    else:
+        _, available, _ = io.get_quota()
+        upload_size_b = sum(file.size for file in files)
+        if upload_size_b > available:
+            io.free_guest_file_space(upload_size_b)
 
     if not all(is_ext_valid(file.filename) for file in files):
         raise BadRequestError(

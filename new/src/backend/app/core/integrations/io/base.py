@@ -32,6 +32,51 @@ class IOBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def rm(self, path: str) -> None:
+        """Removes file.
+
+        Args:
+            path (str): Path to the file which will be removed.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def last_modified(self, path: str) -> float:
+        """Returns the last modified time of a file.
+
+        Args:
+            path (str): Path to the file.
+
+        Returns:
+            datetime.datetime: Last modified utc timestamp.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def dir_size(self, path: str) -> int:
+        """Returns the size of a directory.
+
+        Args:
+            path (str): Path to the directory.
+
+        Returns:
+            int: Size of the directory in bytes.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def file_size(self, path: str) -> int:
+        """Returns the size of a file.
+
+        Args:
+            path (str): Path to the file.
+
+        Returns:
+            int: Size of the file in bytes.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def cp(self, path_src: str, path_dst: str) -> str:
         """Copies file from 'path_src' to 'path_dst'.
 

@@ -21,7 +21,11 @@ class IOService:
 
     workdir = Path(os.environ.get("ACC2_DATA_DIR"))
     examples_dir = Path(os.environ.get("ACC2_EXAMPLES_DIR"))
-    quota = int(os.environ.get("ACC2_USER_STORAGE_QUOTA_BYTES"))
+
+    user_quota = int(os.environ.get("ACC2_USER_STORAGE_QUOTA_BYTES"))
+    guest_file_quota = int(os.environ.get("ACC2_GUEST_FILE_STORAGE_QUOTA_BYTES"))
+    guest_computation_quota = int(os.environ.get("ACC2_GUEST_COMPUTE_STORAGE_QUOTA_BYTES"))
+
     max_file_size = int(os.environ.get("ACC2_MAX_FILE_SIZE_BYTES"))
 
     def __init__(self, io: IOBase, logger: LoggerBase):
@@ -97,10 +101,14 @@ class IOService:
 
         return self.io.path_exists(path)
 
-    def get_user_storage_path(self, user_id: str) -> str:
+    def get_storage_path(self, user_id: str | None) -> str:
         """Get path to user storage."""
 
-        path = self.workdir / "user" / user_id
+        if user_id is not None:
+            path = self.workdir / "user" / user_id
+        else:
+            path = self.workdir / "guest"
+
         return str(path)
 
     def get_file_storage_path(self, user_id: str | None = None) -> str:
@@ -258,6 +266,38 @@ class IOService:
             self.logger.error(f"Unable to get file path: {e}")
             raise e
 
+    def free_guest_file_space(self, amount_to_free: int) -> None:
+        """Free guest file space.
+
+        Args:
+            amount_to_free (int): Amount to free in bytes.
+        """
+
+        path = self.get_file_storage_path()
+
+        self.logger.info(f"Freeing {amount_to_free} bytes of guest file space.")
+
+        available_to_free = self.io.dir_size(path)
+        if available_to_free < amount_to_free:
+            self.logger.error(
+                f"Unable to free {amount_to_free} bytes of guest file space. "
+                + f"Only {available_to_free} bytes available."
+            )
+            raise ValueError("Not enough space to free.")
+
+        files = sorted(self.listdir(path), key=lambda x: self.io.last_modified(str(Path(path) / x)))
+
+        while amount_to_free > 0 and len(files) > 0:
+            file = files.pop(0)
+            file_path = str(Path(path) / file)
+
+            try:
+                amount_to_free -= self.io.file_size(file_path)
+                self.io.rm(file_path)
+            except Exception as e:
+                self.logger.error(f"Unable to delete file {file_path}: {e}")
+                raise e
+
     def parse_filename(self, filename: str) -> Tuple[str, str]:
         """Parse filename to get file hash and name.
 
@@ -275,14 +315,14 @@ class IOService:
         parts = filename.split("_", 1)
 
         if (len(parts) != 2) or (len(parts[0]) != sha256_hash_length):
-            self.logger.error(f"Invalid filename format: {filename}")
+            self.logger.error(f"Invalid filename format (<file_hash>_<file_name>): {filename}")
             raise ValueError("Invalid filename format.")
 
         file_hash, file_name = parts
 
         return file_hash, file_name
 
-    def get_quota(self, user_id: str) -> Tuple[int, int, int]:
+    def get_quota(self, user_id: str | None = None) -> Tuple[int, int, int]:
         """Get user storage quota.
 
         Args:
@@ -292,10 +332,10 @@ class IOService:
             Tuple[int, int, int]: Tuple with used space, available space and quota.
         """
 
-        user_dir = Path(self.get_user_storage_path(user_id))
+        storage_dir = Path(self.get_storage_path(user_id))
+        quota = self.user_quota if user_id else self.guest_file_quota + self.guest_computation_quota
 
-        # Checking if path exsits since broken symlinks throw an error
-        used_space = sum(p.stat().st_size if p.exists() else 0 for p in Path(user_dir).rglob("*"))
-        available_space = self.quota - used_space
+        used_space = self.io.dir_size(storage_dir)
+        available_space = quota - used_space
 
-        return used_space, available_space, self.quota
+        return used_space, available_space, quota
