@@ -71,3 +71,11 @@ export const getFiles = async (
 
   return response.data.data;
 };
+
+export const deleteFile = async (fileHash: string): Promise<void> => {
+  const response = await api.delete<ApiResponse<void>>(`/files/${fileHash}`);
+
+  if (!response.data.success) {
+    throw new Error(response.data.message);
+  }
+};

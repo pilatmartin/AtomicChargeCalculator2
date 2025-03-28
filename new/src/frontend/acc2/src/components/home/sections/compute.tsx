@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@acc2/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { useFileUploadMutation } from "@acc2/hooks/mutations/use-file-upload-mutation";
+import { useFileUploadMutation } from "@acc2/hooks/mutations/files";
 import { toast } from "sonner";
 import { useComputationMutation } from "@acc2/hooks/mutations/use-computation-mutation";
 import { Busy } from "@acc2/components/ui/busy";

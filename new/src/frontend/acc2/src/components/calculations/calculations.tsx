@@ -1,76 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Calculation } from "./calculation";
-import { useCalculationsMutation } from "@acc2/hooks/mutations/use-calculations-mutation";
-import {
-  CalculationsFilters,
-  isValidCalculationOrderField,
-  isValidOrderDirection,
-  PagedData,
-} from "@acc2/api/types";
-import { toast } from "sonner";
-import { handleApiError } from "@acc2/api/base";
-import { CalculationPreview } from "@acc2/api/calculations/types";
-import { useSearchParams } from "react-router";
+import { isValidCalculationOrderField } from "@acc2/api/types";
 import { Paginator } from "../ui/paginator";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
-import { SelectValue } from "@radix-ui/react-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Button } from "../ui/button";
 import { ArrowDownZA, ArrowUpZA } from "lucide-react";
 import { Busy } from "../ui/busy";
-import { useQuotaQuery } from "@acc2/hooks/queries/use-quota-query";
+import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { QuotaProgress } from "../shared/quota-progress";
+import { useCalculationsQuery } from "@acc2/hooks/queries/calculations";
+import { useCalculationFilters } from "@acc2/hooks/filters/use-calculation-filters";
 
 export const Calculations = () => {
-  const calculationMutation = useCalculationsMutation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { data: quota, isPending: isQuotaPending } = useQuotaQuery();
+  const { filters, setFilters } = useCalculationFilters();
 
-  const [filters, setFilters] = useState<CalculationsFilters>(() => {
-    const directionParam = searchParams.get("order") ?? "";
-    const fieldParam = searchParams.get("orderBy") ?? "";
+  const {
+    data: quota,
+    isPending: isQuotaPending,
+    isError: isQuotaError,
+  } = useQuotaQuery();
 
-    return {
-      order: isValidOrderDirection(directionParam) ? directionParam : "desc",
-      orderBy: isValidCalculationOrderField(fieldParam)
-        ? fieldParam
-        : "created_at",
-      page: Math.max(1, Number(searchParams.get("page") ?? 1)),
-      pageSize: Math.max(1, Number(searchParams.get("pageSize") ?? 5)),
-    };
-  });
-
-  const [calculations, setCalculations] = useState<
-    PagedData<CalculationPreview>
-  >({
-    items: [],
-    page: filters.page,
-    pageSize: filters.pageSize,
-    totalCount: 0,
-    totalPages: 1,
-  });
-
-  const getCalculations = async () => {
-    setSearchParams(
-      new URLSearchParams({
-        page: `${filters.page}`,
-        pageSize: `${filters.pageSize}`,
-        order: `${filters.order}`,
-        orderBy: `${filters.orderBy}`,
-      })
-    );
-    await calculationMutation.mutateAsync(filters, {
-      onError: (error) => toast.error(handleApiError(error)),
-      onSuccess: (data) => setCalculations(data),
-    });
-  };
+  const {
+    data: calculations,
+    refetch,
+    isError: isCalculationsError,
+    isPending: isCalculationsPending,
+    isFetching: isCalculationsFetching,
+  } = useCalculationsQuery(filters);
 
   useEffect(() => {
-    getCalculations();
+    refetch();
   }, [filters]);
 
   return (
     <main className="min-h-main w-full max-w-content mx-auto flex flex-col p-4">
-      <Busy isBusy={calculationMutation.isPending || isQuotaPending}>
+      <Busy
+        isBusy={
+          isCalculationsPending || isQuotaPending || isCalculationsFetching
+        }
+      >
         Loading Calculations
       </Busy>
       <h2 className="text-3xl text-primary font-bold mb-2 md:text-5xl">
@@ -112,12 +86,22 @@ export const Calculations = () => {
           {filters.order === "desc" && <ArrowDownZA />}
         </Button>
       </div>
-      {calculations.items.length === 0 && (
+
+      {(isCalculationsError || isQuotaError) && (
+        <div className="grid place-content-center grow">
+          <span className="font-bold text-2xl">
+            Something went wrong while fetching files.
+          </span>
+        </div>
+      )}
+
+      {calculations && calculations.items.length === 0 && (
         <div className="grid place-content-center grow">
           <span className="font-bold text-2xl">No calculations to show.</span>
         </div>
       )}
-      {calculations.items.length > 0 && (
+
+      {calculations && calculations.items.length > 0 && (
         <>
           {calculations.items.map((calculation, index) => (
             <Calculation

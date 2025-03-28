@@ -11,11 +11,30 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn, formatBytes } from "@acc2/lib/utils";
+import { useFileDeleteMutation } from "@acc2/hooks/mutations/files";
+import { toast } from "sonner";
+import { handleApiError } from "@acc2/api/base";
+import { useQueryClient } from "@tanstack/react-query";
 dayjs.extend(localizedFormat);
 
 export type FileProps = { file: FileResponse } & HTMLAttributes<HTMLElement>;
 
 export const File = ({ file, className }: FileProps) => {
+  const fileDeleteMutation = useFileDeleteMutation();
+  const queryClient = useQueryClient();
+
+  const onDelete = async () => {
+    await fileDeleteMutation.mutateAsync(file.fileHash, {
+      onSuccess: () => {
+        toast.success(`File ${file.fileName} successfully deleted.`);
+        queryClient.invalidateQueries({
+          queryKey: ["files"],
+        });
+      },
+      onError: (error) => toast.error(handleApiError(error)),
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -93,7 +112,7 @@ export const File = ({ file, className }: FileProps) => {
           type="button"
           variant={"destructive"}
           className="self-end w-full xs:w-28"
-          onClick={() => console.log("clicked download")}
+          onClick={onDelete}
         >
           Delete
         </Button>

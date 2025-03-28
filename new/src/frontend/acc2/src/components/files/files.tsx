@@ -1,14 +1,8 @@
-import { MoleculeSetStats } from "@acc2/api/calculations/types";
 import { Paginator } from "../ui/paginator";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-import { ArrowDownZA, ArrowUpZA, ChevronsUpDown } from "lucide-react";
+import { ArrowDownZA, ArrowUpZA } from "lucide-react";
 import { Button } from "../ui/button";
 import { QuotaProgress } from "../shared/quota-progress";
 import {
@@ -18,45 +12,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useEffect, useState } from "react";
-import { isValidFilesOrderField, PagedData } from "@acc2/api/types";
+import { useEffect } from "react";
+import { isValidFilesOrderField } from "@acc2/api/types";
 import { useSearchParams } from "react-router";
 import { SearchInput } from "../shared/search-input";
-import { useQuotaQuery } from "@acc2/hooks/queries/use-quota-query";
-import { useFilesMutation } from "@acc2/hooks/mutations/use-files-mutation";
-import { handleApiError } from "@acc2/api/base";
-import { toast } from "sonner";
-import { FileResponse } from "@acc2/api/files/types";
+import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
-import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
+import { useFilesQuery } from "@acc2/hooks/queries/files";
+import { Busy } from "../ui/busy";
 dayjs.extend(localizedFormat);
 
 export const Files = () => {
   const [searchParams, _] = useSearchParams();
-  const { data: quota } = useQuotaQuery();
-  const filesMutation = useFilesMutation();
-
+  const {
+    data: quota,
+    isPending: isQuotaPending,
+    isError: isQuotaError,
+  } = useQuotaQuery();
   const { filters, setFilters } = useFileFilters();
-
-  const [files, setFiles] = useState<PagedData<FileResponse>>({
-    items: [],
-    page: filters.page,
-    pageSize: filters.pageSize,
-    totalCount: 0,
-    totalPages: 1,
-  });
-
-  const getFiles = async () => {
-    await filesMutation.mutateAsync(filters, {
-      onError: (error) => toast.error(handleApiError(error)),
-      onSuccess: (data) => setFiles(data),
-    });
-  };
+  const {
+    data: files,
+    isPending: isFilesPending,
+    isError: isFilesError,
+    refetch,
+  } = useFilesQuery(filters);
 
   useEffect(() => {
-    getFiles();
+    refetch();
   }, [searchParams]);
 
   return (
@@ -64,6 +47,8 @@ export const Files = () => {
       <h2 className="text-3xl text-primary font-bold mb-2 md:text-5xl">
         Uploaded Files
       </h2>
+
+      <Busy isBusy={isFilesPending || isQuotaPending}>Fetching files</Busy>
 
       <div className="w-full flex items-center gap-4">
         {quota && (
@@ -114,13 +99,21 @@ export const Files = () => {
         </div>
       </div>
 
-      {files.items.length === 0 && (
+      {(isFilesError || isQuotaError) && (
+        <div className="grid place-content-center grow">
+          <span className="font-bold text-2xl">
+            Something went wrong while fetching files.
+          </span>
+        </div>
+      )}
+
+      {files && files.items.length === 0 && (
         <div className="grid place-content-center grow">
           <span className="font-bold text-2xl">No files to show.</span>
         </div>
       )}
 
-      {files.items.length > 0 && (
+      {files && files.items.length > 0 && (
         <>
           {files.items.map((file, index) => (
             <File file={file} key={`${index}-${file.fileHash}`} />

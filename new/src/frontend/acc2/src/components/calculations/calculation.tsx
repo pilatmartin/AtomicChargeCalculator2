@@ -9,8 +9,11 @@ import { handleApiError } from "@acc2/api/base";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { HoverCard, HoverCardContent } from "@radix-ui/react-hover-card";
-import { HoverCardTrigger } from "../ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
 import { useCalculationDownloadMutation } from "@acc2/hooks/mutations/use-calculation-download-mutation";
 import { Info } from "lucide-react";
 dayjs.extend(localizedFormat);
