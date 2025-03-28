@@ -1,6 +1,6 @@
 import { api } from "../base";
-import { ApiResponse } from "../types";
-import { QuotaResponse, UploadResponse } from "./types";
+import { ApiResponse, FilesFilters, PagedData } from "../types";
+import { FileResponse, QuotaResponse, UploadResponse } from "./types";
 
 export const upload = async (files: FileList): Promise<UploadResponse> => {
   const formData = new FormData();
@@ -41,6 +41,29 @@ export const downloadCalculation = async (
 
 export const getQuota = async (): Promise<QuotaResponse> => {
   const response = await api.get<ApiResponse<QuotaResponse>>("/files/quota");
+
+  if (!response.data.success) {
+    throw new Error(response.data.message);
+  }
+
+  return response.data.data;
+};
+
+export const getFiles = async (
+  filters: FilesFilters
+): Promise<PagedData<FileResponse>> => {
+  const response = await api.get<ApiResponse<PagedData<FileResponse>>>(
+    "/files",
+    {
+      params: {
+        page: filters.page,
+        page_size: filters.pageSize,
+        order: filters.order,
+        order_by: filters.orderBy,
+        search: filters.search,
+      },
+    }
+  );
 
   if (!response.data.success) {
     throw new Error(response.data.message);

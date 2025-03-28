@@ -5,8 +5,8 @@ import traceback
 
 import pathlib
 
-from typing import Annotated, Any
-from fastapi import Depends, Path, Request, UploadFile, status
+from typing import Annotated, Any, Literal
+from fastapi import Depends, Path, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
@@ -16,6 +16,7 @@ from api.v1.schemas.response import Response
 
 from core.dependency_injection.container import Container
 from core.exceptions.http import BadRequestError, NotFoundError
+from core.models.paging import PagedList
 
 
 from services.chargefw2 import ChargeFW2Service
@@ -28,7 +29,14 @@ files_router = APIRouter(prefix="/files", tags=["files"])
 @files_router.get(path="")
 @inject
 async def get_files(
-    request: Request, io: IOService = Depends(Provide[Container.io_service])
+    request: Request,
+    page: Annotated[int, Query(description="Page number", ge=1)] = 1,
+    page_size: Annotated[int, Query(description="Number of items per page", ge=1)] = 10,
+    order_by: Annotated[Literal["name", "uploaded_at"], Query(description="Order by")] = "name",
+    search: Annotated[str, Query(description="Search term")] = "",
+    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
+    io: IOService = Depends(Provide[Container.io_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
 ) -> Response:
     """Returns the list of files uploaded by the user.."""
 
@@ -44,7 +52,32 @@ async def get_files(
         workdir = io.get_file_storage_path(user_id)
         files = [io.parse_filename(pathlib.Path(name).name) for name in io.listdir(workdir)]
 
-        data = [{"file": name, "file_hash": file_hash} for [file_hash, name] in files]
+        if order_by == "name":
+            files.sort(key=lambda x: x[1], reverse=order == "desc")
+        elif order_by == "uploaded_at":
+            files.sort(
+                key=lambda x: io.get_last_modification(x[0], user_id), reverse=order == "desc"
+            )
+
+        if search != "":
+            print("searching")
+            files = [file for file in files if search.casefold() in file[1].casefold()]
+
+        page_start = (page - 1) * page_size
+        page_end = page * page_size
+
+        items = [
+            {
+                "fileName": name,
+                "fileHash": file_hash,
+                "size": 0,
+                "stats": storage_service.get_info(file_hash),
+                "uploadedAt": io.get_last_modification(file_hash, user_id),
+            }
+            for [file_hash, name] in files[page_start:page_end]
+        ]
+
+        data = PagedList(page=page, page_size=page_size, total_count=len(files), items=items)
         return Response(data=data)
     except Exception as e:
         traceback.print_exc()
@@ -90,9 +123,10 @@ async def upload(
     user_id = str(request.state.user.id) if request.state.user is not None else None
 
     if user_id is not None:
-        _, available, _ = io.get_quota(user_id)
-        if sum(file.size for file in files) > available:
-            quota_mb = io.quota / 1024 / 1024
+        _, available_b, quota_b = io.get_quota(user_id)
+        upload_size_b = sum(file.size for file in files)
+        if upload_size_b > available_b:
+            quota_mb = quota_b / 1024 / 1024
             raise BadRequestError(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Unable to upload files. Quota exceeded. "

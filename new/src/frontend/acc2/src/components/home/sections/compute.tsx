@@ -62,7 +62,7 @@ export const Compute = () => {
 
   const onSetup = async (data: ComputeType) => {
     await uploadMutation.mutateAsync(data.files, {
-      onError: () => toast.error("Unable to upload file(s). Try again later."),
+      onError: (error) => toast.error(handleApiError(error)),
       onSuccess: async (uploadResponse) => {
         await setupMutation.mutateAsync(
           uploadResponse.map((file) => file.file_hash),

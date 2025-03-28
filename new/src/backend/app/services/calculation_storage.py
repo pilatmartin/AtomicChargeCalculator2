@@ -43,26 +43,26 @@ class CalculationStorageService:
         self.stats_repository = stats_repository
         self.logger = logger
 
+    def get_info(self, file_hash: str) -> MoleculeSetStats | None:
+        # Getting info manually due to lazy loading issue
+
+        info = self.stats_repository.get(file_hash)
+
+        if info is None:
+            return None
+
+        info_dict = {
+            "total_molecules": info.total_molecules,
+            "total_atoms": info.total_atoms,
+            "atom_type_counts": [vars(count) for count in info.atom_type_counts],
+        }
+
+        return MoleculeSetStats(info_dict)
+
     def get_calculations(
         self, filters: CalculationSetFilters
     ) -> PagedList[CalculationSetPreviewDto]:
         """Get calculations from database based on filters."""
-
-        def get_info(file_hash: str) -> MoleculeSetStats | None:
-            # Getting info manually due to lazy loading issue
-
-            info = self.stats_repository.get(file_hash)
-
-            if info is None:
-                return None
-
-            info_dict = {
-                "total_molecules": info.total_molecules,
-                "total_atoms": info.total_atoms,
-                "atom_type_counts": [vars(count) for count in info.atom_type_counts],
-            }
-
-            return MoleculeSetStats(info_dict)
 
         try:
             self.logger.info("Getting calculations from database.")
@@ -72,7 +72,7 @@ class CalculationStorageService:
                     {
                         "id": calculation_set.id,
                         "files": {
-                            calculation.file: get_info(calculation.file_hash)
+                            calculation.file: self.get_info(calculation.file_hash)
                             for calculation in set(calculation_set.calculations)
                         },
                         "configs": calculation_set.configs,

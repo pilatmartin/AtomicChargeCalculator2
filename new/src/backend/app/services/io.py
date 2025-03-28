@@ -283,6 +283,42 @@ class IOService:
             self.logger.error(f"Unable to get file path: {e}")
             raise e
 
+    def get_last_modification(self, file_hash: str, user_id: str | None) -> int | None:
+        """Get last modification time of file with provided hash.
+
+        Args:
+            file_hash (str): File hash.
+            user_id (str | None): User id.
+
+        Returns:
+            int | None: Last modification time.
+        """
+
+        try:
+            path = self.get_filepath(file_hash, user_id)
+            return self.io.last_modified(path)
+        except Exception as e:
+            self.logger.error(f"Unable to get last modification time: {e}")
+            raise e
+
+    def get_file_size(self, file_hash: str, user_id: str | None) -> int | None:
+        """Get size of file with provided hash.
+
+        Args:
+            file_hash (str): File hash.
+            user_id (str | None): User id.
+
+        Returns:
+            int | None: File size.
+        """
+
+        try:
+            path = self.get_filepath(file_hash, user_id)
+            return self.io.file_size(path)
+        except Exception as e:
+            self.logger.error(f"Unable to get file size: {e}")
+            raise e
+
     def free_guest_file_space(self, amount_to_free: int) -> None:
         """Free guest file space.
 

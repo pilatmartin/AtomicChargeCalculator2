@@ -1,6 +1,5 @@
-import { cn } from "@acc2/lib/utils";
+import { cn, formatBytes } from "@acc2/lib/utils";
 import { Progress } from "../ui/progress";
-import { formatBytes } from "molstar/lib/mol-util";
 
 export type QuotaProgressProps = {
   usedSpace: number;

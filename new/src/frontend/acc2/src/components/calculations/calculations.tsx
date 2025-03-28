@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { ArrowDownZA, ArrowUpZA } from "lucide-react";
 import { Busy } from "../ui/busy";
 import { useQuotaQuery } from "@acc2/hooks/queries/use-quota-query";
-import { QuotaProgress } from "../shared/quotaProgress";
+import { QuotaProgress } from "../shared/quota-progress";
 
 export const Calculations = () => {
   const calculationMutation = useCalculationsMutation();
