@@ -29,9 +29,9 @@ export const File = ({ file, className }: FileProps) => {
 
   const onDelete = async () => {
     await fileDeleteMutation.mutateAsync(file.fileHash, {
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success(`File ${file.fileName} successfully deleted.`);
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: ["files"],
         });
       },

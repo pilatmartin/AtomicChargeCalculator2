@@ -2,7 +2,7 @@ import { Paginator } from "../ui/paginator";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { ArrowDownZA, ArrowUpZA } from "lucide-react";
+import { ArrowDownZA, ArrowUpZA, ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { QuotaProgress } from "../shared/quota-progress";
 import {
@@ -21,6 +21,15 @@ import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
 import { useFilesQuery } from "@acc2/hooks/queries/files";
 import { Busy } from "../ui/busy";
+import { Input } from "../ui/input";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
+import { Separator } from "../ui/separator";
+import { UploadDialog } from "./upload-dialog";
+
 dayjs.extend(localizedFormat);
 
 export const Files = () => {
@@ -55,6 +64,8 @@ export const Files = () => {
           <QuotaProgress quota={quota.quota} usedSpace={quota.usedSpace} />
         )}
       </div>
+
+      <UploadDialog />
 
       <div className="my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <SearchInput
