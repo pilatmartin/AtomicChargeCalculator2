@@ -32,7 +32,9 @@ async def get_files(
     request: Request,
     page: Annotated[int, Query(description="Page number", ge=1)] = 1,
     page_size: Annotated[int, Query(description="Number of items per page", ge=1)] = 10,
-    order_by: Annotated[Literal["name", "uploaded_at"], Query(description="Order by")] = "name",
+    order_by: Annotated[
+        Literal["name", "uploaded_at", "size"], Query(description="Order by")
+    ] = "uploaded_at",
     search: Annotated[str, Query(description="Search term")] = "",
     order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
     io: IOService = Depends(Provide[Container.io_service]),
@@ -52,12 +54,13 @@ async def get_files(
         workdir = io.get_file_storage_path(user_id)
         files = [io.parse_filename(pathlib.Path(name).name) for name in io.listdir(workdir)]
 
+        is_reverse = order == "desc"
         if order_by == "name":
-            files.sort(key=lambda x: x[1], reverse=order == "desc")
+            files.sort(key=lambda x: x[1], reverse=is_reverse)
         elif order_by == "uploaded_at":
-            files.sort(
-                key=lambda x: io.get_last_modification(x[0], user_id), reverse=order == "desc"
-            )
+            files.sort(key=lambda x: io.get_last_modification(x[0], user_id), reverse=is_reverse)
+        elif order_by == "size":
+            files.sort(key=lambda x: io.get_file_size(x[0], user_id), reverse=is_reverse)
 
         if search != "":
             print("searching")
@@ -70,7 +73,7 @@ async def get_files(
             {
                 "fileName": name,
                 "fileHash": file_hash,
-                "size": 0,
+                "size": io.get_file_size(file_hash, user_id),
                 "stats": storage_service.get_info(file_hash),
                 "uploadedAt": io.get_last_modification(file_hash, user_id),
             }
@@ -221,3 +224,4 @@ async def get_quota(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error getting files.",
         ) from e
+
