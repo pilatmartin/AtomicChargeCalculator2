@@ -65,6 +65,26 @@ class IOService:
             self.logger.error(f"Error storing file {file.filename}: {e}")
             raise e
 
+    def remove_file(self, file_hash: str, user_id: str) -> None:
+        """Remove file with provided hash.
+
+        Args:
+            file_hash (str): File hash.
+            user_id (str): User id.
+
+        Raises:
+            e: Error removing file.
+        """
+
+        self.logger.info(f"Removing file {file_hash}.")
+
+        try:
+            path = self.get_filepath(file_hash, user_id)
+            self.io.rm(path)
+        except Exception as e:
+            self.logger.error(f"Error removing file {file_hash}: {e}")
+            raise e
+
     def zip_charges(self, directory: str) -> str:
         """Create archive from directory."""
 

@@ -225,3 +225,29 @@ async def get_quota(
             detail="Error getting files.",
         ) from e
 
+
+@files_router.delete("/{file_hash}")
+@inject
+async def delete_file(
+    request: Request,
+    file_hash: Annotated[str, Path(description="UUID of the file to delete.")],
+    io: IOService = Depends(Provide[Container.io_service]),
+) -> Response:
+    """Deletes all files uploaded by the user."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    if user_id is None:
+        raise BadRequestError(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be logged in to delete files.",
+        )
+
+    try:
+        io.remove_file(file_hash, user_id)
+        return Response(data=None)
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error deleting files.",
+        ) from e
