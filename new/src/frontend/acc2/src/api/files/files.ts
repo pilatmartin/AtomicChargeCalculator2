@@ -28,12 +28,27 @@ export const upload = async (files: FileList): Promise<UploadResponse> => {
 export const downloadCalculation = async (
   calculationId: string
 ): Promise<Blob> => {
-  const response = await api.get<Blob>(`/files/${calculationId}/download`, {
+  const response = await api.get<Blob>(
+    `/files/download/computation/${calculationId}`,
+    {
+      responseType: "blob",
+    }
+  );
+
+  if (!response.data) {
+    throw Error("Unable to download calculation data.");
+  }
+
+  return response.data;
+};
+
+export const downloadFile = async (fileHash: string): Promise<Blob> => {
+  const response = await api.get<Blob>(`/files/download/file/${fileHash}`, {
     responseType: "blob",
   });
 
   if (!response.data) {
-    throw Error("Unable to download calculation data.");
+    throw Error("Unable to download file.");
   }
 
   return response.data;

@@ -10,8 +10,11 @@ import {
 } from "../ui/collapsible";
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
-import { cn, formatBytes } from "@acc2/lib/utils";
-import { useFileDeleteMutation } from "@acc2/hooks/mutations/files";
+import { cn, downloadBlob, formatBytes } from "@acc2/lib/utils";
+import {
+  useFileDeleteMutation,
+  useFileDownloadMutation,
+} from "@acc2/hooks/mutations/files";
 import { toast } from "sonner";
 import { handleApiError } from "@acc2/api/base";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +24,7 @@ export type FileProps = { file: FileResponse } & HTMLAttributes<HTMLElement>;
 
 export const File = ({ file, className }: FileProps) => {
   const fileDeleteMutation = useFileDeleteMutation();
+  const fileDownloadMutation = useFileDownloadMutation();
   const queryClient = useQueryClient();
 
   const onDelete = async () => {
@@ -32,6 +36,13 @@ export const File = ({ file, className }: FileProps) => {
         });
       },
       onError: (error) => toast.error(handleApiError(error)),
+    });
+  };
+
+  const onDownload = async () => {
+    await fileDownloadMutation.mutateAsync(file.fileHash, {
+      onError: (error) => toast.error(handleApiError(error)),
+      onSuccess: async (data) => downloadBlob(data, file.fileName),
     });
   };
 
@@ -94,17 +105,9 @@ export const File = ({ file, className }: FileProps) => {
       <div className="mt-4 flex flex-col justify-end gap-2 xs:flex-row">
         <Button
           type="button"
-          variant={"default"}
-          className="self-end w-full xs:w-28"
-          onClick={() => console.log("clicked view")}
-        >
-          View
-        </Button>
-        <Button
-          type="button"
           variant={"secondary"}
           className="self-end w-full xs:w-28"
-          onClick={() => console.log("clicked download")}
+          onClick={onDownload}
         >
           Download
         </Button>

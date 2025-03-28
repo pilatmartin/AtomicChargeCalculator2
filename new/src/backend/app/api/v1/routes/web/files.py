@@ -173,7 +173,7 @@ async def upload(
         ) from e
 
 
-@files_router.get("/{computation_id}/download")
+@files_router.get("/download/computation/{computation_id}")
 @inject
 async def download_charges(
     request: Request,
@@ -250,4 +250,29 @@ async def delete_file(
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error deleting files.",
+        ) from e
+
+
+@files_router.get("/download/file/{file_hash}")
+@inject
+async def download_file(
+    request: Request,
+    file_hash: Annotated[str, Path(description="Hash of the file to download.")],
+    io: IOService = Depends(Provide[Container.io_service]),
+) -> FileResponse:
+    """Returns a zip file with all charges for the provided computation."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    try:
+        file_path = io.get_filepath(file_hash, user_id)
+        if not io.path_exists(file_path):
+            raise FileNotFoundError()
+
+        return FileResponse(path=file_path, media_type="application/octet-stream")
+    except FileNotFoundError as e:
+        raise NotFoundError(detail=f"File '{file_hash}' not found.") from e
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading file."
         ) from e
