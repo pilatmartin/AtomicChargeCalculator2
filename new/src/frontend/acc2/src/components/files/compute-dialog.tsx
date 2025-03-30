@@ -76,14 +76,18 @@ export const ComputeDialog = ({ files }: ComputeDialogProps) => {
         <DialogHeader>
           <DialogTitle>Compute charges.</DialogTitle>
           <DialogDescription>
-            <span>Dialog description.</span>
+            <span>Start computation with the selected files.</span>
           </DialogDescription>
         </DialogHeader>
         <div>
           <div>
             <span className="block mr-2 text-sm">Selected files:</span>
             {files.map((file) => (
-              <Badge variant={"secondary"} className="mr-2 rounded">
+              <Badge
+                key={`selected-dialog-${file.fileHash}`}
+                variant={"secondary"}
+                className="mr-2 rounded"
+              >
                 {file.fileName}
               </Badge>
             ))}

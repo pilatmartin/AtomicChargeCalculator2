@@ -1,5 +1,5 @@
 import { FileResponse } from "@acc2/api/files/types";
-import { HTMLAttributes, useState } from "react";
+import { HTMLAttributes } from "react";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
@@ -20,6 +20,8 @@ import { handleApiError } from "@acc2/api/base";
 import { useQueryClient } from "@tanstack/react-query";
 import { Checkbox } from "../ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { ConfirmAction } from "../shared/confirm-action";
+
 dayjs.extend(localizedFormat);
 
 export type FileProps = {
@@ -128,14 +130,21 @@ export const File = ({
         >
           Download
         </Button>
-        <Button
-          type="button"
-          variant={"destructive"}
-          className="self-end w-full xs:w-28"
-          onClick={onDelete}
-        >
-          Delete
-        </Button>
+        <ConfirmAction
+          trigger={
+            <Button
+              type="button"
+              variant={"destructive"}
+              className="self-end w-full xs:w-28"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Delete
+            </Button>
+          }
+          onConfirm={onDelete}
+          title="Confirmation"
+          description={`Are you sure you want to delete "${file.fileName}" file?`}
+        />
       </div>
     </div>
   );

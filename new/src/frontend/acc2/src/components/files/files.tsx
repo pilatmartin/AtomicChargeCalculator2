@@ -2,20 +2,9 @@ import { Paginator } from "../ui/paginator";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { ArrowDownZA, ArrowUpZA, X } from "lucide-react";
-import { Button } from "../ui/button";
 import { QuotaProgress } from "../shared/quota-progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { useEffect, useState } from "react";
-import { isValidFilesOrderField } from "@acc2/api/types";
 import { useSearchParams } from "react-router";
-import { SearchInput } from "../shared/search-input";
 import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
@@ -24,7 +13,8 @@ import { Busy } from "../ui/busy";
 import { UploadDialog } from "./upload-dialog";
 import { ComputeDialog } from "./compute-dialog";
 import { FileResponse } from "@acc2/api/files/types";
-import { Badge } from "../ui/badge";
+import { FilesToolbar } from "./toolbar";
+import { SelectedFiles } from "./selected-files";
 
 dayjs.extend(localizedFormat);
 
@@ -66,73 +56,12 @@ export const Files = () => {
         <ComputeDialog files={selectedFiles} />
       </div>
 
-      <div className="my-2">
-        <span className="text-sm mr-2">Selected Files:</span>
-        {selectedFiles.map((file) => (
-          <Badge
-            key={`selected-${file.fileHash}`}
-            variant={"secondary"}
-            className="mr-2 rounded"
-          >
-            {file.fileName}
-            <X
-              height={10}
-              width={10}
-              className="cursor-pointer ml-2 hover:scale-125"
-              onClick={() =>
-                setSelectedFiles((files) =>
-                  files.filter(
-                    (selectedFile) => selectedFile.fileHash !== file.fileHash
-                  )
-                )
-              }
-            />
-          </Badge>
-        ))}
-      </div>
+      <SelectedFiles
+        selectedFiles={selectedFiles}
+        setSelectedFiles={setSelectedFiles}
+      />
 
-      <div className="mb-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-        <SearchInput
-          searchKey="search"
-          type="text"
-          placeholder="Search ..."
-          className="min-w-[100px] w-full sm:w-[360px]"
-          onSearch={(search) => {
-            setFilters((filters) => ({ ...filters, search }));
-          }}
-        />
-        <div className="flex gap-2 w-full sm:w-fit">
-          <Select
-            defaultValue="uploaded_at"
-            onValueChange={(orderBy) => {
-              if (!isValidFilesOrderField(orderBy)) {
-                return;
-              }
-              setFilters((filters) => ({ ...filters, orderBy: orderBy }));
-            }}
-          >
-            <SelectTrigger className="sm:w-[180px] border-2">
-              <SelectValue placeholder="Order By" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="uploaded_at">Date</SelectItem>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="size">Size</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() =>
-              setFilters((filters) => ({
-                ...filters,
-                order: filters.order === "asc" ? "desc" : "asc",
-              }))
-            }
-          >
-            {filters.order === "asc" && <ArrowUpZA />}
-            {filters.order === "desc" && <ArrowDownZA />}
-          </Button>
-        </div>
-      </div>
+      <FilesToolbar filters={filters} setFilters={setFilters} />
 
       {(isFilesError || isQuotaError) && (
         <div className="grid place-content-center grow">
@@ -174,8 +103,8 @@ export const Files = () => {
             />
           ))}
           <Paginator
-            page={filters.page}
-            pageSize={filters.pageSize}
+            page={files.page}
+            pageSize={files.pageSize}
             totalPages={files.totalPages}
             onPageChange={({ page, pageSize }) =>
               setFilters((filters) => ({ ...filters, page, pageSize }))

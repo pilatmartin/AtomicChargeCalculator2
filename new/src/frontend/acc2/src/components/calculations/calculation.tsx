@@ -15,9 +15,11 @@ import {
   HoverCardTrigger,
 } from "../ui/hover-card";
 import { useCalculationDownloadMutation } from "@acc2/hooks/mutations/use-calculation-download-mutation";
-import { Info } from "lucide-react";
 import { useCalculationDeleteMutation } from "@acc2/hooks/mutations/calculations";
 import { useQueryClient } from "@tanstack/react-query";
+import { InfoTooltip } from "../setup/info-tooltip";
+import { ConfirmAction } from "../shared/confirm-action";
+
 dayjs.extend(localizedFormat);
 
 export type CalculationProps = {
@@ -61,7 +63,10 @@ export const Calculation = ({
       className={cn("w-full border border-solid p-4 relative", className)}
     >
       <div className="mb-4">
-        <span className="block font-bold text-md mb-2">Files</span>
+        <span className="block font-bold text-md mb-2">
+          Files
+          <InfoTooltip info="Hovering on the individual files will show their statistics." />
+        </span>
         <div className="flex gap-2 flex-wrap">
           {Object.entries(files)
             .toSorted((a, b) => a[0].localeCompare(b[0]))
@@ -69,8 +74,7 @@ export const Calculation = ({
               <HoverCard openDelay={0} closeDelay={0} key={`file-${index}`}>
                 <HoverCardTrigger asChild>
                   <Badge className="cursor-pointer rounded" variant="secondary">
-                    <span className="mr-2">{file}</span>
-                    <Info height={15} width={15} />
+                    {file}
                   </Badge>
                 </HoverCardTrigger>
                 <HoverCardContent className="bg-white border z-50 p-4 text-sm shadow mt-2 flex flex-col gap-2">
@@ -139,14 +143,20 @@ export const Calculation = ({
         >
           Download
         </Button>
-        <Button
-          type="button"
-          variant={"destructive"}
-          className="self-end w-full xs:w-28"
-          onClick={onDelete}
-        >
-          Delete
-        </Button>
+        <ConfirmAction
+          onConfirm={onDelete}
+          trigger={
+            <Button
+              type="button"
+              variant={"destructive"}
+              className="self-end w-full xs:w-28"
+            >
+              Delete
+            </Button>
+          }
+          description="Are you sure you want to delete this calculation?"
+          title="Confirmation"
+        />
       </div>
       <span className="absolute right-4 top-4 text-xs">
         {dayjs(createdAt).format("LLL")}
