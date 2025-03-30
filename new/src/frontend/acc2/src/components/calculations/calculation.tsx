@@ -16,6 +16,8 @@ import {
 } from "../ui/hover-card";
 import { useCalculationDownloadMutation } from "@acc2/hooks/mutations/use-calculation-download-mutation";
 import { Info } from "lucide-react";
+import { useCalculationDeleteMutation } from "@acc2/hooks/mutations/calculations";
+import { useQueryClient } from "@tanstack/react-query";
 dayjs.extend(localizedFormat);
 
 export type CalculationProps = {
@@ -30,11 +32,26 @@ export const Calculation = ({
   const { id, configs, files, createdAt } = calculation;
   const navigate = useNavigate();
   const downloadMutation = useCalculationDownloadMutation();
+  const deleteMutation = useCalculationDeleteMutation();
+  const queryClient = useQueryClient();
 
   const onDownload = async () => {
     await downloadMutation.mutateAsync(id, {
       onError: (error) => toast.error(handleApiError(error)),
       onSuccess: async (data) => downloadBlob(data, "charges.zip"),
+    });
+  };
+
+  const onDelete = async () => {
+    await deleteMutation.mutateAsync(id, {
+      onError: (error) => toast.error(handleApiError(error)),
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["calculations"] }),
+          queryClient.invalidateQueries({ queryKey: ["files"] }),
+        ]);
+        toast.success("Calculation successfully deleted.");
+      },
     });
   };
 
@@ -121,6 +138,14 @@ export const Calculation = ({
           onClick={onDownload}
         >
           Download
+        </Button>
+        <Button
+          type="button"
+          variant={"destructive"}
+          className="self-end w-full xs:w-28"
+          onClick={onDelete}
+        >
+          Delete
         </Button>
       </div>
       <span className="absolute right-4 top-4 text-xs">

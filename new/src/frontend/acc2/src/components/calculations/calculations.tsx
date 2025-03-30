@@ -52,9 +52,7 @@ export const Calculations = () => {
       </h2>
 
       <div className="w-full flex items-center gap-4">
-        {quota && (
-          <QuotaProgress quota={quota.quota} usedSpace={quota.usedSpace} />
-        )}
+        {quota && <QuotaProgress quota={quota} />}
       </div>
 
       <div className="my-2 flex justify-end items-center gap-2">

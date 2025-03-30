@@ -1,12 +1,14 @@
 import { cn, formatBytes } from "@acc2/lib/utils";
 import { Progress } from "../ui/progress";
+import { QuotaResponse } from "@acc2/api/files/types";
 
 export type QuotaProgressProps = {
-  usedSpace: number;
-  quota: number;
+  quota: QuotaResponse;
 };
 
-export const QuotaProgress = ({ usedSpace, quota }: QuotaProgressProps) => {
+export const QuotaProgress = ({ quota: data }: QuotaProgressProps) => {
+  const { usedSpace, quota } = data;
+
   return (
     <>
       <Progress

@@ -401,3 +401,36 @@ async def get_calculations(
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error getting calculations."
         ) from e
+
+
+@charges_router.delete("/{computation_id}")
+@inject
+async def delete_calculation(
+    request: Request,
+    computation_id: Annotated[str, Path(description="UUID of the computation.")],
+    chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
+    storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+) -> Response[None]:
+    """Deletes the computation."""
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You need to be logged in to delete calculations.",
+        )
+
+    exists = storage_service.get_calculation_set(computation_id)
+
+    if not exists or str(exists.user_id) != user_id:
+        print(exists)
+        raise NotFoundError(detail="Computation not found.")
+
+    try:
+        chargefw2.delete_calculation(computation_id, user_id)
+        return Response(data=None)
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Something went wrong while deleting computation.",
+        ) from e

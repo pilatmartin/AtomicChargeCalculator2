@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+import traceback
 from typing import Tuple
 
 from dotenv import load_dotenv
@@ -40,7 +41,7 @@ class IOService:
         try:
             self.io.mkdir(path)
         except Exception as e:
-            self.logger.error(f"Unable to create directory '{path}': {e}")
+            self.logger.error(f"Unable to create directory '{path}': {traceback.format_exc()}")
             raise e
 
     def cp(self, path_from: str, path_to: str) -> str:
@@ -52,7 +53,9 @@ class IOService:
             path = self.io.cp(path_from, path_to)
             return path
         except Exception as e:
-            self.logger.error(f"Unable to copy '{path_from}' to '{path_to}': {e}")
+            self.logger.error(
+                f"Unable to copy '{path_from}' to '{path_to}': {traceback.format_exc()}"
+            )
             raise e
 
     async def store_upload_file(self, file: UploadFile, directory: str) -> tuple[str, str]:
@@ -62,7 +65,7 @@ class IOService:
         try:
             return await self.io.store_upload_file(file, directory)
         except Exception as e:
-            self.logger.error(f"Error storing file {file.filename}: {e}")
+            self.logger.error(f"Error storing file {file.filename}: {traceback.format_exc()}")
             raise e
 
     def remove_file(self, file_hash: str, user_id: str) -> None:
@@ -82,7 +85,7 @@ class IOService:
             path = self.get_filepath(file_hash, user_id)
             self.io.rm(path)
         except Exception as e:
-            self.logger.error(f"Error removing file {file_hash}: {e}")
+            self.logger.error(f"Error removing file {file_hash}: {traceback.format_exc()}")
             raise e
 
     def zip_charges(self, directory: str) -> str:
@@ -109,7 +112,7 @@ class IOService:
 
             return self.io.zip(archive_dir, archive_dir)
         except Exception as e:
-            self.logger.error(f"Error creating archive from {directory}: {e}")
+            self.logger.error(f"Error creating archive from {directory}: {traceback.format_exc()}")
             raise e
 
     def listdir(self, directory: str) -> list[str]:
@@ -277,7 +280,7 @@ class IOService:
                 config_path, json.dumps([config.model_dump() for config in configs], indent=4)
             )
         except Exception as e:
-            self.logger.error(f"Unable to store configs: {e}")
+            self.logger.error(f"Unable to store configs: {traceback.format_exc()}")
             raise e
 
     def get_filepath(self, file_hash: str, user_id: str | None) -> str | None:
@@ -300,7 +303,7 @@ class IOService:
 
             return None
         except Exception as e:
-            self.logger.error(f"Unable to get file path: {e}")
+            self.logger.error(f"Unable to get file path: {traceback.format_exc()}")
             raise e
 
     def get_last_modification(self, file_hash: str, user_id: str | None) -> int | None:
@@ -318,7 +321,7 @@ class IOService:
             path = self.get_filepath(file_hash, user_id)
             return self.io.last_modified(path)
         except Exception as e:
-            self.logger.error(f"Unable to get last modification time: {e}")
+            self.logger.error(f"Unable to get last modification time: {traceback.format_exc()}")
             raise e
 
     def get_file_size(self, file_hash: str, user_id: str | None) -> int | None:
@@ -336,7 +339,7 @@ class IOService:
             path = self.get_filepath(file_hash, user_id)
             return self.io.file_size(path)
         except Exception as e:
-            self.logger.error(f"Unable to get file size: {e}")
+            self.logger.error(f"Unable to get file size: {traceback.format_exc()}")
             raise e
 
     def free_guest_file_space(self, amount_to_free: int) -> None:
@@ -375,7 +378,7 @@ class IOService:
                 amount_to_free -= self.io.file_size(file_path)
                 self.io.rm(file_path)
             except Exception as e:
-                self.logger.error(f"Unable to delete file {file_path}: {e}")
+                self.logger.error(f"Unable to delete file {file_path}: {traceback.format_exc()}")
                 raise e
 
     def free_guest_compute_space(self) -> None:
@@ -404,8 +407,26 @@ class IOService:
                 amount_to_free -= self.io.dir_size(computation_path)
                 self.io.rmdir(computation_path)
             except Exception as e:
-                self.logger.error(f"Unable to delete computation {computation_path}: {e}")
+                self.logger.error(
+                    f"Unable to delete computation {computation_path}: {traceback.format_exc()}"
+                )
                 raise e
+
+    def delete_computation(self, computation_id: str, user_id: str) -> None:
+        """Delete the provided computation from the filesystem.
+
+        Args:
+            computation_id (str): Computation id.
+            user_id (str): User id.
+
+        Raises:
+            e: Error deleting computation.
+        """
+        try:
+            self.io.rmdir(self.get_computation_path(computation_id, user_id))
+        except Exception as e:
+            self.logger(f"Error deleting computation {computation_id}: {traceback.format_exc()}")
+            raise e
 
     def parse_filename(self, filename: str) -> Tuple[str, str]:
         """Parse filename to get file hash and name.

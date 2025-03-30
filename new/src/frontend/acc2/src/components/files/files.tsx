@@ -2,7 +2,7 @@ import { Paginator } from "../ui/paginator";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { ArrowDownZA, ArrowUpZA, ChevronsUpDown } from "lucide-react";
+import { ArrowDownZA, ArrowUpZA, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { QuotaProgress } from "../shared/quota-progress";
 import {
@@ -21,13 +21,6 @@ import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
 import { useFilesQuery } from "@acc2/hooks/queries/files";
 import { Busy } from "../ui/busy";
-import { Input } from "../ui/input";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-import { Separator } from "../ui/separator";
 import { UploadDialog } from "./upload-dialog";
 import { ComputeDialog } from "./compute-dialog";
 import { FileResponse } from "@acc2/api/files/types";
@@ -65,9 +58,7 @@ export const Files = () => {
       <Busy isBusy={isFilesPending || isQuotaPending}>Fetching files</Busy>
 
       <div className="w-full flex items-center gap-4">
-        {quota && (
-          <QuotaProgress quota={quota.quota} usedSpace={quota.usedSpace} />
-        )}
+        {quota && <QuotaProgress quota={quota} />}
       </div>
 
       <div className="flex gap-2">
@@ -75,22 +66,32 @@ export const Files = () => {
         <ComputeDialog files={selectedFiles} />
       </div>
 
-      {selectedFiles.length > 0 && (
-        <div className="my-2">
-          <span className="text-sm mr-2">Selected Files:</span>
-          {selectedFiles.map((file) => (
-            <Badge
-              key={`selected-${file.fileHash}`}
-              variant={"secondary"}
-              className="mr-2 rounded"
-            >
-              {file.fileName}
-            </Badge>
-          ))}
-        </div>
-      )}
+      <div className="my-2">
+        <span className="text-sm mr-2">Selected Files:</span>
+        {selectedFiles.map((file) => (
+          <Badge
+            key={`selected-${file.fileHash}`}
+            variant={"secondary"}
+            className="mr-2 rounded"
+          >
+            {file.fileName}
+            <X
+              height={10}
+              width={10}
+              className="cursor-pointer ml-2 hover:scale-125"
+              onClick={() =>
+                setSelectedFiles((files) =>
+                  files.filter(
+                    (selectedFile) => selectedFile.fileHash !== file.fileHash
+                  )
+                )
+              }
+            />
+          </Badge>
+        ))}
+      </div>
 
-      <div className="my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+      <div className="mb-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <SearchInput
           searchKey="search"
           type="text"

@@ -245,3 +245,15 @@ class CalculationStorageService:
                 f"Error getting calculation results for computation {computation_id}: {traceback.format_exc()}"
             )
             raise e
+
+    def delete_calculation_set(self, computation_id: str) -> None:
+        """Delete calculation set from database."""
+
+        try:
+            self.logger.info(f"Deleting calculation set {computation_id}.")
+            self.set_repository.delete(computation_id)
+        except Exception as e:
+            self.logger.error(
+                f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
+            )
+            raise e
