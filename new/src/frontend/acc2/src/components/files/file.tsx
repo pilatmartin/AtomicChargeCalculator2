@@ -1,5 +1,5 @@
 import { FileResponse } from "@acc2/api/files/types";
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useState } from "react";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
@@ -18,11 +18,22 @@ import {
 import { toast } from "sonner";
 import { handleApiError } from "@acc2/api/base";
 import { useQueryClient } from "@tanstack/react-query";
+import { Checkbox } from "../ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
 dayjs.extend(localizedFormat);
 
-export type FileProps = { file: FileResponse } & HTMLAttributes<HTMLElement>;
+export type FileProps = {
+  file: FileResponse;
+  isSelected: boolean;
+  onFileSelect: (file: FileResponse, checked: CheckedState) => void;
+} & HTMLAttributes<HTMLElement>;
 
-export const File = ({ file, className }: FileProps) => {
+export const File = ({
+  file,
+  onFileSelect,
+  isSelected,
+  className,
+}: FileProps) => {
   const fileDeleteMutation = useFileDeleteMutation();
   const fileDownloadMutation = useFileDownloadMutation();
   const queryClient = useQueryClient();
@@ -49,10 +60,16 @@ export const File = ({ file, className }: FileProps) => {
   return (
     <div
       className={cn(
-        "w-full border border-solid p-4 relative mb-2 flex flex-col gap-2",
+        "w-full border border-solid p-4 relative mb-2 flex flex-col gap-2 hover:bg-secondary/20",
+        isSelected ? "bg-secondary/40" : "bg-none",
         className
       )}
+      onClick={(e) => {
+        e.stopPropagation();
+        onFileSelect(file, !isSelected);
+      }}
     >
+      <Checkbox checked={isSelected} onChange={(e) => e.stopPropagation()} />
       <div className="flex justify-between items-center">
         <span
           className="text-lg font-bold text-primary overflow-ellipsis overflow-hidden w-3/5"
@@ -70,7 +87,7 @@ export const File = ({ file, className }: FileProps) => {
         </div>
       </div>
       <Collapsible>
-        <CollapsibleTrigger asChild>
+        <CollapsibleTrigger asChild onClick={(e) => e.stopPropagation()}>
           <div className="flex gap-2 items-center cursor-pointer">
             <span className="font-semibold">Statistics</span>
             <ChevronsUpDown height={15} width={15} />

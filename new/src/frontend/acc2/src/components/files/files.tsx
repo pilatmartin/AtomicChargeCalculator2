@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { isValidFilesOrderField } from "@acc2/api/types";
 import { useSearchParams } from "react-router";
 import { SearchInput } from "../shared/search-input";
@@ -29,6 +29,9 @@ import {
 } from "../ui/collapsible";
 import { Separator } from "../ui/separator";
 import { UploadDialog } from "./upload-dialog";
+import { ComputeDialog } from "./compute-dialog";
+import { FileResponse } from "@acc2/api/files/types";
+import { Badge } from "../ui/badge";
 
 dayjs.extend(localizedFormat);
 
@@ -46,6 +49,8 @@ export const Files = () => {
     isError: isFilesError,
     refetch,
   } = useFilesQuery(filters);
+
+  const [selectedFiles, setSelectedFiles] = useState<FileResponse[]>([]);
 
   useEffect(() => {
     refetch();
@@ -65,7 +70,25 @@ export const Files = () => {
         )}
       </div>
 
-      <UploadDialog />
+      <div className="flex gap-2">
+        <UploadDialog />
+        <ComputeDialog files={selectedFiles} />
+      </div>
+
+      {selectedFiles.length > 0 && (
+        <div className="my-2">
+          <span className="text-sm mr-2">Selected Files:</span>
+          {selectedFiles.map((file) => (
+            <Badge
+              key={`selected-${file.fileHash}`}
+              variant={"secondary"}
+              className="mr-2 rounded"
+            >
+              {file.fileName}
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <SearchInput
@@ -127,7 +150,27 @@ export const Files = () => {
       {files && files.items.length > 0 && (
         <>
           {files.items.map((file, index) => (
-            <File file={file} key={`${index}-${file.fileHash}`} />
+            <File
+              file={file}
+              isSelected={
+                !!selectedFiles.find(
+                  (selectedFile: FileResponse) =>
+                    selectedFile.fileHash === file.fileHash
+                )
+              }
+              onFileSelect={(selectedFile, checked) => {
+                if (checked) {
+                  setSelectedFiles((files) => [...files, file]);
+                } else {
+                  setSelectedFiles((files) =>
+                    files.filter(
+                      (file) => selectedFile.fileHash != file.fileHash
+                    )
+                  );
+                }
+              }}
+              key={`${index}-${file.fileHash}`}
+            />
           ))}
           <Paginator
             page={filters.page}

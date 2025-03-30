@@ -56,7 +56,7 @@ export const UploadDialog = () => {
     <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
       <DialogTrigger asChild>
         <div>
-          <Button>Upload</Button>
+          <Button variant={"secondary"}>Upload</Button>
         </div>
       </DialogTrigger>
       <Form {...form}>
