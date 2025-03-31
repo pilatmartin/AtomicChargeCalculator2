@@ -5,7 +5,7 @@ import traceback
 
 import pathlib
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 from fastapi import Depends, Path, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
@@ -13,6 +13,7 @@ from dependency_injector.wiring import inject, Provide
 
 from api.v1.constants import ALLOWED_FILE_TYPES
 from api.v1.schemas.response import Response
+from api.v1.schemas.file import QuotaResponse, UploadResponse, FileResponse as FileResponseModel
 
 from core.dependency_injection.container import Container
 from core.exceptions.http import BadRequestError, NotFoundError
@@ -39,7 +40,7 @@ async def get_files(
     order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
     io: IOService = Depends(Provide[Container.io_service]),
     storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
-) -> Response:
+) -> Response[PagedList[FileResponseModel]]:
     """Returns the list of files uploaded by the user.."""
 
     user_id = str(request.state.user.id) if request.state.user is not None else None
@@ -55,28 +56,31 @@ async def get_files(
         files = [io.parse_filename(pathlib.Path(name).name) for name in io.listdir(workdir)]
 
         is_reverse = order == "desc"
-        if order_by == "name":
-            files.sort(key=lambda x: x[1], reverse=is_reverse)
-        elif order_by == "uploaded_at":
-            files.sort(key=lambda x: io.get_last_modification(x[0], user_id), reverse=is_reverse)
-        elif order_by == "size":
-            files.sort(key=lambda x: io.get_file_size(x[0], user_id), reverse=is_reverse)
+
+        match order_by:
+            case "name":
+                files.sort(key=lambda x: x[1], reverse=is_reverse)
+            case "size":
+                files.sort(key=lambda x: io.get_file_size(x[0], user_id), reverse=is_reverse)
+            case "uploaded_at" | _:
+                files.sort(
+                    key=lambda x: io.get_last_modification(x[0], user_id), reverse=is_reverse
+                )
 
         if search != "":
-            print("searching")
             files = [file for file in files if search.casefold() in file[1].casefold()]
 
         page_start = (page - 1) * page_size
         page_end = page * page_size
 
         items = [
-            {
-                "fileName": name,
-                "fileHash": file_hash,
-                "size": io.get_file_size(file_hash, user_id),
-                "stats": storage_service.get_info(file_hash),
-                "uploadedAt": io.get_last_modification(file_hash, user_id),
-            }
+            FileResponseModel(
+                file_name=name,
+                file_hash=file_hash,
+                size=io.get_file_size(file_hash, user_id),
+                stats=storage_service.get_info(file_hash),
+                uploaded_at=io.get_last_modification(file_hash, user_id),
+            )
             for [file_hash, name] in files[page_start:page_end]
         ]
 
@@ -102,7 +106,7 @@ async def upload(
     io: IOService = Depends(Provide[Container.io_service]),
     storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
     chargefw2: ChargeFW2Service = Depends(Provide[Container.chargefw2_service]),
-) -> Response[Any]:
+) -> Response[list[UploadResponse]]:
     """Stores the provided files on disk and returns the computation id."""
 
     def is_ext_valid(filename: str) -> bool:
@@ -160,7 +164,7 @@ async def upload(
             storage_service.store_file_info(file_hash, info)
 
         data = [
-            {"file": io.parse_filename(pathlib.Path(name).name)[1], "file_hash": file_hash}
+            UploadResponse(file=io.parse_filename(pathlib.Path(name).name)[1], file_hash=file_hash)
             for [name, file_hash] in stored_files
         ]
 
@@ -205,7 +209,7 @@ async def download_charges(
 async def get_quota(
     request: Request,
     io: IOService = Depends(Provide[Container.io_service]),
-) -> Response[dict]:
+) -> Response[QuotaResponse]:
     """Returns the quota of the user."""
 
     user_id = str(request.state.user.id) if request.state.user is not None else None
@@ -218,7 +222,7 @@ async def get_quota(
 
     try:
         used, available, quota = io.get_quota(user_id)
-        return Response(data={"usedSpace": used, "availableSpace": available, "quota": quota})
+        return Response(data=QuotaResponse(used_space=used, available_space=available, quota=quota))
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -232,7 +236,7 @@ async def delete_file(
     request: Request,
     file_hash: Annotated[str, Path(description="UUID of the file to delete.")],
     io: IOService = Depends(Provide[Container.io_service]),
-) -> Response:
+) -> Response[None]:
     """Deletes all files uploaded by the user."""
 
     user_id = str(request.state.user.id) if request.state.user is not None else None

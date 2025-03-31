@@ -1,6 +1,7 @@
 """Base class for the file system interaction service."""
 
 from abc import ABC, abstractmethod
+import datetime
 import os
 import uuid
 
@@ -41,7 +42,7 @@ class IOBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def last_modified(self, path: str) -> float:
+    def last_modified(self, path: str) -> datetime.datetime:
         """Returns the last modified time of a file.
 
         Args:

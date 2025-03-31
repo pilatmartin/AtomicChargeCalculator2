@@ -423,7 +423,6 @@ async def delete_calculation(
     exists = storage_service.get_calculation_set(computation_id)
 
     if not exists or str(exists.user_id) != user_id:
-        print(exists)
         raise NotFoundError(detail="Computation not found.")
 
     try:

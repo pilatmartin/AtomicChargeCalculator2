@@ -1,5 +1,6 @@
 """Service for handling file operations."""
 
+import datetime
 import json
 import os
 from pathlib import Path
@@ -306,7 +307,9 @@ class IOService:
             self.logger.error(f"Unable to get file path: {traceback.format_exc()}")
             raise e
 
-    def get_last_modification(self, file_hash: str, user_id: str | None) -> int | None:
+    def get_last_modification(
+        self, file_hash: str, user_id: str | None
+    ) -> datetime.datetime | None:
         """Get last modification time of file with provided hash.
 
         Args:
@@ -314,7 +317,7 @@ class IOService:
             user_id (str | None): User id.
 
         Returns:
-            int | None: Last modification time.
+            datetime.datetime | None: Last modification time.
         """
 
         try:
