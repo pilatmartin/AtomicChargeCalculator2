@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { QuotaProgress } from "../shared/quota-progress";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
 import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
@@ -19,25 +18,26 @@ import { SelectedFiles } from "./selected-files";
 dayjs.extend(localizedFormat);
 
 export const Files = () => {
-  const [searchParams, _] = useSearchParams();
+  const { filters, setFilters } = useFileFilters();
+
   const {
     data: quota,
     isPending: isQuotaPending,
     isError: isQuotaError,
   } = useQuotaQuery();
-  const { filters, setFilters } = useFileFilters();
   const {
     data: files,
+    refetch,
     isPending: isFilesPending,
     isError: isFilesError,
-    refetch,
+    isFetching: isFilesFetching,
   } = useFilesQuery(filters);
 
   const [selectedFiles, setSelectedFiles] = useState<FileResponse[]>([]);
 
   useEffect(() => {
-    refetch();
-  }, [searchParams]);
+    refetch({ cancelRefetch: false });
+  }, [filters]);
 
   return (
     <main className="min-h-main w-full max-w-content mx-auto flex flex-col p-4">
@@ -45,7 +45,9 @@ export const Files = () => {
         Uploaded Files
       </h2>
 
-      <Busy isBusy={isFilesPending || isQuotaPending}>Fetching files</Busy>
+      <Busy isBusy={isFilesPending || isQuotaPending || isFilesFetching}>
+        Fetching files
+      </Busy>
 
       <div className="w-full flex items-center gap-4">
         {quota && <QuotaProgress quota={quota} />}

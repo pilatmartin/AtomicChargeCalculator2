@@ -25,7 +25,6 @@ export const Calculations = () => {
     isPending: isQuotaPending,
     isError: isQuotaError,
   } = useQuotaQuery();
-
   const {
     data: calculations,
     refetch,
@@ -35,7 +34,7 @@ export const Calculations = () => {
   } = useCalculationsQuery(filters);
 
   useEffect(() => {
-    refetch();
+    refetch({ cancelRefetch: false });
   }, [filters]);
 
   return (
