@@ -42,7 +42,7 @@ export const ConfirmAction = ({
         <AlertDialogHeader>
           <AlertDialogTitle>{title ?? "Confirmation"}</AlertDialogTitle>
           <AlertDialogDescription>
-            {description ?? "Are you sure you want to delete this calculation?"}
+            {description ?? "Are you sure you want to perform this action?"}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
