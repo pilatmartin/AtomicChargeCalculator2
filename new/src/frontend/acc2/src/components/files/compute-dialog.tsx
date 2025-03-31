@@ -1,5 +1,5 @@
 import { FileResponse } from "@acc2/api/files/types";
-import { Busy } from "../ui/busy";
+import { Busy } from "../shared/busy";
 import { Button } from "../ui/button";
 import {
   Dialog,

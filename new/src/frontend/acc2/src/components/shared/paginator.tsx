@@ -6,7 +6,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "./pagination";
+} from "../ui/pagination";
 import { PagingFilters } from "@acc2/api/types";
 import { useSearchParams } from "react-router";
 
@@ -29,10 +29,7 @@ export const Paginator = ({
   const onChange = (filters: PagingFilters) => {
     const params = new URLSearchParams(searchParams);
 
-    console.log("filters", filters);
-
     Object.keys(filters).forEach((key, value) => {
-      console.log("setting", key, value);
       params.set(key, `${value}`);
     });
 

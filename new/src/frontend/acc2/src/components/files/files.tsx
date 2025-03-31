@@ -1,4 +1,4 @@
-import { Paginator } from "../ui/paginator";
+import { Paginator } from "../shared/paginator";
 
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
@@ -8,7 +8,7 @@ import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { File } from "./file";
 import { useFileFilters } from "@acc2/hooks/filters/use-file-filters";
 import { useFilesQuery } from "@acc2/hooks/queries/files";
-import { Busy } from "../ui/busy";
+import { Busy } from "../shared/busy";
 import { UploadDialog } from "./upload-dialog";
 import { ComputeDialog } from "./compute-dialog";
 import { FileResponse } from "@acc2/api/files/types";

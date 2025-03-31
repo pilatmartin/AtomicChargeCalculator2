@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Calculation } from "./calculation";
 import { isValidCalculationOrderField } from "@acc2/api/types";
-import { Paginator } from "../ui/paginator";
+import { Paginator } from "../shared/paginator";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { ArrowDownZA, ArrowUpZA } from "lucide-react";
-import { Busy } from "../ui/busy";
+import { Busy } from "../shared/busy";
 import { useQuotaQuery } from "@acc2/hooks/queries/files";
 import { QuotaProgress } from "../shared/quota-progress";
 import { useCalculationsQuery } from "@acc2/hooks/queries/calculations";

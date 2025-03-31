@@ -17,7 +17,7 @@ import { handleApiError } from "@acc2/api/base";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Form } from "../ui/form";
-import { Busy } from "../ui/busy";
+import { Busy } from "../shared/busy";
 import { useState } from "react";
 
 const uploadSchema = z.object({
