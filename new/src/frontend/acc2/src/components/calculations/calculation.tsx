@@ -65,7 +65,7 @@ export const Calculation = ({
       <div className="mb-4">
         <span className="block font-bold text-md mb-2">
           Files
-          <InfoTooltip info="Hovering on the individual files will show their statistics." />
+          <InfoTooltip info="Hovering over the individual files will show their statistics." />
         </span>
         <div className="flex gap-2 flex-wrap">
           {Object.entries(files)
