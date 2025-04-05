@@ -7,11 +7,9 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from typing import Tuple
 
-from api.v1.routes.web.charges import charges_router
-from api.v1.routes.web.auth import auth_router
-from api.v1.routes.web.files import files_router
-from api.v1.routes.web.protonation import protonation_router
-from api.v1.routes.web.user import user_router
+from api.v1.routes.charges import charges_router
+from api.v1.routes.auth import auth_router
+from api.v1.routes.files import files_router
 from api.v1.middleware.logging import LoggingMiddleware
 from api.v1.middleware.exceptions import http_exception_handler
 from api.v1.middleware.user_loader import UserLoaderMiddleware
@@ -54,8 +52,6 @@ def create_app() -> FastAPI:
     app.include_router(router=charges_router, prefix=PREFIX)
     app.include_router(router=files_router, prefix=PREFIX)
     app.include_router(router=auth_router, prefix=PREFIX)
-    app.include_router(router=protonation_router, prefix=PREFIX)
-    app.include_router(router=user_router, prefix=PREFIX)
 
     return app
 
