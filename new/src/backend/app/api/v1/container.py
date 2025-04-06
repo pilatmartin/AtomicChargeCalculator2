@@ -5,7 +5,6 @@ import os
 from dependency_injector import containers, providers
 from dotenv import load_dotenv, find_dotenv
 
-from core.logging.file_logger import FileLogger
 
 from db.database import Database, SessionManager
 from db.repositories.calculation_config_repository import CalculationConfigRepository
@@ -20,6 +19,7 @@ from integrations.io.io import IOLocal
 from services.calculation_storage import CalculationStorageService
 from services.chargefw2 import ChargeFW2Service
 from services.io import IOService
+from services.logging.file_logger import FileLogger
 from services.mmcif import MmCIFService
 from services.oidc import OIDCService
 
@@ -30,7 +30,7 @@ load_dotenv(find_dotenv())
 class Container(containers.DeclarativeContainer):
     """IoC container for the application."""
 
-    wiring_config = containers.WiringConfiguration(packages=["api", "core", "services"])
+    wiring_config = containers.WiringConfiguration(packages=["api", "services"])
 
     # integrations
     chargefw2 = providers.Singleton(ChargeFW2Local)

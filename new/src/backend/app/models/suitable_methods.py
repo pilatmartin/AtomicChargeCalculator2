@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from core.models.method import Method
-from core.models.parameters import Parameters
+from models.method import Method
+from models.parameters import Parameters
 
 
 @dataclass

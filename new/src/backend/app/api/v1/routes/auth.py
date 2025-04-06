@@ -4,8 +4,8 @@ import urllib
 import urllib.parse
 
 import httpx
+from api.v1.container import Container
 from api.v1.schemas.response import Response
-from core.dependency_injection.container import Container
 from db.models.user.user import User
 from db.repositories.user_repository import UserRepository
 from dependency_injector.wiring import Provide, inject

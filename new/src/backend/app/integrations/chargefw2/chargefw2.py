@@ -3,7 +3,7 @@
 from typing import Dict
 import chargefw2
 
-from core.models.method import Method
+from models.method import Method
 
 from integrations.chargefw2.base import ChargeFW2Base
 

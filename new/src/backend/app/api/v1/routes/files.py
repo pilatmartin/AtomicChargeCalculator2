@@ -14,10 +14,11 @@ from dependency_injector.wiring import inject, Provide
 from api.v1.constants import ALLOWED_FILE_TYPES
 from api.v1.schemas.response import Response
 from api.v1.schemas.file import QuotaResponse, UploadResponse, FileResponse as FileResponseModel
+from api.v1.exceptions import BadRequestError, NotFoundError
 
-from core.dependency_injection.container import Container
-from core.exceptions.http import BadRequestError, NotFoundError
-from core.models.paging import PagedList
+from models.paging import PagedList
+
+from api.v1.container import Container
 
 
 from services.chargefw2 import ChargeFW2Service

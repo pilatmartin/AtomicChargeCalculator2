@@ -4,7 +4,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from core.logging.base import LoggerBase
+from services.logging.base import LoggerBase
 
 load_dotenv()
 

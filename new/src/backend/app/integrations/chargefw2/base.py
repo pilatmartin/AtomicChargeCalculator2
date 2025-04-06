@@ -4,7 +4,7 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from chargefw2 import Molecules
-from core.models.method import Method
+from models.method import Method
 
 Charges = Dict[str, list[float]]
 
