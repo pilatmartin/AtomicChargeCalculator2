@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 from fastapi import UploadFile
 
 from core.logging.base import LoggerBase
-from core.integrations.io.base import IOBase
 from core.models.calculation import ChargeCalculationConfigDto
 
+from integrations.io.base import IOBase
 
 load_dotenv()
 

@@ -3,8 +3,9 @@
 from typing import Dict
 import chargefw2
 
-from core.integrations.chargefw2.base import ChargeFW2Base
 from core.models.method import Method
+
+from integrations.chargefw2.base import ChargeFW2Base
 
 
 class ChargeFW2Local(ChargeFW2Base):

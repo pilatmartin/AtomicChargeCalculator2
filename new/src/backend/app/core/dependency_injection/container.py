@@ -6,8 +6,6 @@ from dependency_injector import containers, providers
 from dotenv import load_dotenv, find_dotenv
 
 from core.logging.file_logger import FileLogger
-from core.integrations.chargefw2.chargefw2 import ChargeFW2Local
-from core.integrations.io.io import IOLocal
 
 from db.database import Database, SessionManager
 from db.repositories.calculation_config_repository import CalculationConfigRepository
@@ -15,6 +13,9 @@ from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import CalculationSetRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.moleculeset_stats_repository import MoleculeSetStatsRepository
+
+from integrations.chargefw2.chargefw2 import ChargeFW2Local
+from integrations.io.io import IOLocal
 
 from services.calculation_storage import CalculationStorageService
 from services.chargefw2 import ChargeFW2Service

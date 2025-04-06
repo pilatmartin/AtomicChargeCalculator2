@@ -8,9 +8,9 @@ from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 from core.models.paging import PagingFilters
-from core.integrations.chargefw2.base import Charges
-
 from core.models.molecule_info import MoleculeSetStats
+
+from integrations.chargefw2.base import Charges
 
 
 @dataclass
