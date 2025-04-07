@@ -1,5 +1,5 @@
-import { useVerifyAuthMutation } from "@acc2/hooks/mutations/use-verify-auth-mutation";
 import { createContext, PropsWithChildren, useEffect, useState } from "react";
+import { useAuthMutations } from "../hooks/mutations/use-auth";
 
 type AuthProviderType = {
   isAuthenticated: boolean;
@@ -16,13 +16,13 @@ export const AuthContext = createContext<AuthProviderType>({
 type AuthProviderProps = PropsWithChildren;
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const verifyAuthMutation = useVerifyAuthMutation();
+  const { verifyMutation } = useAuthMutations();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkAuthStatus = async () => {
     try {
-      const { isAuthenticated } = await verifyAuthMutation.mutateAsync();
+      const { isAuthenticated } = await verifyMutation.mutateAsync();
       setIsAuthenticated(isAuthenticated);
     } catch (error) {
       setIsAuthenticated(false);

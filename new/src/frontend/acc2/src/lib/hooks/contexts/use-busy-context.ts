@@ -1,4 +1,4 @@
-import { BusyContext, BusyContextType } from "@acc2/contexts/busy-context";
+import { BusyContext, BusyContextType } from "@acc2/lib/contexts/busy-context";
 import { useContext } from "react";
 
 export type BusyContextHookType = {

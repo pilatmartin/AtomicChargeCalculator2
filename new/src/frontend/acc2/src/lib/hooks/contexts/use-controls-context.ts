@@ -1,6 +1,6 @@
 import { MolstarColoringType } from "@acc2/components/results/controls/coloring-controls";
 import { MolstarViewType } from "@acc2/components/results/controls/view-controls";
-import { ControlsContext } from "@acc2/contexts/controls-context";
+import { ControlsContext } from "@acc2/lib/contexts/controls-context";
 import MolstarPartialCharges from "molstar-partial-charges";
 import { useContext } from "react";
 
