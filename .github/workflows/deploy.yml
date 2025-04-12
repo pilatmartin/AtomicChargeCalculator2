@@ -66,6 +66,7 @@ jobs:
               echo "Web service deployment finished."
             elif [ "$DEPLOY_TARGET" = "all" ]; then
               echo "Deploying all services ..."
+              sudo docker compose $COMPOSE_FILES build --no-cache
               sudo docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate
               echo "All services deployment finished."
             else
