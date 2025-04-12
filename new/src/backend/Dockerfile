@@ -30,7 +30,7 @@ RUN git clone -b devel --depth 1 https://github.com/pilatmartin/ChargeFW2.git &&
     mkdir build && \
     cd build && \
     cmake .. -DCMAKE_INSTALL_PREFIX=. -DPYTHON_MODULE=ON && \
-    make -j1 && \
+    make -j$(nproc) && \
     make install
 
 # Bundle dependencies

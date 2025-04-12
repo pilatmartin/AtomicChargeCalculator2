@@ -49,32 +49,55 @@ jobs:
 
             if [ "$DEPLOY_TARGET" = "api" ]; then
               echo "Deploying API only ..."
-              sudo docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate api
-            
-              if [ $? -ne 0 ]; then echo "API deployment failed!"; exit 1; fi
-                echo "API service deployment finished."
+              
+              docker compose $COMPOSE_FILES down --remove-orphans api
+              docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate api              
+              if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
+                          
+              echo "API service deployment finished."
             
             elif [ "$DEPLOY_TARGET" = "api including chargefw2" ]; then
               echo "Deploying API including chargefw2 ..."
-              sudo docker compose $COMPOSE_FILES build --no-cache api
-              sudo docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate api
+              
+              docker compose $COMPOSE_FILES down --remove-orphans api
+              
+              docker compose $COMPOSE_FILES build --no-cache api
+              if [ $? -ne 0 ]; then echo "Docker compose build failed!"; exit 1; fi
+              
+              docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate api
+              if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
+              
               echo "API service deployment with ChargeFW2 finished."
 
             elif [ "$DEPLOY_TARGET" = "web" ]; then
               echo "Deploying web ..."
-              sudo docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate web
+              
+              docker compose $COMPOSE_FILES down --remove-orphans web
+              
+              docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate web
+              if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
+              
               echo "Web service deployment finished."
+            
             elif [ "$DEPLOY_TARGET" = "all" ]; then
               echo "Deploying all services ..."
-              sudo docker compose $COMPOSE_FILES build --no-cache
-              sudo docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate
+              
+              docker compose $COMPOSE_FILES down --remove-orphans
+              
+              docker compose $COMPOSE_FILES build --no-cache
+              if [ $? -ne 0 ]; then echo "Docker compose build failed!"; exit 1; fi
+
+              docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate
+              if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
+              
               echo "All services deployment finished."
+            
             else
               echo "Error: Invalid deployment target: $DEPLOY_TARGET"
               exit 1
             fi
 
             echo "Pruning old Docker images..."
-            sudo docker image prune -af
+            docker image prune -af
 
             echo "Deployment finished successfully."
