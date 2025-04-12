@@ -29,12 +29,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 60m
           script: |
             DEPLOY_TARGET=${{ github.event.inputs.services_to_deploy }}
 
             echo "Deployment target: $DEPLOY_TARGET"
 
-            cd /AtomicChargeCalculator2
+            cd /AtomicChargeCalculator2/new/src/docker
             echo "Changed directory to $(pwd)"
 
             echo "Pulling latest changes ..."
