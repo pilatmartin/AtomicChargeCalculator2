@@ -12,6 +12,11 @@ ACC II uses [pnpm](https://pnpm.io/) for package management, so it needs to be i
 $ npm install -g pnpm
 ```
 
+Navigate to the `acc2` directory:
+```bash
+$ cd acc2
+```
+
 ### Installing Dependencies
 
 ```bash

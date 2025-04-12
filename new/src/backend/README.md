@@ -45,15 +45,19 @@ We firstly need to start the database. Easiest way is by using an official postg
 $ docker run -it --rm -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:17-alpine
 ```
 
+Following commands require being in the `app` directory:
+```bash
+$ cd app
+```
+
 After the database is ready, we need to run migrations:
 ```bash
 $ poetry run alembic upgrade head
 ```
 
-API can now be started just by running the main file from the `./app` directory:
+API can now be started just by running the main file:
 
 ```bash
-$ cd app
 $ poetry run gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker main:web_app
 ```
 
