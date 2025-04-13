@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
@@ -34,6 +34,10 @@ jobs:
             DEPLOY_TARGET=${{ github.event.inputs.services_to_deploy }}
 
             echo "Deployment target: $DEPLOY_TARGET"
+
+            echo "Setting up environment variables ..."
+            export PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+            export OIDC_CLIENT_SECRET=${{ secrets.OIDC_CLIENT_SECRET }}
 
             cd /AtomicChargeCalculator2/new/src/docker
             echo "Changed directory to $(pwd)"
@@ -55,7 +59,7 @@ jobs:
               if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
                           
               echo "API service deployment finished."
-            
+
             elif [ "$DEPLOY_TARGET" = "api including chargefw2" ]; then
               echo "Deploying API including chargefw2 ..."
               
@@ -78,7 +82,7 @@ jobs:
               if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
               
               echo "Web service deployment finished."
-            
+
             elif [ "$DEPLOY_TARGET" = "all" ]; then
               echo "Deploying all services ..."
               
@@ -91,7 +95,7 @@ jobs:
               if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
               
               echo "All services deployment finished."
-            
+
             else
               echo "Error: Invalid deployment target: $DEPLOY_TARGET"
               exit 1
