@@ -33,8 +33,10 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"], include_in_schema=False)
 @inject
 async def login(oidc_service: OIDCService = Depends(Provide[Container.oidc_service])):
     """Initiate the OIDC authentication flow."""
+
     config = await oidc_service.get_oidc_config()
     auth_endpoint = config["authorization_endpoint"]
+
     params = {
         "response_type": "code",
         "client_id": oidc_service.client_id,
@@ -52,6 +54,7 @@ async def logout(
     request: Request, oidc_service: OIDCService = Depends(Provide[Container.oidc_service])
 ):
     """Log out the user."""
+
     config = await oidc_service.get_oidc_config()
     token = request.cookies.get("access_token")
     redirect_uri = "https://acc2-dev.biodata.ceitec.cz/"  # TODO get from config
@@ -89,14 +92,12 @@ async def auth_callback(
     token_endpoint = config["token_endpoint"]
 
     async with httpx.AsyncClient() as client:
-        print(f"username: [{oidc_service.client_id}]")
-        print(f"password: [{oidc_service.client_secret}]")
-
         response = await client.post(
             token_endpoint,
             data={
                 "grant_type": "authorization_code",
                 "code": code,
+                "redirect_uri": oidc_service.redirect_uri,
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             auth=httpx.BasicAuth(
