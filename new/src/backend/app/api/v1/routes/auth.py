@@ -89,6 +89,9 @@ async def auth_callback(
     token_endpoint = config["token_endpoint"]
 
     async with httpx.AsyncClient() as client:
+        print(f"username: [{oidc_service.client_id}]")
+        print(f"password: [{oidc_service.client_secret}]")
+
         response = await client.post(
             token_endpoint,
             data={

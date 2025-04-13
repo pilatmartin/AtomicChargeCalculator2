@@ -54,7 +54,7 @@ jobs:
             if [ "$DEPLOY_TARGET" = "api" ]; then
               echo "Deploying API only ..."
               
-              docker compose $COMPOSE_FILES down --remove-orphans api
+              docker compose $COMPOSE_FILES down api
               docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate api              
               if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
                           
@@ -63,7 +63,7 @@ jobs:
             elif [ "$DEPLOY_TARGET" = "api including chargefw2" ]; then
               echo "Deploying API including chargefw2 ..."
               
-              docker compose $COMPOSE_FILES down --remove-orphans api
+              docker compose $COMPOSE_FILES down api
               
               docker compose $COMPOSE_FILES build --no-cache api
               if [ $? -ne 0 ]; then echo "Docker compose build failed!"; exit 1; fi
@@ -76,7 +76,7 @@ jobs:
             elif [ "$DEPLOY_TARGET" = "web" ]; then
               echo "Deploying web ..."
               
-              docker compose $COMPOSE_FILES down --remove-orphans web
+              docker compose $COMPOSE_FILES down web
               
               docker compose $COMPOSE_FILES up -d --no-deps --build --force-recreate web
               if [ $? -ne 0 ]; then echo "Docker compose up failed!"; exit 1; fi
