@@ -32,8 +32,9 @@ jobs:
           command_timeout: 60m
           script: |
             DEPLOY_TARGET="${{ github.event.inputs.services_to_deploy }}"
-
-            echo "Deployment target: [$DEPLOY_TARGET"]
+            BRANCH_NAME="${{ github.ref_name }}"
+            
+            echo "Deployment target: [$DEPLOY_TARGET] from branch [$BRANCH_NAME]"
 
             echo "Setting up environment variables ..."
             export PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
@@ -43,9 +44,9 @@ jobs:
             echo "Changed directory to $(pwd)"
 
             echo "Pulling latest changes ..."
-            sudo git checkout architecture-redesign
+            sudo git checkout $BRANCH_NAME
             sudo git fetch origin
-            sudo git reset --hard origin/architecture-redesign
+            sudo git reset --hard origin/$BRANCH_NAME
 
             if [ $? -ne 0 ]; then echo "Git pull failed"; exit 1; fi;
 
@@ -91,6 +92,9 @@ jobs:
               
               docker compose $COMPOSE_FILES down --remove-orphans
               
+              echo "Building chargefw2 base image ..."
+              docker build -t chargefw2-base:local -f ../backend/Dockerfile.chargefw2 . --no-cache
+
               docker compose $COMPOSE_FILES build --no-cache
               if [ $? -ne 0 ]; then echo "Docker compose build failed!"; exit 1; fi
 
