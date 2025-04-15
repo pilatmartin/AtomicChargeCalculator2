@@ -3,6 +3,7 @@
 import urllib
 import urllib.parse
 
+from fastapi.security import OAuth2AuthorizationCodeBearer
 import httpx
 from api.v1.container import Container
 from api.v1.schemas.response import Response
@@ -26,7 +27,14 @@ class TokenResponse(BaseModel):
     id_token: str
 
 
-auth_router = APIRouter(prefix="/auth", tags=["auth"], include_in_schema=False)
+code_bearer = OAuth2AuthorizationCodeBearer(
+    authorizationUrl="https://login.aai.lifescience-ri.eu/oidc/authorize",
+    scheme_name="openid",
+    # scopes="openid",
+    tokenUrl="https://login.aai.lifescience-ri.eu/oidc/token",
+)
+
+auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @auth_router.get("/login", tags=["login"])
@@ -136,9 +144,10 @@ async def auth_callback(
         return response
 
 
-@auth_router.get("/verify", tags=["verify"])
-async def verify(request: Request):
+@auth_router.get("/verify", tags=["verify"], include_in_schema=True)
+async def verify(request: Request, idk: str = Depends(code_bearer)):
     """Verifies if user is logged in."""
 
+    print(idk)
     user = request.state.user
     return Response(data={"isAuthenticated": user is not None})
