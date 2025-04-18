@@ -47,7 +47,7 @@ class ChargeFW2Local(ChargeFW2Base):
             for method in methods
         ]
 
-    def get_available_parameters(self, method: str) -> list[str]:
+    def get_available_parameters(self, method: str) -> list[Parameters]:
         """Get all parameters available for provided method.
 
         Args:
@@ -132,3 +132,22 @@ class ChargeFW2Local(ChargeFW2Base):
             Dict[str, list[float]]: Dictionary with molecule names as keys and list of charges (floats) as values.
         """
         return chargefw2.calculate_charges(molecules, method_name, parameters_name, chg_out_dir)
+
+    def save_charges(
+        self,
+        charges: Dict[str, list[float]],
+        molecules: chargefw2.Molecules,
+        method_name: str,
+        parameters_name: str | None = None,
+        chg_out_dir: str | None = None,
+    ) -> None:
+        """Save charges for a given molecules and method.
+
+        Args:
+            charges (Dict[str, list[float]]): Dictionary with molecule names as keys and list of charges (floats) as values.
+            molecules (chargefw2.Molecules): Set of molecules.
+            method_name (str): Method name to be used.
+            parameters_name (Optional[str], optional): Parameters to be used with provided method. Defaults to None.
+            chg_out_dir (Optional[str], optional): Path to the directory where to save the charges. Defaults to current working directory.
+        """
+        chargefw2.save_charges(charges, molecules, method_name, parameters_name, chg_out_dir)

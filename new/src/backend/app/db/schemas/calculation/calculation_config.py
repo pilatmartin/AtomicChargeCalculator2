@@ -3,13 +3,13 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from db.models import Base
+from db.schemas import Base
 
 
 class CalculationConfig(Base):
     """Calculation config database model. It represents a single calculation configuration."""
 
-    __tablename__ = "calculation_configs"
+    __tablename__ = "configs"
 
     id: Mapped[str] = mapped_column(sa.Uuid, primary_key=True, default=uuid.uuid4)
     method: Mapped[str] = mapped_column(sa.VARCHAR(20), nullable=False)
@@ -23,9 +23,6 @@ class CalculationConfig(Base):
     )
 
     calculation_set = relationship("CalculationSet", back_populates="configs")
-    calculations = relationship(
-        "Calculation", back_populates="config", cascade="all, delete-orphan"
-    )
 
     def __repr__(self):
         return f"""<CalculationConfig

@@ -3,7 +3,7 @@ import uuid
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from db.models import Base
+from db.schemas import Base
 
 
 class AtomTypeCount(Base):

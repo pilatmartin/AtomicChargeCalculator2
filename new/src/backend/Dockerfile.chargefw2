@@ -40,5 +40,6 @@ COPY --from=ubuntu:24.04 /usr/lib/x86_64-linux-gnu/libgomp.so.1* \
     /usr/lib/x86_64-linux-gnu/libboost_program_options.so.* \
     /usr/lib/x86_64-linux-gnu/
 
+# Setup ENV variables for use with Python bindings
 ENV LD_LIBRARY_PATH=${CHARGEFW2_DIR}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=${CHARGEFW2_DIR}/lib

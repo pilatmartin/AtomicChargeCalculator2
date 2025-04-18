@@ -8,12 +8,14 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
-from db.models import Base  # noqa: F401
-from db.models.calculation.calculation import Calculation  # noqa: F401
-from db.models.calculation.calculation_config import CalculationConfig  # noqa: F401
-from db.models.calculation.calculation_set import CalculationSet  # noqa: F401
-from db.models.user.user import User  # noqa: F401
-from db.models.moleculeset_stats import MoleculeSetStats, AtomTypeCount  # noqa: F401
+from db.schemas import Base  # noqa: F401
+
+# from db.schemas.calculation.calculation import Calculation  # noqa: F401
+# from db.schemas.calculation.calculation_config import CalculationConfig  # noqa: F401
+# from db.schemas.calculation.calculation_set import CalculationSet  # noqa: F401
+# from db.schemas.user.user import User  # noqa: F401
+# from db.schemas.moleculeset_stats import MoleculeSetStats, AtomTypeCount  # noqa: F401
+from db.schemas.schema import *  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

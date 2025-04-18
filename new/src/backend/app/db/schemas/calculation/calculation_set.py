@@ -5,7 +5,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from db.models import Base
+from db.schemas import Base
 
 
 class CalculationSet(Base):
@@ -21,9 +21,6 @@ class CalculationSet(Base):
     )
     user_id: Mapped[str] = mapped_column(sa.Uuid, sa.ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="calculation_sets")
-    calculations = relationship(
-        "Calculation", back_populates="calculation_set", cascade="all, delete-orphan"
-    )
     configs = relationship(
         "CalculationConfig", back_populates="calculation_set", cascade="all, delete-orphan"
     )
