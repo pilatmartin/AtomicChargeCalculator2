@@ -21,6 +21,7 @@ from models.paging import PagedList
 from api.v1.container import Container
 
 
+from db.database import SessionManager
 from services.chargefw2 import ChargeFW2Service
 from services.calculation_storage import CalculationStorageService
 from services.io import IOService
@@ -41,6 +42,7 @@ async def get_files(
     order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
     io: IOService = Depends(Provide[Container.io_service]),
     storage_service: CalculationStorageService = Depends(Provide[Container.storage_service]),
+    session_manager: SessionManager = Depends(Provide[Container.session_manager]),
 ) -> Response[PagedList[FileResponseModel]]:
     """Returns the list of files uploaded by the user.."""
 
@@ -74,19 +76,20 @@ async def get_files(
         page_start = (page - 1) * page_size
         page_end = page * page_size
 
-        items = [
-            FileResponseModel(
-                file_name=name,
-                file_hash=file_hash,
-                size=io.get_file_size(file_hash, user_id),
-                stats=storage_service.get_info(file_hash),
-                uploaded_at=io.get_last_modification(file_hash, user_id),
-            )
-            for [file_hash, name] in files[page_start:page_end]
-        ]
+        with session_manager.session() as session:
+            items = [
+                FileResponseModel(
+                    file_name=name,
+                    file_hash=file_hash,
+                    size=io.get_file_size(file_hash, user_id),
+                    stats=storage_service.get_info(session, file_hash),
+                    uploaded_at=io.get_last_modification(file_hash, user_id),
+                )
+                for [file_hash, name] in files[page_start:page_end]
+            ]
 
-        data = PagedList(page=page, page_size=page_size, total_count=len(files), items=items)
-        return Response(data=data)
+            data = PagedList(page=page, page_size=page_size, total_count=len(files), items=items)
+            return Response(data=data)
     except Exception as e:
         traceback.print_exc()
         raise BadRequestError(

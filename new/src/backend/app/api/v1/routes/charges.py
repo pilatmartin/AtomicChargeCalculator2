@@ -164,8 +164,8 @@ async def info(
 async def calculate_charges(
     request: Request,
     configs: list[CalculationConfigDto],
-    settings: AdvancedSettingsDto | None,
     file_hashes: list[str],
+    settings: AdvancedSettingsDto | None = None,
     computation_id: str | None = None,
     response_format: Annotated[
         Literal["charges", "none"], Query(description="Output format.")
@@ -285,7 +285,9 @@ async def setup(
 
     try:
         io_service.prepare_inputs(user_id, computation_id, config.file_hashes)
-        storage_service.setup_calculation(config.settings, config.file_hashes, user_id)
+        storage_service.setup_calculation(
+            computation_id, config.settings, config.file_hashes, user_id
+        )
         return Response(data=computation_id)
     except Exception as e:
         raise BadRequestError(
