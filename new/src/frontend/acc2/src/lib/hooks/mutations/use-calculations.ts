@@ -15,7 +15,7 @@ type ComputationMutationData = {
   computationId?: string;
   fileHashes: string[];
   configs: ComputationConfig[];
-  settings: AdvancedSettings;
+  settings?: AdvancedSettings;
 };
 
 type LoadMmcifMutationData = {

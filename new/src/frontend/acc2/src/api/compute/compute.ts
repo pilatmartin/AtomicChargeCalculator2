@@ -4,11 +4,11 @@ import { AdvancedSettings, ComputationConfig } from "./types";
 
 export const setup = async (
   fileHashes: string[],
-  settings: AdvancedSettings
+  settings?: AdvancedSettings
 ): Promise<string> => {
   const response = await api.post<ApiResponse<string>>("/charges/setup", {
     file_hashes: fileHashes,
-    settings: settings,
+    ...settingsToParams(settings),
   });
 
   if (!response.data.success) {
@@ -30,7 +30,7 @@ export const compute = async (
       method: comp.method || null,
       parameters: comp.parameters || null,
     })),
-    settings,
+    ...settingsToParams(settings),
   };
 
   const response = await api.post<ApiResponse<string>>(
@@ -63,4 +63,18 @@ export const getMolecules = async (
   }
 
   return response.data.data;
+};
+
+const settingsToParams = (settings?: AdvancedSettings) => {
+  if (!settings) {
+    return {};
+  }
+
+  return {
+    settings: {
+      read_hetatm: settings.readHetatm,
+      ignore_water: settings.ignoreWater,
+      permissive_types: settings.permissiveTypes,
+    },
+  };
 };

@@ -194,6 +194,6 @@ export const Setup = ({ computationId }: SetupProps) => {
           </Form>
         </Card>
       </ScrollArea>
-    </main> 
+    </main>
   );
 };
