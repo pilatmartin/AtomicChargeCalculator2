@@ -4,7 +4,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 
-from db.schemas.calculation import AdvancedSettings, CalculationSet
+from db.schemas.calculation import AdvancedSettings
 from models.setup import AdvancedSettingsDto
 
 
@@ -29,7 +29,7 @@ class AdvancedSettingsRepository:
             )
         )
 
-        advanced_settings = (session.execute(statement)).unique().scalars(CalculationSet).first()
+        advanced_settings = (session.execute(statement)).unique().scalars(AdvancedSettings).first()
 
         return advanced_settings
 
@@ -40,4 +40,4 @@ class AdvancedSettingsRepository:
             advanced_settings (AdvancedSettings): Advanced calculation settings.
         """
 
-        session.merge(advanced_settings)
+        session.add(advanced_settings)

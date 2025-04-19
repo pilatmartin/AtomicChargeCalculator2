@@ -139,88 +139,38 @@ class CalculationStorageService:
         results: list[CalculationResultDto],
         user_id: str | None,
     ) -> None:
-        """Store calculation results to database."""
-
         try:
             self.logger.info(f"Storing calculation results for computation {computation_id}.")
 
             with self.session_manager.session() as session:
-                unique_configs = {}
-                existing_calculation_set = self.set_repository.get(session, computation_id)
-                settings_exist = self.advanced_settings_repository.get(session, settings)
-                if settings_exist is None:
-                    settings_exist = AdvancedSettings(
-                        read_hetatm=settings.read_hetatm,
-                        permissive_types=settings.permissive_types,
-                        ignore_water=settings.ignore_water,
-                    )
-                if existing_calculation_set:
-                    calculation_set = existing_calculation_set
-                else:
-                    calculation_set = CalculationSet(
-                        id=computation_id,
-                        user_id=user_id,
-                        advanced_settings=settings_exist,
-                    )
+                settings_entity = self._get_or_create_advanced_settings(session, settings)
+                calculation_set = self._get_or_create_calculation_set(
+                    session, computation_id, user_id, settings_entity
+                )
+
                 calculations = []
                 added_stats = set()
 
                 for result in results:
-                    config_key = (
-                        result.config.method,
-                        result.config.parameters,
+                    config_entity = self._get_or_create_config(
+                        session, result.config, calculation_set
                     )
-                    config = CalculationConfig(
-                        method=result.config.method, parameters=result.config.parameters
+
+                    new_calculations, file_hashes = self._process_calculations(
+                        session, result, config_entity, settings_entity
                     )
-                    if config_key in unique_configs:
-                        result.config = unique_configs[config_key]
-                    existing_config = self.config_repository.get(session, *config_key)
-                    config_to_store = config if existing_config is None else existing_config
+                    calculations.extend(new_calculations)
 
-                    if config_to_store not in calculation_set.configs:
-                        calculation_set.configs.append(config_to_store)
-
-                    if existing_config is None:
-                        unique_configs[config_key] = config
-
-                    for calculation in result.calculations:
-                        calculation_exists = self.calculation_repository.get(
-                            session,
-                            CalculationsFilters(
-                                hash=calculation.file_hash,
-                                method=calculation.config.method,
-                                parameters=calculation.config.parameters,
-                                read_hetatm=settings.read_hetatm,
-                                permissive_types=settings.permissive_types,
-                                ignore_water=settings.ignore_water,
-                            ),
-                        )
-                        if calculation_exists is None:
-                            calculations.append(
-                                Calculation(
-                                    file_name=calculation.file,
-                                    file_hash=calculation.file_hash,
-                                    charges=calculation.charges,
-                                    config=config_to_store,
-                                    advanced_settings=settings_exist,
-                                )
-                            )
-
-                        if calculation.file_hash not in added_stats:
-                            calculation_set.molecule_set_stats.append(
-                                self.stats_repository.get(session, calculation.file_hash)
-                            )
-                            added_stats.add(calculation.file_hash)
+                    self._add_molecule_stats(session, calculation_set, file_hashes, added_stats)
 
                 for calculation in calculations:
                     self.calculation_repository.store(session, calculation)
+
                 self.set_repository.store(session, calculation_set)
 
-                session.commit()
         except Exception as e:
             self.logger.error(
-                f"Error storing calculation results for computation {computation_id}: {traceback.format_exc()}"
+                f"Error storing calculation results for computation {computation_id}."
             )
             raise e
 
@@ -234,12 +184,15 @@ class CalculationStorageService:
         """Setup calculation in database."""
 
         try:
+            self.logger.info("Setting up calculation.")
+
             with self.session_manager.session() as session:
-                self.logger.info("Setting up calculation.")
+                settings_entity = self._get_or_create_advanced_settings(session, settings)
+
                 calculation_set = CalculationSet(
                     id=computation_id,
                     user_id=user_id,
-                    advanced_settings=self.advanced_settings_repository.get(session, settings),
+                    advanced_settings=settings_entity,
                 )
 
                 for file_hash in file_hashes:
@@ -350,3 +303,107 @@ class CalculationStorageService:
                 f"Error deleting calculation set {computation_id}: {traceback.format_exc()}"
             )
             raise e
+
+    def _get_or_create_advanced_settings(
+        self, session: Session, settings: AdvancedSettingsDto
+    ) -> AdvancedSettings:
+        """Get existing settings or create new."""
+
+        settings_entity = self.advanced_settings_repository.get(session, settings)
+        if settings_entity is None:
+            settings_entity = AdvancedSettings(
+                ignore_water=settings.ignore_water,
+                read_hetatm=settings.read_hetatm,
+                permissive_types=settings.permissive_types,
+            )
+            self.advanced_settings_repository.store(session, settings_entity)
+        return settings_entity
+
+    def _get_or_create_calculation_set(
+        self,
+        session: Session,
+        computation_id: str,
+        user_id: str | None,
+        settings_entity: AdvancedSettings,
+    ) -> CalculationSet:
+        """Get existing calculation set or create new."""
+
+        calculation_set = self.set_repository.get(session, computation_id)
+        if calculation_set is None:
+            calculation_set = CalculationSet(
+                id=computation_id,
+                user_id=user_id,
+                advanced_settings=settings_entity,
+            )
+            self.set_repository.store(session, calculation_set)
+
+        return calculation_set
+
+    def _get_or_create_config(
+        self, session: Session, config: CalculationConfigDto, calculation_set: CalculationSet
+    ) -> CalculationConfig:
+        """Get existing config or create new."""
+
+        existing_config = self.config_repository.get(session, config.method, config.parameters)
+
+        if existing_config is None:
+            config_entity = CalculationConfig(method=config.method, parameters=config.parameters)
+        else:
+            config_entity = existing_config
+
+        if config_entity not in calculation_set.configs:
+            calculation_set.configs.append(config_entity)
+
+        return config_entity
+
+    def _process_calculations(
+        self,
+        session: Session,
+        result: CalculationResultDto,
+        config_entity: CalculationConfig,
+        settings_entity: AdvancedSettings,
+    ) -> tuple[list[Calculation], set[str]]:
+        """Process calculation results and return new calculations and file hashes."""
+
+        new_calculations = []
+        file_hashes = set()
+
+        for calculation in result.calculations:
+            calculation_exists = self.calculation_repository.get(
+                session,
+                CalculationsFilters(
+                    hash=calculation.file_hash,
+                    method=calculation.config.method,
+                    parameters=calculation.config.parameters,
+                    read_hetatm=settings_entity.read_hetatm,
+                    ignore_water=settings_entity.ignore_water,
+                    permissive_types=settings_entity.permissive_types,
+                ),
+            )
+
+            if calculation_exists is None:
+                new_calculations.append(
+                    Calculation(
+                        file_name=calculation.file,
+                        file_hash=calculation.file_hash,
+                        charges=calculation.charges,
+                        config=config_entity,
+                        advanced_settings=settings_entity,
+                    )
+                )
+
+        return new_calculations, file_hashes
+
+    def _add_molecule_stats(
+        self,
+        session: Session,
+        calculation_set: CalculationSet,
+        file_hashes: set[str],
+        added_stats: set[str],
+    ) -> None:
+        new_file_hashes = file_hashes - added_stats
+
+        for file_hash in new_file_hashes:
+            stats = self.stats_repository.get(session, file_hash)
+            calculation_set.molecule_set_stats.append(stats)
+            added_stats.add(file_hash)

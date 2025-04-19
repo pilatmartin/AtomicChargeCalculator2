@@ -38,7 +38,7 @@ class ChargeFW2Local(ChargeFW2Base):
         return [
             Method(
                 internal_name=method.internal_name,
-                name=method.internal_name,  # TODO: fix this
+                name=method.name,
                 full_name=method.full_name,
                 publication=method.publication,
                 type=method.type,
@@ -85,7 +85,7 @@ class ChargeFW2Local(ChargeFW2Base):
             method_obj = Method(
                 internal_name=method.internal_name,
                 full_name=method.full_name,
-                name=method.internal_name,  # TODO: fix this
+                name=method.name,
                 publication=method.publication,
                 type=method.type,
                 has_parameters=method.has_parameters,
