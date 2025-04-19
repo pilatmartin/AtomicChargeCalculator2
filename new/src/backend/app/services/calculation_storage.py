@@ -12,14 +12,9 @@ from models.calculation import (
 )
 from models.paging import PagedList
 from models.molecule_info import MoleculeSetStats
-from db.schemas.schema import (
-    AdvancedSettings,
-    Calculation,
-    CalculationConfig,
-    CalculationSet,
-    AtomTypeCount,
-    MoleculeSetStats as MoleculeSetStatsModel,
-)
+from db.schemas.calculation import AdvancedSettings, Calculation, CalculationConfig, CalculationSet
+from db.schemas.stats import AtomTypeCount, MoleculeSetStats as MoleculeSetStatsModel
+
 from db.repositories.calculation_config_repository import CalculationConfigRepository
 from db.repositories.calculation_repository import CalculationRepository
 from db.repositories.calculation_set_repository import (
@@ -128,6 +123,7 @@ class CalculationStorageService:
                         for count in info.atom_type_counts
                     ],
                 )
+
                 return self.stats_repository.store(session, info_model)
         except Exception as e:
             self.logger.error(
@@ -189,15 +185,27 @@ class CalculationStorageService:
                         unique_configs[config_key] = config
 
                     for calculation in result.calculations:
-                        calculations.append(
-                            Calculation(
-                                file_name=calculation.file,
-                                file_hash=calculation.file_hash,
-                                charges=calculation.charges,
-                                config=config_to_store,
-                                advanced_settings=settings_exist,
-                            )
+                        calculation_exists = self.calculation_repository.get(
+                            session,
+                            CalculationsFilters(
+                                hash=calculation.file_hash,
+                                method=calculation.config.method,
+                                parameters=calculation.config.parameters,
+                                read_hetatm=settings.read_hetatm,
+                                permissive_types=settings.permissive_types,
+                                ignore_water=settings.ignore_water,
+                            ),
                         )
+                        if calculation_exists is None:
+                            calculations.append(
+                                Calculation(
+                                    file_name=calculation.file,
+                                    file_hash=calculation.file_hash,
+                                    charges=calculation.charges,
+                                    config=config_to_store,
+                                    advanced_settings=settings_exist,
+                                )
+                            )
 
                         if calculation.file_hash not in added_stats:
                             calculation_set.molecule_set_stats.append(
@@ -217,7 +225,11 @@ class CalculationStorageService:
             raise e
 
     def setup_calculation(
-        self, settings: AdvancedSettingsDto, file_hashes: list[str], user_id: str | None
+        self,
+        computation_id: str,
+        settings: AdvancedSettingsDto,
+        file_hashes: list[str],
+        user_id: str | None,
     ) -> None:
         """Setup calculation in database."""
 
@@ -225,6 +237,7 @@ class CalculationStorageService:
             with self.session_manager.session() as session:
                 self.logger.info("Setting up calculation.")
                 calculation_set = CalculationSet(
+                    id=computation_id,
                     user_id=user_id,
                     advanced_settings=self.advanced_settings_repository.get(session, settings),
                 )
