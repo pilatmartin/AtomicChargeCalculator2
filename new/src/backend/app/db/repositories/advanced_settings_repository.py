@@ -4,7 +4,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 
-from db.schemas.schema import AdvancedSettings, CalculationSet
+from db.schemas.calculation import AdvancedSettings, CalculationSet
 from models.setup import AdvancedSettingsDto
 
 

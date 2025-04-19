@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload, Session
 from models.paging import PagedList
 from models.calculation import CalculationsFilters
 
-from db.schemas.schema import AdvancedSettings, Calculation, CalculationConfig
+from db.schemas.calculation import AdvancedSettings, Calculation, CalculationConfig
 from db.repositories.calculation_set_repository import CalculationSetRepository
 
 

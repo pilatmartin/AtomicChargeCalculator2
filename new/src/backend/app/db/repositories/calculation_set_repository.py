@@ -9,7 +9,7 @@ from sqlalchemy.orm import joinedload, Session
 
 from models.paging import PagedList, PagingFilters
 
-from db.schemas.schema import CalculationSet
+from db.schemas.calculation import CalculationSet
 
 
 @dataclass
@@ -100,7 +100,8 @@ class CalculationSetRepository:
             CalculationSet: Stored calculation set.
         """
 
-        session.add(calculation_set)
+        if self.get(session, calculation_set.id) is None:
+            session.add(calculation_set)
 
     def _paginate(
         self, session: Session, statement: Select, page: int, page_size: int

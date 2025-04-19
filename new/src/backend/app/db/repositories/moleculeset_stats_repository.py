@@ -4,7 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, Session
 
 
-from db.schemas.schema import CalculationConfig, MoleculeSetStats
+from db.schemas.calculation import CalculationConfig
+from db.schemas.stats import MoleculeSetStats
 
 
 class MoleculeSetStatsRepository:

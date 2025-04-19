@@ -4,7 +4,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 
-from db.schemas.schema import CalculationConfig
+from db.schemas.calculation import CalculationConfig
 from db.repositories.calculation_set_repository import CalculationSetRepository
 
 
