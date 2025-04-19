@@ -8,7 +8,7 @@ import MolstarPartialCharges from "molstar-partial-charges";
 
 type SetupMutationData = {
   fileHashes: string[];
-  settings: AdvancedSettings;
+  settings?: AdvancedSettings;
 };
 
 type ComputationMutationData = {

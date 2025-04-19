@@ -21,7 +21,7 @@ export const setup = async (
 export const compute = async (
   fileHashes: string[],
   configs: ComputationConfig[],
-  settings: AdvancedSettings,
+  settings?: AdvancedSettings,
   computationId?: string
 ): Promise<string> => {
   const body = {
