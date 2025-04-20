@@ -73,6 +73,7 @@ class CalculationSetPreviewDto(BaseModel):
     id: uuid.UUID
     files: dict[str, MoleculeSetStats]
     configs: list[CalculationConfigDto]
+    settings: AdvancedSettingsDto
     created_at: datetime
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)

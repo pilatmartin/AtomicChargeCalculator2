@@ -30,7 +30,13 @@ class CalculationSet(Base):
     )
     advanced_settings = relationship("AdvancedSettings", back_populates="calculation_sets")
     molecule_set_stats = relationship(
-        "MoleculeSetStats", secondary="calculation_set_stats", back_populates="calculation_sets"
+        "MoleculeSetStats",
+        secondary="calculation_set_stats",
+        back_populates="calculation_sets",
+        viewonly=True,
+    )
+    molecule_set_stats_associations = relationship(
+        "CalculationSetStats", back_populates="calculation_set"
     )
 
     def __repr__(self) -> str:
@@ -92,6 +98,13 @@ class CalculationSetStats(Base):
         sa.VARCHAR(100), sa.ForeignKey("molecule_set_stats.file_hash"), primary_key=True
     )
 
+    file_name: Mapped[str] = mapped_column(sa.VARCHAR(255), nullable=True)
+
+    calculation_set = relationship(
+        "CalculationSet", back_populates="molecule_set_stats_associations"
+    )
+    molecule_set = relationship("MoleculeSetStats", back_populates="calculation_set_associations")
+
     def __repr__(self) -> str:
         return f"<CalculationSetStats calculation_set_id={self.calculation_set_id}, molecule_set_id={self.molecule_set_id}>"
 
@@ -102,7 +115,7 @@ class Calculation(Base):
     __tablename__ = "calculations"
 
     id: Mapped[str] = mapped_column(sa.Uuid, primary_key=True, default=uuid.uuid4)
-    file_name: Mapped[str] = mapped_column(sa.VARCHAR(100), nullable=False)
+    file_name: Mapped[str] = mapped_column(sa.VARCHAR(255), nullable=False)
     file_hash: Mapped[str] = mapped_column(sa.VARCHAR(100), nullable=False)
     charges: Mapped[dict] = mapped_column(sa.JSON, nullable=False)
 

@@ -12,7 +12,13 @@ from models.calculation import (
 )
 from models.paging import PagedList
 from models.molecule_info import MoleculeSetStats
-from db.schemas.calculation import AdvancedSettings, Calculation, CalculationConfig, CalculationSet
+from db.schemas.calculation import (
+    AdvancedSettings,
+    Calculation,
+    CalculationConfig,
+    CalculationSet,
+    CalculationSetStats,
+)
 from db.schemas.stats import AtomTypeCount, MoleculeSetStats as MoleculeSetStatsModel
 
 from db.repositories.calculation_config_repository import CalculationConfigRepository
@@ -80,10 +86,15 @@ class CalculationStorageService:
                         {
                             "id": calculation_set.id,
                             "files": {
-                                calculation.file: self.get_info(session, calculation.file_hash)
-                                for calculation in set(calculation_set.calculations)
+                                stats_assoc.file_name: self.get_info(
+                                    session, stats_assoc.molecule_set_id
+                                )
+                                for stats_assoc in calculation_set.molecule_set_stats_associations
                             },
                             "configs": calculation_set.configs,
+                            "settings": AdvancedSettingsDto.model_validate(
+                                vars(calculation_set.advanced_settings)
+                            ),
                             "created_at": calculation_set.created_at,
                         }
                     )
@@ -156,12 +167,12 @@ class CalculationStorageService:
                         session, result.config, calculation_set
                     )
 
-                    new_calculations, file_hashes = self._process_calculations(
+                    new_calculations, files = self._process_calculations(
                         session, result, config_entity, settings_entity
                     )
                     calculations.extend(new_calculations)
 
-                    self._add_molecule_stats(session, calculation_set, file_hashes, added_stats)
+                    self._add_molecule_stats(session, calculation_set, files, added_stats)
 
                 for calculation in calculations:
                     self.calculation_repository.store(session, calculation)
@@ -362,13 +373,15 @@ class CalculationStorageService:
         result: CalculationResultDto,
         config_entity: CalculationConfig,
         settings_entity: AdvancedSettings,
-    ) -> tuple[list[Calculation], set[str]]:
-        """Process calculation results and return new calculations and file hashes."""
+    ) -> tuple[list[Calculation], dict[str, str]]:
+        """Process calculation results and return new calculations and files (file_hash -> file)."""
 
         new_calculations = []
-        file_hashes = set()
+        files = {}
 
         for calculation in result.calculations:
+            files[calculation.file_hash] = calculation.file
+
             calculation_exists = self.calculation_repository.get(
                 session,
                 CalculationsFilters(
@@ -392,18 +405,28 @@ class CalculationStorageService:
                     )
                 )
 
-        return new_calculations, file_hashes
+        return new_calculations, files
 
     def _add_molecule_stats(
         self,
         session: Session,
         calculation_set: CalculationSet,
-        file_hashes: set[str],
+        files: dict[str, str],
         added_stats: set[str],
     ) -> None:
+        file_hashes = set(files.keys())
         new_file_hashes = file_hashes - added_stats
 
         for file_hash in new_file_hashes:
             stats = self.stats_repository.get(session, file_hash)
-            calculation_set.molecule_set_stats.append(stats)
-            added_stats.add(file_hash)
+
+            if stats is None:
+                # This should never happen
+                continue
+
+            association = CalculationSetStats(
+                molecule_set_id=stats.file_hash,
+                file_name=files.get(stats.file_hash),
+            )
+            calculation_set.molecule_set_stats_associations.append(association)
+            added_stats.add(stats.file_hash)

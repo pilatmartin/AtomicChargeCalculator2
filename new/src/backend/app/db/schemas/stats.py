@@ -39,7 +39,13 @@ class MoleculeSetStats(Base):
 
     atom_type_counts = relationship("AtomTypeCount", back_populates="molecule_set_stats")
     calculation_sets = relationship(
-        "CalculationSet", secondary="calculation_set_stats", back_populates="molecule_set_stats"
+        "CalculationSet",
+        secondary="calculation_set_stats",
+        back_populates="molecule_set_stats",
+        viewonly=True,
+    )
+    calculation_set_associations = relationship(
+        "CalculationSetStats", back_populates="molecule_set"
     )
 
     def __repr__(self):
