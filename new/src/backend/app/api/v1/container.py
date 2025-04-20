@@ -19,6 +19,7 @@ from integrations.io.io import IOLocal
 
 from services.calculation_storage import CalculationStorageService
 from services.chargefw2 import ChargeFW2Service
+from services.file_storage import FileStorageService
 from services.io import IOService
 from services.logging.file_logger import FileLogger
 from services.mmcif import MmCIFService
@@ -68,6 +69,13 @@ class Container(containers.DeclarativeContainer):
         stats_repository=stats_repository,
         advanced_settings_repository=advanced_settings_repository,
         session_manager=session_manager,
+    )
+    file_storage_service = providers.Singleton(
+        FileStorageService,
+        logger=logger_service,
+        io=io_service,
+        session_manager=session_manager,
+        storage_service=storage_service,
     )
     chargefw2_service = providers.Singleton(
         ChargeFW2Service,
