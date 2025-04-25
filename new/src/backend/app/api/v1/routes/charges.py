@@ -82,7 +82,7 @@ async def suitable_methods(
         ) from e
 
 
-@charges_router.post("/{computation_id}/methods/suitable")
+@charges_router.post("/{computation_id}/methods/suitable", include_in_schema=False)
 @inject
 async def computation_suitable_methods(
     request: Request,
@@ -396,7 +396,7 @@ async def get_example_mmcif(
         ) from e
 
 
-@charges_router.get("/{computation_id}/molecules")
+@charges_router.get("/{computation_id}/molecules", include_in_schema=False)
 @inject
 async def get_molecules(
     request: Request,

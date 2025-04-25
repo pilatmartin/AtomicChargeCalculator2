@@ -26,7 +26,7 @@ RUN apt-get update && \
 
 ENV CHARGEFW2_DIR=/ChargeFW2/build
 
-RUN git clone -b fix/files-list-compute-settings --depth 1 https://github.com/pilatmartin/ChargeFW2.git /ChargeFW2_source && \
+RUN git clone -b feat/save-charges-in-python --depth 1 https://github.com/pilatmartin/ChargeFW2.git /ChargeFW2_source && \
     cd /ChargeFW2_source && \
     mkdir build_temp && \
     cd build_temp && \
