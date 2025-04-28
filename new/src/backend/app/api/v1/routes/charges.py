@@ -350,7 +350,7 @@ async def setup(
 
 
 # chemical/x-cif
-@charges_router.get("/{computation_id}/mmcif")
+@charges_router.get("/{computation_id}/mmcif", include_in_schema=False)
 @inject
 async def get_mmcif(
     request: Request,
@@ -482,7 +482,7 @@ async def get_calculations(
         ) from e
 
 
-@charges_router.delete("/{computation_id}")
+@charges_router.delete("/{computation_id}", include_in_schema=False)
 @inject
 async def delete_calculation(
     request: Request,
