@@ -26,14 +26,15 @@ RUN apt-get update && \
 
 ENV CHARGEFW2_DIR=/ChargeFW2/build
 
-RUN git clone -b feat/save-charges-in-python --depth 1 https://github.com/pilatmartin/ChargeFW2.git /ChargeFW2_source && \
-    cd /ChargeFW2_source && \
+COPY ChargeFW2 /ChargeFW2
+
+RUN cd /ChargeFW2 && \
     mkdir build_temp && \
     cd build_temp && \
     cmake .. -DCMAKE_INSTALL_PREFIX=${CHARGEFW2_DIR} -DPYTHON_MODULE=ON && \
     make -j$(nproc) && \
     make install && \
-    cd / && rm -rf /ChargeFW2_source
+    cd / && rm -rf /ChargeFW2
 
 COPY --from=ubuntu:24.04 /usr/lib/x86_64-linux-gnu/libgomp.so.1* \
     /usr/lib/x86_64-linux-gnu/libfmt.so.* \
