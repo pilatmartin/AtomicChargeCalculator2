@@ -6,7 +6,7 @@ import tempfile
 from typing import Any, Generator
 import pytest
 
-from integrations.io.io import IOLocal
+from app.integrations.io.io import IOLocal
 
 
 @pytest.fixture
