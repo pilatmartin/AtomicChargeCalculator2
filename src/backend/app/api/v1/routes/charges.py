@@ -268,6 +268,20 @@ async def calculate_charges(
                 detail="No file hashes provided.",
             )
 
+        data.file_hashes = list(set(data.file_hashes))
+
+        total_size = sum(
+            io_service.get_file_size(file_hash, user_id) or 0 for file_hash in data.file_hashes
+        )
+
+        if total_size > io_service.max_file_size:
+            max_file_size_mb = io_service.max_file_size / 1024 / 1024
+            raise BadRequestError(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="Unable to calculate charges. Calculation is too large."
+                + f"Maximum allowed size is {max_file_size_mb} MB.",
+            )
+
         configs = data.configs
         if not configs:
             # use most suitable method and parameters if none provided
