@@ -39,9 +39,5 @@ class UserLoaderMiddleware(BaseHTTPMiddleware):
                 user = self.user_repository.get(openid)
                 request.state.user = user
 
-        openid = "f8e916e578ec64cbb26786c2769b4a95bd87aef0@lifescience-ri.eu"
-        user = self.user_repository.get(openid)
-        request.state.user = user
-
         response = await call_next(request)
         return response
