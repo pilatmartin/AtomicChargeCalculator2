@@ -52,7 +52,7 @@ export const MolstarColoringControls = ({
   useEffect(() => {
     void context.set.coloringType(context.get.coloringType);
     void resetMaxValue();
-  }, [context.get, context.set]);
+  }, [context.get.coloringType]);
 
   return (
     <div className="flex gap-4 flex-col sm:flex-row">
