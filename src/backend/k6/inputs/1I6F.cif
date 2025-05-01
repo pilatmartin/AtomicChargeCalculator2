@@ -1,0 +1,2242 @@
+data_1I6F
+# 
+_entry.id   1I6F 
+# 
+_audit_conform.dict_name       mmcif_pdbx.dic 
+_audit_conform.dict_version    5.398 
+_audit_conform.dict_location   http://mmcif.pdb.org/dictionaries/ascii/mmcif_pdbx.dic 
+# 
+loop_
+_database_2.database_id 
+_database_2.database_code 
+_database_2.pdbx_database_accession 
+_database_2.pdbx_DOI 
+PDB   1I6F         pdb_00001i6f 10.2210/pdb1i6f/pdb 
+RCSB  RCSB012962   ?            ?                   
+WWPDB D_1000012962 ?            ?                   
+# 
+loop_
+_pdbx_audit_revision_history.ordinal 
+_pdbx_audit_revision_history.data_content_type 
+_pdbx_audit_revision_history.major_revision 
+_pdbx_audit_revision_history.minor_revision 
+_pdbx_audit_revision_history.revision_date 
+1 'Structure model' 1 0 2001-08-01 
+2 'Structure model' 1 1 2008-04-27 
+3 'Structure model' 1 2 2011-07-13 
+4 'Structure model' 1 3 2022-02-23 
+5 'Structure model' 1 4 2024-11-06 
+# 
+_pdbx_audit_revision_details.ordinal             1 
+_pdbx_audit_revision_details.revision_ordinal    1 
+_pdbx_audit_revision_details.data_content_type   'Structure model' 
+_pdbx_audit_revision_details.provider            repository 
+_pdbx_audit_revision_details.type                'Initial release' 
+_pdbx_audit_revision_details.description         ? 
+_pdbx_audit_revision_details.details             ? 
+# 
+loop_
+_pdbx_audit_revision_group.ordinal 
+_pdbx_audit_revision_group.revision_ordinal 
+_pdbx_audit_revision_group.data_content_type 
+_pdbx_audit_revision_group.group 
+1 2 'Structure model' 'Version format compliance' 
+2 3 'Structure model' 'Version format compliance' 
+3 4 'Structure model' 'Data collection'           
+4 4 'Structure model' 'Database references'       
+5 4 'Structure model' 'Derived calculations'      
+6 5 'Structure model' 'Data collection'           
+7 5 'Structure model' 'Structure summary'         
+# 
+loop_
+_pdbx_audit_revision_category.ordinal 
+_pdbx_audit_revision_category.revision_ordinal 
+_pdbx_audit_revision_category.data_content_type 
+_pdbx_audit_revision_category.category 
+1 4 'Structure model' database_2                
+2 4 'Structure model' pdbx_nmr_software         
+3 4 'Structure model' pdbx_struct_assembly      
+4 4 'Structure model' pdbx_struct_oper_list     
+5 5 'Structure model' chem_comp_atom            
+6 5 'Structure model' chem_comp_bond            
+7 5 'Structure model' pdbx_entry_details        
+8 5 'Structure model' pdbx_modification_feature 
+# 
+loop_
+_pdbx_audit_revision_item.ordinal 
+_pdbx_audit_revision_item.revision_ordinal 
+_pdbx_audit_revision_item.data_content_type 
+_pdbx_audit_revision_item.item 
+1 4 'Structure model' '_database_2.pdbx_DOI'                
+2 4 'Structure model' '_database_2.pdbx_database_accession' 
+3 4 'Structure model' '_pdbx_nmr_software.name'             
+# 
+_pdbx_database_status.status_code                     REL 
+_pdbx_database_status.entry_id                        1I6F 
+_pdbx_database_status.recvd_initial_deposition_date   2001-03-02 
+_pdbx_database_status.deposit_site                    RCSB 
+_pdbx_database_status.process_site                    RCSB 
+_pdbx_database_status.status_code_mr                  REL 
+_pdbx_database_status.SG_entry                        . 
+_pdbx_database_status.pdb_format_compatible           Y 
+_pdbx_database_status.status_code_sf                  ? 
+_pdbx_database_status.status_code_cs                  ? 
+_pdbx_database_status.status_code_nmr_data            ? 
+_pdbx_database_status.methods_development_category    ? 
+# 
+loop_
+_pdbx_database_related.db_name 
+_pdbx_database_related.db_id 
+_pdbx_database_related.details 
+_pdbx_database_related.content_type 
+PDB 1NRB 'Neurotoxin CsE-V'                 unspecified 
+PDB 1B3C 'Neurotoxin CsE-I'                 unspecified 
+PDB 1I6G 'Neurotoxin CsE-v5, 20 conformers' unspecified 
+# 
+loop_
+_audit_author.name 
+_audit_author.pdbx_ordinal 
+'Jablonsky, M.J.' 1 
+'Jackson, P.L.'   2 
+'Krishna, N.R.'   3 
+# 
+_citation.id                        primary 
+_citation.title                     
+'Solution structure of an insect-specific neurotoxin from the New World scorpion Centruroides sculpturatus Ewing.' 
+_citation.journal_abbrev            Biochemistry 
+_citation.journal_volume            40 
+_citation.page_first                8273 
+_citation.page_last                 8282 
+_citation.year                      2001 
+_citation.journal_id_ASTM           BICHAW 
+_citation.country                   US 
+_citation.journal_id_ISSN           0006-2960 
+_citation.journal_id_CSD            0033 
+_citation.book_publisher            ? 
+_citation.pdbx_database_id_PubMed   11444973 
+_citation.pdbx_database_id_DOI      10.1021/bi010223h 
+# 
+loop_
+_citation_author.citation_id 
+_citation_author.name 
+_citation_author.ordinal 
+_citation_author.identifier_ORCID 
+primary 'Jablonsky, M.J.' 1 ? 
+primary 'Jackson, P.L.'   2 ? 
+primary 'Krishna, N.R.'   3 ? 
+# 
+_entity.id                         1 
+_entity.type                       polymer 
+_entity.src_method                 nat 
+_entity.pdbx_description           'NEUROTOXIN V-5' 
+_entity.formula_weight             6370.235 
+_entity.pdbx_number_of_molecules   1 
+_entity.pdbx_ec                    ? 
+_entity.pdbx_mutation              ? 
+_entity.pdbx_fragment              ? 
+_entity.details                    ? 
+# 
+_entity_name_com.entity_id   1 
+_entity_name_com.name        CSE-V5 
+# 
+_entity_poly.entity_id                      1 
+_entity_poly.type                           'polypeptide(L)' 
+_entity_poly.nstd_linkage                   no 
+_entity_poly.nstd_monomer                   no 
+_entity_poly.pdbx_seq_one_letter_code       KDGYPVDSKGCKLSCVANNYCDNQCKMKKASGGHCYAMSCYCEGLPENAKVSDSATNICG 
+_entity_poly.pdbx_seq_one_letter_code_can   KDGYPVDSKGCKLSCVANNYCDNQCKMKKASGGHCYAMSCYCEGLPENAKVSDSATNICG 
+_entity_poly.pdbx_strand_id                 A 
+_entity_poly.pdbx_target_identifier         ? 
+# 
+loop_
+_entity_poly_seq.entity_id 
+_entity_poly_seq.num 
+_entity_poly_seq.mon_id 
+_entity_poly_seq.hetero 
+1 1  LYS n 
+1 2  ASP n 
+1 3  GLY n 
+1 4  TYR n 
+1 5  PRO n 
+1 6  VAL n 
+1 7  ASP n 
+1 8  SER n 
+1 9  LYS n 
+1 10 GLY n 
+1 11 CYS n 
+1 12 LYS n 
+1 13 LEU n 
+1 14 SER n 
+1 15 CYS n 
+1 16 VAL n 
+1 17 ALA n 
+1 18 ASN n 
+1 19 ASN n 
+1 20 TYR n 
+1 21 CYS n 
+1 22 ASP n 
+1 23 ASN n 
+1 24 GLN n 
+1 25 CYS n 
+1 26 LYS n 
+1 27 MET n 
+1 28 LYS n 
+1 29 LYS n 
+1 30 ALA n 
+1 31 SER n 
+1 32 GLY n 
+1 33 GLY n 
+1 34 HIS n 
+1 35 CYS n 
+1 36 TYR n 
+1 37 ALA n 
+1 38 MET n 
+1 39 SER n 
+1 40 CYS n 
+1 41 TYR n 
+1 42 CYS n 
+1 43 GLU n 
+1 44 GLY n 
+1 45 LEU n 
+1 46 PRO n 
+1 47 GLU n 
+1 48 ASN n 
+1 49 ALA n 
+1 50 LYS n 
+1 51 VAL n 
+1 52 SER n 
+1 53 ASP n 
+1 54 SER n 
+1 55 ALA n 
+1 56 THR n 
+1 57 ASN n 
+1 58 ILE n 
+1 59 CYS n 
+1 60 GLY n 
+# 
+_entity_src_nat.entity_id                  1 
+_entity_src_nat.pdbx_src_id                1 
+_entity_src_nat.pdbx_alt_source_flag       sample 
+_entity_src_nat.pdbx_beg_seq_num           ? 
+_entity_src_nat.pdbx_end_seq_num           ? 
+_entity_src_nat.common_name                'bark scorpion' 
+_entity_src_nat.pdbx_organism_scientific   'Centruroides sculpturatus' 
+_entity_src_nat.pdbx_ncbi_taxonomy_id      218467 
+_entity_src_nat.genus                      Centruroides 
+_entity_src_nat.species                    ? 
+_entity_src_nat.strain                     ? 
+_entity_src_nat.tissue                     ? 
+_entity_src_nat.tissue_fraction            ? 
+_entity_src_nat.pdbx_secretion             ? 
+_entity_src_nat.pdbx_fragment              ? 
+_entity_src_nat.pdbx_variant               5 
+_entity_src_nat.pdbx_cell_line             ? 
+_entity_src_nat.pdbx_atcc                  ? 
+_entity_src_nat.pdbx_cellular_location     ? 
+_entity_src_nat.pdbx_organ                 ? 
+_entity_src_nat.pdbx_organelle             ? 
+_entity_src_nat.pdbx_cell                  ? 
+_entity_src_nat.pdbx_plasmid_name          ? 
+_entity_src_nat.pdbx_plasmid_details       ? 
+_entity_src_nat.details                    ? 
+# 
+loop_
+_chem_comp.id 
+_chem_comp.type 
+_chem_comp.mon_nstd_flag 
+_chem_comp.name 
+_chem_comp.pdbx_synonyms 
+_chem_comp.formula 
+_chem_comp.formula_weight 
+ALA 'L-peptide linking' y ALANINE         ? 'C3 H7 N O2'     89.093  
+ASN 'L-peptide linking' y ASPARAGINE      ? 'C4 H8 N2 O3'    132.118 
+ASP 'L-peptide linking' y 'ASPARTIC ACID' ? 'C4 H7 N O4'     133.103 
+CYS 'L-peptide linking' y CYSTEINE        ? 'C3 H7 N O2 S'   121.158 
+GLN 'L-peptide linking' y GLUTAMINE       ? 'C5 H10 N2 O3'   146.144 
+GLU 'L-peptide linking' y 'GLUTAMIC ACID' ? 'C5 H9 N O4'     147.129 
+GLY 'peptide linking'   y GLYCINE         ? 'C2 H5 N O2'     75.067  
+HIS 'L-peptide linking' y HISTIDINE       ? 'C6 H10 N3 O2 1' 156.162 
+ILE 'L-peptide linking' y ISOLEUCINE      ? 'C6 H13 N O2'    131.173 
+LEU 'L-peptide linking' y LEUCINE         ? 'C6 H13 N O2'    131.173 
+LYS 'L-peptide linking' y LYSINE          ? 'C6 H15 N2 O2 1' 147.195 
+MET 'L-peptide linking' y METHIONINE      ? 'C5 H11 N O2 S'  149.211 
+PRO 'L-peptide linking' y PROLINE         ? 'C5 H9 N O2'     115.130 
+SER 'L-peptide linking' y SERINE          ? 'C3 H7 N O3'     105.093 
+THR 'L-peptide linking' y THREONINE       ? 'C4 H9 N O3'     119.119 
+TYR 'L-peptide linking' y TYROSINE        ? 'C9 H11 N O3'    181.189 
+VAL 'L-peptide linking' y VALINE          ? 'C5 H11 N O2'    117.146 
+# 
+loop_
+_pdbx_poly_seq_scheme.asym_id 
+_pdbx_poly_seq_scheme.entity_id 
+_pdbx_poly_seq_scheme.seq_id 
+_pdbx_poly_seq_scheme.mon_id 
+_pdbx_poly_seq_scheme.ndb_seq_num 
+_pdbx_poly_seq_scheme.pdb_seq_num 
+_pdbx_poly_seq_scheme.auth_seq_num 
+_pdbx_poly_seq_scheme.pdb_mon_id 
+_pdbx_poly_seq_scheme.auth_mon_id 
+_pdbx_poly_seq_scheme.pdb_strand_id 
+_pdbx_poly_seq_scheme.pdb_ins_code 
+_pdbx_poly_seq_scheme.hetero 
+A 1 1  LYS 1  1  1  LYS LYS A . n 
+A 1 2  ASP 2  2  2  ASP ASP A . n 
+A 1 3  GLY 3  3  3  GLY GLY A . n 
+A 1 4  TYR 4  4  4  TYR TYR A . n 
+A 1 5  PRO 5  5  5  PRO PRO A . n 
+A 1 6  VAL 6  6  6  VAL VAL A . n 
+A 1 7  ASP 7  7  7  ASP ASP A . n 
+A 1 8  SER 8  8  8  SER SER A . n 
+A 1 9  LYS 9  9  9  LYS LYS A . n 
+A 1 10 GLY 10 10 10 GLY GLY A . n 
+A 1 11 CYS 11 11 11 CYS CYS A . n 
+A 1 12 LYS 12 12 12 LYS LYS A . n 
+A 1 13 LEU 13 13 13 LEU LEU A . n 
+A 1 14 SER 14 14 14 SER SER A . n 
+A 1 15 CYS 15 15 15 CYS CYS A . n 
+A 1 16 VAL 16 16 16 VAL VAL A . n 
+A 1 17 ALA 17 17 17 ALA ALA A . n 
+A 1 18 ASN 18 18 18 ASN ASN A . n 
+A 1 19 ASN 19 19 19 ASN ASN A . n 
+A 1 20 TYR 20 20 20 TYR TYR A . n 
+A 1 21 CYS 21 21 21 CYS CYS A . n 
+A 1 22 ASP 22 22 22 ASP ASP A . n 
+A 1 23 ASN 23 23 23 ASN ASN A . n 
+A 1 24 GLN 24 24 24 GLN GLN A . n 
+A 1 25 CYS 25 25 25 CYS CYS A . n 
+A 1 26 LYS 26 26 26 LYS LYS A . n 
+A 1 27 MET 27 27 27 MET MET A . n 
+A 1 28 LYS 28 28 28 LYS LYS A . n 
+A 1 29 LYS 29 29 29 LYS LYS A . n 
+A 1 30 ALA 30 30 30 ALA ALA A . n 
+A 1 31 SER 31 31 31 SER SER A . n 
+A 1 32 GLY 32 32 32 GLY GLY A . n 
+A 1 33 GLY 33 33 33 GLY GLY A . n 
+A 1 34 HIS 34 34 34 HIS HIS A . n 
+A 1 35 CYS 35 35 35 CYS CYS A . n 
+A 1 36 TYR 36 36 36 TYR TYR A . n 
+A 1 37 ALA 37 37 37 ALA ALA A . n 
+A 1 38 MET 38 38 38 MET MET A . n 
+A 1 39 SER 39 39 39 SER SER A . n 
+A 1 40 CYS 40 40 40 CYS CYS A . n 
+A 1 41 TYR 41 41 41 TYR TYR A . n 
+A 1 42 CYS 42 42 42 CYS CYS A . n 
+A 1 43 GLU 43 43 43 GLU GLU A . n 
+A 1 44 GLY 44 44 44 GLY GLY A . n 
+A 1 45 LEU 45 45 45 LEU LEU A . n 
+A 1 46 PRO 46 46 46 PRO PRO A . n 
+A 1 47 GLU 47 47 47 GLU GLU A . n 
+A 1 48 ASN 48 48 48 ASN ASN A . n 
+A 1 49 ALA 49 49 49 ALA ALA A . n 
+A 1 50 LYS 50 50 50 LYS LYS A . n 
+A 1 51 VAL 51 51 51 VAL VAL A . n 
+A 1 52 SER 52 52 52 SER SER A . n 
+A 1 53 ASP 53 53 53 ASP ASP A . n 
+A 1 54 SER 54 54 54 SER SER A . n 
+A 1 55 ALA 55 55 55 ALA ALA A . n 
+A 1 56 THR 56 56 56 THR THR A . n 
+A 1 57 ASN 57 57 57 ASN ASN A . n 
+A 1 58 ILE 58 58 58 ILE ILE A . n 
+A 1 59 CYS 59 59 59 CYS CYS A . n 
+A 1 60 GLY 60 60 60 GLY GLY A . n 
+# 
+_cell.entry_id           1I6F 
+_cell.length_a           ? 
+_cell.length_b           ? 
+_cell.length_c           ? 
+_cell.angle_alpha        ? 
+_cell.angle_beta         ? 
+_cell.angle_gamma        ? 
+_cell.Z_PDB              1 
+_cell.pdbx_unique_axis   ? 
+# 
+_exptl.entry_id          1I6F 
+_exptl.method            'SOLUTION NMR' 
+_exptl.crystals_number   ? 
+# 
+_database_PDB_matrix.entry_id          1I6F 
+_database_PDB_matrix.origx[1][1]       1.000000 
+_database_PDB_matrix.origx[1][2]       0.000000 
+_database_PDB_matrix.origx[1][3]       0.000000 
+_database_PDB_matrix.origx[2][1]       0.000000 
+_database_PDB_matrix.origx[2][2]       1.000000 
+_database_PDB_matrix.origx[2][3]       0.000000 
+_database_PDB_matrix.origx[3][1]       0.000000 
+_database_PDB_matrix.origx[3][2]       0.000000 
+_database_PDB_matrix.origx[3][3]       1.000000 
+_database_PDB_matrix.origx_vector[1]   0.00000 
+_database_PDB_matrix.origx_vector[2]   0.00000 
+_database_PDB_matrix.origx_vector[3]   0.00000 
+# 
+_struct.entry_id                  1I6F 
+_struct.title                     
+'NMR SOLUTION STRUCTURE OF THE INSECT-SPECIFIC NEUROTOXIN VARIANT 5 (CSE-V5) FROM THE SCORPION CENTRUROIDES SCULPTURATUS EWING' 
+_struct.pdbx_model_details        ? 
+_struct.pdbx_CASP_flag            ? 
+_struct.pdbx_model_type_details   'minimized average' 
+# 
+_struct_keywords.entry_id        1I6F 
+_struct_keywords.pdbx_keywords   TOXIN 
+_struct_keywords.text            'scorpion, neurotoxin, sodium channel, alpha helix, beta sheet, disulfide linkages, TOXIN' 
+# 
+_struct_asym.id                            A 
+_struct_asym.pdbx_blank_PDB_chainid_flag   N 
+_struct_asym.pdbx_modified                 N 
+_struct_asym.entity_id                     1 
+_struct_asym.details                       ? 
+# 
+_struct_ref.id                         1 
+_struct_ref.db_name                    UNP 
+_struct_ref.db_code                    SCX5_CENSC 
+_struct_ref.entity_id                  1 
+_struct_ref.pdbx_seq_one_letter_code   KDGYPVDSKGCKLSCVANNYCDNQCKMKKASGGHCYAMSCYCEGLPENAKVSDSATNIC 
+_struct_ref.pdbx_align_begin           1 
+_struct_ref.pdbx_db_accession          P58779 
+_struct_ref.pdbx_db_isoform            ? 
+# 
+_struct_ref_seq.align_id                      1 
+_struct_ref_seq.ref_id                        1 
+_struct_ref_seq.pdbx_PDB_id_code              1I6F 
+_struct_ref_seq.pdbx_strand_id                A 
+_struct_ref_seq.seq_align_beg                 1 
+_struct_ref_seq.pdbx_seq_align_beg_ins_code   ? 
+_struct_ref_seq.seq_align_end                 59 
+_struct_ref_seq.pdbx_seq_align_end_ins_code   ? 
+_struct_ref_seq.pdbx_db_accession             P58779 
+_struct_ref_seq.db_align_beg                  1 
+_struct_ref_seq.pdbx_db_align_beg_ins_code    ? 
+_struct_ref_seq.db_align_end                  59 
+_struct_ref_seq.pdbx_db_align_end_ins_code    ? 
+_struct_ref_seq.pdbx_auth_seq_align_beg       1 
+_struct_ref_seq.pdbx_auth_seq_align_end       59 
+# 
+_struct_ref_seq_dif.align_id                     1 
+_struct_ref_seq_dif.pdbx_pdb_id_code             1I6F 
+_struct_ref_seq_dif.mon_id                       GLY 
+_struct_ref_seq_dif.pdbx_pdb_strand_id           A 
+_struct_ref_seq_dif.seq_num                      60 
+_struct_ref_seq_dif.pdbx_pdb_ins_code            ? 
+_struct_ref_seq_dif.pdbx_seq_db_name             UNP 
+_struct_ref_seq_dif.pdbx_seq_db_accession_code   P58779 
+_struct_ref_seq_dif.db_mon_id                    ? 
+_struct_ref_seq_dif.pdbx_seq_db_seq_num          ? 
+_struct_ref_seq_dif.details                      'SEE REMARK 999' 
+_struct_ref_seq_dif.pdbx_auth_seq_num            60 
+_struct_ref_seq_dif.pdbx_ordinal                 1 
+# 
+_pdbx_struct_assembly.id                   1 
+_pdbx_struct_assembly.details              author_defined_assembly 
+_pdbx_struct_assembly.method_details       ? 
+_pdbx_struct_assembly.oligomeric_details   monomeric 
+_pdbx_struct_assembly.oligomeric_count     1 
+# 
+_pdbx_struct_assembly_gen.assembly_id       1 
+_pdbx_struct_assembly_gen.oper_expression   1 
+_pdbx_struct_assembly_gen.asym_id_list      A 
+# 
+_pdbx_struct_oper_list.id                   1 
+_pdbx_struct_oper_list.type                 'identity operation' 
+_pdbx_struct_oper_list.name                 1_555 
+_pdbx_struct_oper_list.symmetry_operation   x,y,z 
+_pdbx_struct_oper_list.matrix[1][1]         1.0000000000 
+_pdbx_struct_oper_list.matrix[1][2]         0.0000000000 
+_pdbx_struct_oper_list.matrix[1][3]         0.0000000000 
+_pdbx_struct_oper_list.vector[1]            0.0000000000 
+_pdbx_struct_oper_list.matrix[2][1]         0.0000000000 
+_pdbx_struct_oper_list.matrix[2][2]         1.0000000000 
+_pdbx_struct_oper_list.matrix[2][3]         0.0000000000 
+_pdbx_struct_oper_list.vector[2]            0.0000000000 
+_pdbx_struct_oper_list.matrix[3][1]         0.0000000000 
+_pdbx_struct_oper_list.matrix[3][2]         0.0000000000 
+_pdbx_struct_oper_list.matrix[3][3]         1.0000000000 
+_pdbx_struct_oper_list.vector[3]            0.0000000000 
+# 
+_struct_biol.id   1 
+# 
+_struct_conf.conf_type_id            HELX_P 
+_struct_conf.id                      HELX_P1 
+_struct_conf.pdbx_PDB_helix_id       1 
+_struct_conf.beg_label_comp_id       ALA 
+_struct_conf.beg_label_asym_id       A 
+_struct_conf.beg_label_seq_id        17 
+_struct_conf.pdbx_beg_PDB_ins_code   ? 
+_struct_conf.end_label_comp_id       LYS 
+_struct_conf.end_label_asym_id       A 
+_struct_conf.end_label_seq_id        28 
+_struct_conf.pdbx_end_PDB_ins_code   ? 
+_struct_conf.beg_auth_comp_id        ALA 
+_struct_conf.beg_auth_asym_id        A 
+_struct_conf.beg_auth_seq_id         17 
+_struct_conf.end_auth_comp_id        LYS 
+_struct_conf.end_auth_asym_id        A 
+_struct_conf.end_auth_seq_id         28 
+_struct_conf.pdbx_PDB_helix_class    1 
+_struct_conf.details                 ? 
+_struct_conf.pdbx_PDB_helix_length   12 
+# 
+_struct_conf_type.id          HELX_P 
+_struct_conf_type.criteria    ? 
+_struct_conf_type.reference   ? 
+# 
+loop_
+_struct_conn.id 
+_struct_conn.conn_type_id 
+_struct_conn.pdbx_leaving_atom_flag 
+_struct_conn.pdbx_PDB_id 
+_struct_conn.ptnr1_label_asym_id 
+_struct_conn.ptnr1_label_comp_id 
+_struct_conn.ptnr1_label_seq_id 
+_struct_conn.ptnr1_label_atom_id 
+_struct_conn.pdbx_ptnr1_label_alt_id 
+_struct_conn.pdbx_ptnr1_PDB_ins_code 
+_struct_conn.pdbx_ptnr1_standard_comp_id 
+_struct_conn.ptnr1_symmetry 
+_struct_conn.ptnr2_label_asym_id 
+_struct_conn.ptnr2_label_comp_id 
+_struct_conn.ptnr2_label_seq_id 
+_struct_conn.ptnr2_label_atom_id 
+_struct_conn.pdbx_ptnr2_label_alt_id 
+_struct_conn.pdbx_ptnr2_PDB_ins_code 
+_struct_conn.ptnr1_auth_asym_id 
+_struct_conn.ptnr1_auth_comp_id 
+_struct_conn.ptnr1_auth_seq_id 
+_struct_conn.ptnr2_auth_asym_id 
+_struct_conn.ptnr2_auth_comp_id 
+_struct_conn.ptnr2_auth_seq_id 
+_struct_conn.ptnr2_symmetry 
+_struct_conn.pdbx_ptnr3_label_atom_id 
+_struct_conn.pdbx_ptnr3_label_seq_id 
+_struct_conn.pdbx_ptnr3_label_comp_id 
+_struct_conn.pdbx_ptnr3_label_asym_id 
+_struct_conn.pdbx_ptnr3_label_alt_id 
+_struct_conn.pdbx_ptnr3_PDB_ins_code 
+_struct_conn.details 
+_struct_conn.pdbx_dist_value 
+_struct_conn.pdbx_value_order 
+_struct_conn.pdbx_role 
+disulf1 disulf ? ? A CYS 11 SG ? ? ? 1_555 A CYS 59 SG ? ? A CYS 11 A CYS 59 1_555 ? ? ? ? ? ? ? 2.020 ? ? 
+disulf2 disulf ? ? A CYS 15 SG ? ? ? 1_555 A CYS 35 SG ? ? A CYS 15 A CYS 35 1_555 ? ? ? ? ? ? ? 2.020 ? ? 
+disulf3 disulf ? ? A CYS 21 SG ? ? ? 1_555 A CYS 40 SG ? ? A CYS 21 A CYS 40 1_555 ? ? ? ? ? ? ? 2.020 ? ? 
+disulf4 disulf ? ? A CYS 25 SG ? ? ? 1_555 A CYS 42 SG ? ? A CYS 25 A CYS 42 1_555 ? ? ? ? ? ? ? 2.020 ? ? 
+# 
+_struct_conn_type.id          disulf 
+_struct_conn_type.criteria    ? 
+_struct_conn_type.reference   ? 
+# 
+loop_
+_pdbx_modification_feature.ordinal 
+_pdbx_modification_feature.label_comp_id 
+_pdbx_modification_feature.label_asym_id 
+_pdbx_modification_feature.label_seq_id 
+_pdbx_modification_feature.label_alt_id 
+_pdbx_modification_feature.modified_residue_label_comp_id 
+_pdbx_modification_feature.modified_residue_label_asym_id 
+_pdbx_modification_feature.modified_residue_label_seq_id 
+_pdbx_modification_feature.modified_residue_label_alt_id 
+_pdbx_modification_feature.auth_comp_id 
+_pdbx_modification_feature.auth_asym_id 
+_pdbx_modification_feature.auth_seq_id 
+_pdbx_modification_feature.PDB_ins_code 
+_pdbx_modification_feature.symmetry 
+_pdbx_modification_feature.modified_residue_auth_comp_id 
+_pdbx_modification_feature.modified_residue_auth_asym_id 
+_pdbx_modification_feature.modified_residue_auth_seq_id 
+_pdbx_modification_feature.modified_residue_PDB_ins_code 
+_pdbx_modification_feature.modified_residue_symmetry 
+_pdbx_modification_feature.comp_id_linking_atom 
+_pdbx_modification_feature.modified_residue_id_linking_atom 
+_pdbx_modification_feature.modified_residue_id 
+_pdbx_modification_feature.ref_pcm_id 
+_pdbx_modification_feature.ref_comp_id 
+_pdbx_modification_feature.type 
+_pdbx_modification_feature.category 
+1 CYS A 11 ? CYS A 59 ? CYS A 11 ? 1_555 CYS A 59 ? 1_555 SG SG . . . None 'Disulfide bridge' 
+2 CYS A 15 ? CYS A 35 ? CYS A 15 ? 1_555 CYS A 35 ? 1_555 SG SG . . . None 'Disulfide bridge' 
+3 CYS A 21 ? CYS A 40 ? CYS A 21 ? 1_555 CYS A 40 ? 1_555 SG SG . . . None 'Disulfide bridge' 
+4 CYS A 25 ? CYS A 42 ? CYS A 25 ? 1_555 CYS A 42 ? 1_555 SG SG . . . None 'Disulfide bridge' 
+# 
+_struct_sheet.id               A 
+_struct_sheet.type             ? 
+_struct_sheet.number_strands   4 
+_struct_sheet.details          ? 
+# 
+loop_
+_struct_sheet_order.sheet_id 
+_struct_sheet_order.range_id_1 
+_struct_sheet_order.range_id_2 
+_struct_sheet_order.offset 
+_struct_sheet_order.sense 
+A 1 2 ? anti-parallel 
+A 2 3 ? anti-parallel 
+A 3 4 ? anti-parallel 
+# 
+loop_
+_struct_sheet_range.sheet_id 
+_struct_sheet_range.id 
+_struct_sheet_range.beg_label_comp_id 
+_struct_sheet_range.beg_label_asym_id 
+_struct_sheet_range.beg_label_seq_id 
+_struct_sheet_range.pdbx_beg_PDB_ins_code 
+_struct_sheet_range.end_label_comp_id 
+_struct_sheet_range.end_label_asym_id 
+_struct_sheet_range.end_label_seq_id 
+_struct_sheet_range.pdbx_end_PDB_ins_code 
+_struct_sheet_range.beg_auth_comp_id 
+_struct_sheet_range.beg_auth_asym_id 
+_struct_sheet_range.beg_auth_seq_id 
+_struct_sheet_range.end_auth_comp_id 
+_struct_sheet_range.end_auth_asym_id 
+_struct_sheet_range.end_auth_seq_id 
+A 1 HIS A 34 ? TYR A 36 ? HIS A 34 TYR A 36 
+A 2 SER A 39 ? GLU A 43 ? SER A 39 GLU A 43 
+A 3 ASP A 2  ? PRO A 5  ? ASP A 2  PRO A 5  
+A 4 VAL A 51 ? SER A 52 ? VAL A 51 SER A 52 
+# 
+loop_
+_pdbx_struct_sheet_hbond.sheet_id 
+_pdbx_struct_sheet_hbond.range_id_1 
+_pdbx_struct_sheet_hbond.range_id_2 
+_pdbx_struct_sheet_hbond.range_1_label_atom_id 
+_pdbx_struct_sheet_hbond.range_1_label_comp_id 
+_pdbx_struct_sheet_hbond.range_1_label_asym_id 
+_pdbx_struct_sheet_hbond.range_1_label_seq_id 
+_pdbx_struct_sheet_hbond.range_1_PDB_ins_code 
+_pdbx_struct_sheet_hbond.range_1_auth_atom_id 
+_pdbx_struct_sheet_hbond.range_1_auth_comp_id 
+_pdbx_struct_sheet_hbond.range_1_auth_asym_id 
+_pdbx_struct_sheet_hbond.range_1_auth_seq_id 
+_pdbx_struct_sheet_hbond.range_2_label_atom_id 
+_pdbx_struct_sheet_hbond.range_2_label_comp_id 
+_pdbx_struct_sheet_hbond.range_2_label_asym_id 
+_pdbx_struct_sheet_hbond.range_2_label_seq_id 
+_pdbx_struct_sheet_hbond.range_2_PDB_ins_code 
+_pdbx_struct_sheet_hbond.range_2_auth_atom_id 
+_pdbx_struct_sheet_hbond.range_2_auth_comp_id 
+_pdbx_struct_sheet_hbond.range_2_auth_asym_id 
+_pdbx_struct_sheet_hbond.range_2_auth_seq_id 
+A 1 2 O TYR A 36 ? O TYR A 36 N SER A 39 ? N SER A 39 
+A 2 3 N CYS A 42 ? N CYS A 42 O GLY A 3  ? O GLY A 3  
+A 3 4 O TYR A 4  ? O TYR A 4  N SER A 52 ? N SER A 52 
+# 
+_pdbx_entry_details.entry_id                   1I6F 
+_pdbx_entry_details.compound_details           ? 
+_pdbx_entry_details.source_details             ? 
+_pdbx_entry_details.nonpolymer_details         ? 
+_pdbx_entry_details.sequence_details           ? 
+_pdbx_entry_details.has_ligand_of_interest     ? 
+_pdbx_entry_details.has_protein_modification   Y 
+# 
+_pdbx_validate_close_contact.id               1 
+_pdbx_validate_close_contact.PDB_model_num    1 
+_pdbx_validate_close_contact.auth_atom_id_1   H3 
+_pdbx_validate_close_contact.auth_asym_id_1   A 
+_pdbx_validate_close_contact.auth_comp_id_1   LYS 
+_pdbx_validate_close_contact.auth_seq_id_1    1 
+_pdbx_validate_close_contact.PDB_ins_code_1   ? 
+_pdbx_validate_close_contact.label_alt_id_1   ? 
+_pdbx_validate_close_contact.auth_atom_id_2   O 
+_pdbx_validate_close_contact.auth_asym_id_2   A 
+_pdbx_validate_close_contact.auth_comp_id_2   LEU 
+_pdbx_validate_close_contact.auth_seq_id_2    45 
+_pdbx_validate_close_contact.PDB_ins_code_2   ? 
+_pdbx_validate_close_contact.label_alt_id_2   ? 
+_pdbx_validate_close_contact.dist             1.59 
+# 
+loop_
+_pdbx_validate_torsion.id 
+_pdbx_validate_torsion.PDB_model_num 
+_pdbx_validate_torsion.auth_comp_id 
+_pdbx_validate_torsion.auth_asym_id 
+_pdbx_validate_torsion.auth_seq_id 
+_pdbx_validate_torsion.PDB_ins_code 
+_pdbx_validate_torsion.label_alt_id 
+_pdbx_validate_torsion.phi 
+_pdbx_validate_torsion.psi 
+1 1 MET A 38 ? ? 59.29  14.49 
+2 1 ASP A 53 ? ? -92.04 30.51 
+# 
+_pdbx_database_remark.id     999 
+_pdbx_database_remark.text   
+;SEQUENCE
+The authors have found that the previously published
+sequence (PIR C23727) was incorrect.  They have
+demonstrated the existence of an additional Gly, 60,
+from sequencing, NMR, and mass spec. (Data included 
+in the primary citation article).
+;
+# 
+_pdbx_nmr_ensemble.entry_id                             1I6F 
+_pdbx_nmr_ensemble.conformers_calculated_total_number   ? 
+_pdbx_nmr_ensemble.conformers_submitted_total_number    1 
+_pdbx_nmr_ensemble.conformer_selection_criteria         ? 
+# 
+_pdbx_nmr_representative.entry_id             1I6F 
+_pdbx_nmr_representative.conformer_id         ? 
+_pdbx_nmr_representative.selection_criteria   'minimized average structure' 
+# 
+loop_
+_pdbx_nmr_sample_details.solution_id 
+_pdbx_nmr_sample_details.contents 
+_pdbx_nmr_sample_details.solvent_system 
+1 '1mM CsE-v5, pH 4.0' '90% H2O, 10% D20' 
+2 '1mM CsE-v5, pH 4.0' '100% D2O'         
+# 
+_pdbx_nmr_exptl_sample_conditions.conditions_id       1 
+_pdbx_nmr_exptl_sample_conditions.temperature         303 
+_pdbx_nmr_exptl_sample_conditions.pressure            ambient 
+_pdbx_nmr_exptl_sample_conditions.pH                  4.0 
+_pdbx_nmr_exptl_sample_conditions.ionic_strength      ? 
+_pdbx_nmr_exptl_sample_conditions.pressure_units      ? 
+_pdbx_nmr_exptl_sample_conditions.temperature_units   K 
+# 
+loop_
+_pdbx_nmr_exptl.experiment_id 
+_pdbx_nmr_exptl.solution_id 
+_pdbx_nmr_exptl.conditions_id 
+_pdbx_nmr_exptl.type 
+1 1 1 '2D NOESY' 
+2 1 1 TOCSY      
+3 2 1 '2D NOESY' 
+4 2 1 DQF-COSY   
+# 
+_pdbx_nmr_details.entry_id   1I6F 
+_pdbx_nmr_details.text       'This structure was determined using standard homonuclear 2D-NMR techniques.' 
+# 
+_pdbx_nmr_refine.entry_id           1I6F 
+_pdbx_nmr_refine.method             
+;distance geometry   
+simulated annealing
+;
+_pdbx_nmr_refine.details            
+;The structures are based on 1010   
+total restraints: 849 distance,    
+70 H-bonds, 91 dihedral angle
+;
+_pdbx_nmr_refine.software_ordinal   1 
+# 
+loop_
+_pdbx_nmr_software.name 
+_pdbx_nmr_software.version 
+_pdbx_nmr_software.classification 
+_pdbx_nmr_software.authors 
+_pdbx_nmr_software.ordinal 
+DISNMR disr88 collection Bruker  1 
+Felix  9.80   processing Biosym  2 
+X-PLOR 3.851  refinement Brunger 3 
+# 
+loop_
+_chem_comp_atom.comp_id 
+_chem_comp_atom.atom_id 
+_chem_comp_atom.type_symbol 
+_chem_comp_atom.pdbx_aromatic_flag 
+_chem_comp_atom.pdbx_stereo_config 
+_chem_comp_atom.pdbx_ordinal 
+ALA N    N N N 1   
+ALA CA   C N S 2   
+ALA C    C N N 3   
+ALA O    O N N 4   
+ALA CB   C N N 5   
+ALA OXT  O N N 6   
+ALA H    H N N 7   
+ALA H2   H N N 8   
+ALA HA   H N N 9   
+ALA HB1  H N N 10  
+ALA HB2  H N N 11  
+ALA HB3  H N N 12  
+ALA HXT  H N N 13  
+ASN N    N N N 14  
+ASN CA   C N S 15  
+ASN C    C N N 16  
+ASN O    O N N 17  
+ASN CB   C N N 18  
+ASN CG   C N N 19  
+ASN OD1  O N N 20  
+ASN ND2  N N N 21  
+ASN OXT  O N N 22  
+ASN H    H N N 23  
+ASN H2   H N N 24  
+ASN HA   H N N 25  
+ASN HB2  H N N 26  
+ASN HB3  H N N 27  
+ASN HD21 H N N 28  
+ASN HD22 H N N 29  
+ASN HXT  H N N 30  
+ASP N    N N N 31  
+ASP CA   C N S 32  
+ASP C    C N N 33  
+ASP O    O N N 34  
+ASP CB   C N N 35  
+ASP CG   C N N 36  
+ASP OD1  O N N 37  
+ASP OD2  O N N 38  
+ASP OXT  O N N 39  
+ASP H    H N N 40  
+ASP H2   H N N 41  
+ASP HA   H N N 42  
+ASP HB2  H N N 43  
+ASP HB3  H N N 44  
+ASP HD2  H N N 45  
+ASP HXT  H N N 46  
+CYS N    N N N 47  
+CYS CA   C N R 48  
+CYS C    C N N 49  
+CYS O    O N N 50  
+CYS CB   C N N 51  
+CYS SG   S N N 52  
+CYS OXT  O N N 53  
+CYS H    H N N 54  
+CYS H2   H N N 55  
+CYS HA   H N N 56  
+CYS HB2  H N N 57  
+CYS HB3  H N N 58  
+CYS HG   H N N 59  
+CYS HXT  H N N 60  
+GLN N    N N N 61  
+GLN CA   C N S 62  
+GLN C    C N N 63  
+GLN O    O N N 64  
+GLN CB   C N N 65  
+GLN CG   C N N 66  
+GLN CD   C N N 67  
+GLN OE1  O N N 68  
+GLN NE2  N N N 69  
+GLN OXT  O N N 70  
+GLN H    H N N 71  
+GLN H2   H N N 72  
+GLN HA   H N N 73  
+GLN HB2  H N N 74  
+GLN HB3  H N N 75  
+GLN HG2  H N N 76  
+GLN HG3  H N N 77  
+GLN HE21 H N N 78  
+GLN HE22 H N N 79  
+GLN HXT  H N N 80  
+GLU N    N N N 81  
+GLU CA   C N S 82  
+GLU C    C N N 83  
+GLU O    O N N 84  
+GLU CB   C N N 85  
+GLU CG   C N N 86  
+GLU CD   C N N 87  
+GLU OE1  O N N 88  
+GLU OE2  O N N 89  
+GLU OXT  O N N 90  
+GLU H    H N N 91  
+GLU H2   H N N 92  
+GLU HA   H N N 93  
+GLU HB2  H N N 94  
+GLU HB3  H N N 95  
+GLU HG2  H N N 96  
+GLU HG3  H N N 97  
+GLU HE2  H N N 98  
+GLU HXT  H N N 99  
+GLY N    N N N 100 
+GLY CA   C N N 101 
+GLY C    C N N 102 
+GLY O    O N N 103 
+GLY OXT  O N N 104 
+GLY H    H N N 105 
+GLY H2   H N N 106 
+GLY HA2  H N N 107 
+GLY HA3  H N N 108 
+GLY HXT  H N N 109 
+HIS N    N N N 110 
+HIS CA   C N S 111 
+HIS C    C N N 112 
+HIS O    O N N 113 
+HIS CB   C N N 114 
+HIS CG   C Y N 115 
+HIS ND1  N Y N 116 
+HIS CD2  C Y N 117 
+HIS CE1  C Y N 118 
+HIS NE2  N Y N 119 
+HIS OXT  O N N 120 
+HIS H    H N N 121 
+HIS H2   H N N 122 
+HIS HA   H N N 123 
+HIS HB2  H N N 124 
+HIS HB3  H N N 125 
+HIS HD1  H N N 126 
+HIS HD2  H N N 127 
+HIS HE1  H N N 128 
+HIS HE2  H N N 129 
+HIS HXT  H N N 130 
+ILE N    N N N 131 
+ILE CA   C N S 132 
+ILE C    C N N 133 
+ILE O    O N N 134 
+ILE CB   C N S 135 
+ILE CG1  C N N 136 
+ILE CG2  C N N 137 
+ILE CD1  C N N 138 
+ILE OXT  O N N 139 
+ILE H    H N N 140 
+ILE H2   H N N 141 
+ILE HA   H N N 142 
+ILE HB   H N N 143 
+ILE HG12 H N N 144 
+ILE HG13 H N N 145 
+ILE HG21 H N N 146 
+ILE HG22 H N N 147 
+ILE HG23 H N N 148 
+ILE HD11 H N N 149 
+ILE HD12 H N N 150 
+ILE HD13 H N N 151 
+ILE HXT  H N N 152 
+LEU N    N N N 153 
+LEU CA   C N S 154 
+LEU C    C N N 155 
+LEU O    O N N 156 
+LEU CB   C N N 157 
+LEU CG   C N N 158 
+LEU CD1  C N N 159 
+LEU CD2  C N N 160 
+LEU OXT  O N N 161 
+LEU H    H N N 162 
+LEU H2   H N N 163 
+LEU HA   H N N 164 
+LEU HB2  H N N 165 
+LEU HB3  H N N 166 
+LEU HG   H N N 167 
+LEU HD11 H N N 168 
+LEU HD12 H N N 169 
+LEU HD13 H N N 170 
+LEU HD21 H N N 171 
+LEU HD22 H N N 172 
+LEU HD23 H N N 173 
+LEU HXT  H N N 174 
+LYS N    N N N 175 
+LYS CA   C N S 176 
+LYS C    C N N 177 
+LYS O    O N N 178 
+LYS CB   C N N 179 
+LYS CG   C N N 180 
+LYS CD   C N N 181 
+LYS CE   C N N 182 
+LYS NZ   N N N 183 
+LYS OXT  O N N 184 
+LYS H    H N N 185 
+LYS H2   H N N 186 
+LYS HA   H N N 187 
+LYS HB2  H N N 188 
+LYS HB3  H N N 189 
+LYS HG2  H N N 190 
+LYS HG3  H N N 191 
+LYS HD2  H N N 192 
+LYS HD3  H N N 193 
+LYS HE2  H N N 194 
+LYS HE3  H N N 195 
+LYS HZ1  H N N 196 
+LYS HZ2  H N N 197 
+LYS HZ3  H N N 198 
+LYS HXT  H N N 199 
+MET N    N N N 200 
+MET CA   C N S 201 
+MET C    C N N 202 
+MET O    O N N 203 
+MET CB   C N N 204 
+MET CG   C N N 205 
+MET SD   S N N 206 
+MET CE   C N N 207 
+MET OXT  O N N 208 
+MET H    H N N 209 
+MET H2   H N N 210 
+MET HA   H N N 211 
+MET HB2  H N N 212 
+MET HB3  H N N 213 
+MET HG2  H N N 214 
+MET HG3  H N N 215 
+MET HE1  H N N 216 
+MET HE2  H N N 217 
+MET HE3  H N N 218 
+MET HXT  H N N 219 
+PRO N    N N N 220 
+PRO CA   C N S 221 
+PRO C    C N N 222 
+PRO O    O N N 223 
+PRO CB   C N N 224 
+PRO CG   C N N 225 
+PRO CD   C N N 226 
+PRO OXT  O N N 227 
+PRO H    H N N 228 
+PRO HA   H N N 229 
+PRO HB2  H N N 230 
+PRO HB3  H N N 231 
+PRO HG2  H N N 232 
+PRO HG3  H N N 233 
+PRO HD2  H N N 234 
+PRO HD3  H N N 235 
+PRO HXT  H N N 236 
+SER N    N N N 237 
+SER CA   C N S 238 
+SER C    C N N 239 
+SER O    O N N 240 
+SER CB   C N N 241 
+SER OG   O N N 242 
+SER OXT  O N N 243 
+SER H    H N N 244 
+SER H2   H N N 245 
+SER HA   H N N 246 
+SER HB2  H N N 247 
+SER HB3  H N N 248 
+SER HG   H N N 249 
+SER HXT  H N N 250 
+THR N    N N N 251 
+THR CA   C N S 252 
+THR C    C N N 253 
+THR O    O N N 254 
+THR CB   C N R 255 
+THR OG1  O N N 256 
+THR CG2  C N N 257 
+THR OXT  O N N 258 
+THR H    H N N 259 
+THR H2   H N N 260 
+THR HA   H N N 261 
+THR HB   H N N 262 
+THR HG1  H N N 263 
+THR HG21 H N N 264 
+THR HG22 H N N 265 
+THR HG23 H N N 266 
+THR HXT  H N N 267 
+TYR N    N N N 268 
+TYR CA   C N S 269 
+TYR C    C N N 270 
+TYR O    O N N 271 
+TYR CB   C N N 272 
+TYR CG   C Y N 273 
+TYR CD1  C Y N 274 
+TYR CD2  C Y N 275 
+TYR CE1  C Y N 276 
+TYR CE2  C Y N 277 
+TYR CZ   C Y N 278 
+TYR OH   O N N 279 
+TYR OXT  O N N 280 
+TYR H    H N N 281 
+TYR H2   H N N 282 
+TYR HA   H N N 283 
+TYR HB2  H N N 284 
+TYR HB3  H N N 285 
+TYR HD1  H N N 286 
+TYR HD2  H N N 287 
+TYR HE1  H N N 288 
+TYR HE2  H N N 289 
+TYR HH   H N N 290 
+TYR HXT  H N N 291 
+VAL N    N N N 292 
+VAL CA   C N S 293 
+VAL C    C N N 294 
+VAL O    O N N 295 
+VAL CB   C N N 296 
+VAL CG1  C N N 297 
+VAL CG2  C N N 298 
+VAL OXT  O N N 299 
+VAL H    H N N 300 
+VAL H2   H N N 301 
+VAL HA   H N N 302 
+VAL HB   H N N 303 
+VAL HG11 H N N 304 
+VAL HG12 H N N 305 
+VAL HG13 H N N 306 
+VAL HG21 H N N 307 
+VAL HG22 H N N 308 
+VAL HG23 H N N 309 
+VAL HXT  H N N 310 
+# 
+loop_
+_chem_comp_bond.comp_id 
+_chem_comp_bond.atom_id_1 
+_chem_comp_bond.atom_id_2 
+_chem_comp_bond.value_order 
+_chem_comp_bond.pdbx_aromatic_flag 
+_chem_comp_bond.pdbx_stereo_config 
+_chem_comp_bond.pdbx_ordinal 
+ALA N   CA   sing N N 1   
+ALA N   H    sing N N 2   
+ALA N   H2   sing N N 3   
+ALA CA  C    sing N N 4   
+ALA CA  CB   sing N N 5   
+ALA CA  HA   sing N N 6   
+ALA C   O    doub N N 7   
+ALA C   OXT  sing N N 8   
+ALA CB  HB1  sing N N 9   
+ALA CB  HB2  sing N N 10  
+ALA CB  HB3  sing N N 11  
+ALA OXT HXT  sing N N 12  
+ASN N   CA   sing N N 13  
+ASN N   H    sing N N 14  
+ASN N   H2   sing N N 15  
+ASN CA  C    sing N N 16  
+ASN CA  CB   sing N N 17  
+ASN CA  HA   sing N N 18  
+ASN C   O    doub N N 19  
+ASN C   OXT  sing N N 20  
+ASN CB  CG   sing N N 21  
+ASN CB  HB2  sing N N 22  
+ASN CB  HB3  sing N N 23  
+ASN CG  OD1  doub N N 24  
+ASN CG  ND2  sing N N 25  
+ASN ND2 HD21 sing N N 26  
+ASN ND2 HD22 sing N N 27  
+ASN OXT HXT  sing N N 28  
+ASP N   CA   sing N N 29  
+ASP N   H    sing N N 30  
+ASP N   H2   sing N N 31  
+ASP CA  C    sing N N 32  
+ASP CA  CB   sing N N 33  
+ASP CA  HA   sing N N 34  
+ASP C   O    doub N N 35  
+ASP C   OXT  sing N N 36  
+ASP CB  CG   sing N N 37  
+ASP CB  HB2  sing N N 38  
+ASP CB  HB3  sing N N 39  
+ASP CG  OD1  doub N N 40  
+ASP CG  OD2  sing N N 41  
+ASP OD2 HD2  sing N N 42  
+ASP OXT HXT  sing N N 43  
+CYS N   CA   sing N N 44  
+CYS N   H    sing N N 45  
+CYS N   H2   sing N N 46  
+CYS CA  C    sing N N 47  
+CYS CA  CB   sing N N 48  
+CYS CA  HA   sing N N 49  
+CYS C   O    doub N N 50  
+CYS C   OXT  sing N N 51  
+CYS CB  SG   sing N N 52  
+CYS CB  HB2  sing N N 53  
+CYS CB  HB3  sing N N 54  
+CYS SG  HG   sing N N 55  
+CYS OXT HXT  sing N N 56  
+GLN N   CA   sing N N 57  
+GLN N   H    sing N N 58  
+GLN N   H2   sing N N 59  
+GLN CA  C    sing N N 60  
+GLN CA  CB   sing N N 61  
+GLN CA  HA   sing N N 62  
+GLN C   O    doub N N 63  
+GLN C   OXT  sing N N 64  
+GLN CB  CG   sing N N 65  
+GLN CB  HB2  sing N N 66  
+GLN CB  HB3  sing N N 67  
+GLN CG  CD   sing N N 68  
+GLN CG  HG2  sing N N 69  
+GLN CG  HG3  sing N N 70  
+GLN CD  OE1  doub N N 71  
+GLN CD  NE2  sing N N 72  
+GLN NE2 HE21 sing N N 73  
+GLN NE2 HE22 sing N N 74  
+GLN OXT HXT  sing N N 75  
+GLU N   CA   sing N N 76  
+GLU N   H    sing N N 77  
+GLU N   H2   sing N N 78  
+GLU CA  C    sing N N 79  
+GLU CA  CB   sing N N 80  
+GLU CA  HA   sing N N 81  
+GLU C   O    doub N N 82  
+GLU C   OXT  sing N N 83  
+GLU CB  CG   sing N N 84  
+GLU CB  HB2  sing N N 85  
+GLU CB  HB3  sing N N 86  
+GLU CG  CD   sing N N 87  
+GLU CG  HG2  sing N N 88  
+GLU CG  HG3  sing N N 89  
+GLU CD  OE1  doub N N 90  
+GLU CD  OE2  sing N N 91  
+GLU OE2 HE2  sing N N 92  
+GLU OXT HXT  sing N N 93  
+GLY N   CA   sing N N 94  
+GLY N   H    sing N N 95  
+GLY N   H2   sing N N 96  
+GLY CA  C    sing N N 97  
+GLY CA  HA2  sing N N 98  
+GLY CA  HA3  sing N N 99  
+GLY C   O    doub N N 100 
+GLY C   OXT  sing N N 101 
+GLY OXT HXT  sing N N 102 
+HIS N   CA   sing N N 103 
+HIS N   H    sing N N 104 
+HIS N   H2   sing N N 105 
+HIS CA  C    sing N N 106 
+HIS CA  CB   sing N N 107 
+HIS CA  HA   sing N N 108 
+HIS C   O    doub N N 109 
+HIS C   OXT  sing N N 110 
+HIS CB  CG   sing N N 111 
+HIS CB  HB2  sing N N 112 
+HIS CB  HB3  sing N N 113 
+HIS CG  ND1  sing Y N 114 
+HIS CG  CD2  doub Y N 115 
+HIS ND1 CE1  doub Y N 116 
+HIS ND1 HD1  sing N N 117 
+HIS CD2 NE2  sing Y N 118 
+HIS CD2 HD2  sing N N 119 
+HIS CE1 NE2  sing Y N 120 
+HIS CE1 HE1  sing N N 121 
+HIS NE2 HE2  sing N N 122 
+HIS OXT HXT  sing N N 123 
+ILE N   CA   sing N N 124 
+ILE N   H    sing N N 125 
+ILE N   H2   sing N N 126 
+ILE CA  C    sing N N 127 
+ILE CA  CB   sing N N 128 
+ILE CA  HA   sing N N 129 
+ILE C   O    doub N N 130 
+ILE C   OXT  sing N N 131 
+ILE CB  CG1  sing N N 132 
+ILE CB  CG2  sing N N 133 
+ILE CB  HB   sing N N 134 
+ILE CG1 CD1  sing N N 135 
+ILE CG1 HG12 sing N N 136 
+ILE CG1 HG13 sing N N 137 
+ILE CG2 HG21 sing N N 138 
+ILE CG2 HG22 sing N N 139 
+ILE CG2 HG23 sing N N 140 
+ILE CD1 HD11 sing N N 141 
+ILE CD1 HD12 sing N N 142 
+ILE CD1 HD13 sing N N 143 
+ILE OXT HXT  sing N N 144 
+LEU N   CA   sing N N 145 
+LEU N   H    sing N N 146 
+LEU N   H2   sing N N 147 
+LEU CA  C    sing N N 148 
+LEU CA  CB   sing N N 149 
+LEU CA  HA   sing N N 150 
+LEU C   O    doub N N 151 
+LEU C   OXT  sing N N 152 
+LEU CB  CG   sing N N 153 
+LEU CB  HB2  sing N N 154 
+LEU CB  HB3  sing N N 155 
+LEU CG  CD1  sing N N 156 
+LEU CG  CD2  sing N N 157 
+LEU CG  HG   sing N N 158 
+LEU CD1 HD11 sing N N 159 
+LEU CD1 HD12 sing N N 160 
+LEU CD1 HD13 sing N N 161 
+LEU CD2 HD21 sing N N 162 
+LEU CD2 HD22 sing N N 163 
+LEU CD2 HD23 sing N N 164 
+LEU OXT HXT  sing N N 165 
+LYS N   CA   sing N N 166 
+LYS N   H    sing N N 167 
+LYS N   H2   sing N N 168 
+LYS CA  C    sing N N 169 
+LYS CA  CB   sing N N 170 
+LYS CA  HA   sing N N 171 
+LYS C   O    doub N N 172 
+LYS C   OXT  sing N N 173 
+LYS CB  CG   sing N N 174 
+LYS CB  HB2  sing N N 175 
+LYS CB  HB3  sing N N 176 
+LYS CG  CD   sing N N 177 
+LYS CG  HG2  sing N N 178 
+LYS CG  HG3  sing N N 179 
+LYS CD  CE   sing N N 180 
+LYS CD  HD2  sing N N 181 
+LYS CD  HD3  sing N N 182 
+LYS CE  NZ   sing N N 183 
+LYS CE  HE2  sing N N 184 
+LYS CE  HE3  sing N N 185 
+LYS NZ  HZ1  sing N N 186 
+LYS NZ  HZ2  sing N N 187 
+LYS NZ  HZ3  sing N N 188 
+LYS OXT HXT  sing N N 189 
+MET N   CA   sing N N 190 
+MET N   H    sing N N 191 
+MET N   H2   sing N N 192 
+MET CA  C    sing N N 193 
+MET CA  CB   sing N N 194 
+MET CA  HA   sing N N 195 
+MET C   O    doub N N 196 
+MET C   OXT  sing N N 197 
+MET CB  CG   sing N N 198 
+MET CB  HB2  sing N N 199 
+MET CB  HB3  sing N N 200 
+MET CG  SD   sing N N 201 
+MET CG  HG2  sing N N 202 
+MET CG  HG3  sing N N 203 
+MET SD  CE   sing N N 204 
+MET CE  HE1  sing N N 205 
+MET CE  HE2  sing N N 206 
+MET CE  HE3  sing N N 207 
+MET OXT HXT  sing N N 208 
+PRO N   CA   sing N N 209 
+PRO N   CD   sing N N 210 
+PRO N   H    sing N N 211 
+PRO CA  C    sing N N 212 
+PRO CA  CB   sing N N 213 
+PRO CA  HA   sing N N 214 
+PRO C   O    doub N N 215 
+PRO C   OXT  sing N N 216 
+PRO CB  CG   sing N N 217 
+PRO CB  HB2  sing N N 218 
+PRO CB  HB3  sing N N 219 
+PRO CG  CD   sing N N 220 
+PRO CG  HG2  sing N N 221 
+PRO CG  HG3  sing N N 222 
+PRO CD  HD2  sing N N 223 
+PRO CD  HD3  sing N N 224 
+PRO OXT HXT  sing N N 225 
+SER N   CA   sing N N 226 
+SER N   H    sing N N 227 
+SER N   H2   sing N N 228 
+SER CA  C    sing N N 229 
+SER CA  CB   sing N N 230 
+SER CA  HA   sing N N 231 
+SER C   O    doub N N 232 
+SER C   OXT  sing N N 233 
+SER CB  OG   sing N N 234 
+SER CB  HB2  sing N N 235 
+SER CB  HB3  sing N N 236 
+SER OG  HG   sing N N 237 
+SER OXT HXT  sing N N 238 
+THR N   CA   sing N N 239 
+THR N   H    sing N N 240 
+THR N   H2   sing N N 241 
+THR CA  C    sing N N 242 
+THR CA  CB   sing N N 243 
+THR CA  HA   sing N N 244 
+THR C   O    doub N N 245 
+THR C   OXT  sing N N 246 
+THR CB  OG1  sing N N 247 
+THR CB  CG2  sing N N 248 
+THR CB  HB   sing N N 249 
+THR OG1 HG1  sing N N 250 
+THR CG2 HG21 sing N N 251 
+THR CG2 HG22 sing N N 252 
+THR CG2 HG23 sing N N 253 
+THR OXT HXT  sing N N 254 
+TYR N   CA   sing N N 255 
+TYR N   H    sing N N 256 
+TYR N   H2   sing N N 257 
+TYR CA  C    sing N N 258 
+TYR CA  CB   sing N N 259 
+TYR CA  HA   sing N N 260 
+TYR C   O    doub N N 261 
+TYR C   OXT  sing N N 262 
+TYR CB  CG   sing N N 263 
+TYR CB  HB2  sing N N 264 
+TYR CB  HB3  sing N N 265 
+TYR CG  CD1  doub Y N 266 
+TYR CG  CD2  sing Y N 267 
+TYR CD1 CE1  sing Y N 268 
+TYR CD1 HD1  sing N N 269 
+TYR CD2 CE2  doub Y N 270 
+TYR CD2 HD2  sing N N 271 
+TYR CE1 CZ   doub Y N 272 
+TYR CE1 HE1  sing N N 273 
+TYR CE2 CZ   sing Y N 274 
+TYR CE2 HE2  sing N N 275 
+TYR CZ  OH   sing N N 276 
+TYR OH  HH   sing N N 277 
+TYR OXT HXT  sing N N 278 
+VAL N   CA   sing N N 279 
+VAL N   H    sing N N 280 
+VAL N   H2   sing N N 281 
+VAL CA  C    sing N N 282 
+VAL CA  CB   sing N N 283 
+VAL CA  HA   sing N N 284 
+VAL C   O    doub N N 285 
+VAL C   OXT  sing N N 286 
+VAL CB  CG1  sing N N 287 
+VAL CB  CG2  sing N N 288 
+VAL CB  HB   sing N N 289 
+VAL CG1 HG11 sing N N 290 
+VAL CG1 HG12 sing N N 291 
+VAL CG1 HG13 sing N N 292 
+VAL CG2 HG21 sing N N 293 
+VAL CG2 HG22 sing N N 294 
+VAL CG2 HG23 sing N N 295 
+VAL OXT HXT  sing N N 296 
+# 
+_pdbx_nmr_spectrometer.spectrometer_id   1 
+_pdbx_nmr_spectrometer.type              ? 
+_pdbx_nmr_spectrometer.manufacturer      Bruker 
+_pdbx_nmr_spectrometer.model             AM 
+_pdbx_nmr_spectrometer.field_strength    600 
+# 
+_atom_sites.entry_id                    1I6F 
+_atom_sites.fract_transf_matrix[1][1]   1.000000 
+_atom_sites.fract_transf_matrix[1][2]   0.000000 
+_atom_sites.fract_transf_matrix[1][3]   0.000000 
+_atom_sites.fract_transf_matrix[2][1]   0.000000 
+_atom_sites.fract_transf_matrix[2][2]   1.000000 
+_atom_sites.fract_transf_matrix[2][3]   0.000000 
+_atom_sites.fract_transf_matrix[3][1]   0.000000 
+_atom_sites.fract_transf_matrix[3][2]   0.000000 
+_atom_sites.fract_transf_matrix[3][3]   1.000000 
+_atom_sites.fract_transf_vector[1]      0.00000 
+_atom_sites.fract_transf_vector[2]      0.00000 
+_atom_sites.fract_transf_vector[3]      0.00000 
+# 
+loop_
+_atom_type.symbol 
+C 
+H 
+N 
+O 
+S 
+# 
+loop_
+_atom_site.group_PDB 
+_atom_site.id 
+_atom_site.type_symbol 
+_atom_site.label_atom_id 
+_atom_site.label_alt_id 
+_atom_site.label_comp_id 
+_atom_site.label_asym_id 
+_atom_site.label_entity_id 
+_atom_site.label_seq_id 
+_atom_site.pdbx_PDB_ins_code 
+_atom_site.Cartn_x 
+_atom_site.Cartn_y 
+_atom_site.Cartn_z 
+_atom_site.occupancy 
+_atom_site.B_iso_or_equiv 
+_atom_site.pdbx_formal_charge 
+_atom_site.auth_seq_id 
+_atom_site.auth_comp_id 
+_atom_site.auth_asym_id 
+_atom_site.auth_atom_id 
+_atom_site.pdbx_PDB_model_num 
+ATOM 1   N N    . LYS A 1 1  ? -3.641  10.573  -4.010  1.00 0.57 ? 1  LYS A N    1 
+ATOM 2   C CA   . LYS A 1 1  ? -2.643  9.869   -4.866  1.00 0.45 ? 1  LYS A CA   1 
+ATOM 3   C C    . LYS A 1 1  ? -2.700  8.360   -4.613  1.00 0.38 ? 1  LYS A C    1 
+ATOM 4   O O    . LYS A 1 1  ? -3.157  7.911   -3.581  1.00 0.44 ? 1  LYS A O    1 
+ATOM 5   C CB   . LYS A 1 1  ? -1.287  10.434  -4.441  1.00 0.41 ? 1  LYS A CB   1 
+ATOM 6   C CG   . LYS A 1 1  ? -0.933  9.915   -3.046  1.00 0.49 ? 1  LYS A CG   1 
+ATOM 7   C CD   . LYS A 1 1  ? 0.507   10.304  -2.707  1.00 0.53 ? 1  LYS A CD   1 
+ATOM 8   C CE   . LYS A 1 1  ? 1.029   9.403   -1.584  1.00 0.61 ? 1  LYS A CE   1 
+ATOM 9   N NZ   . LYS A 1 1  ? 1.947   10.269  -0.793  1.00 0.55 ? 1  LYS A NZ   1 
+ATOM 10  H H1   . LYS A 1 1  ? -4.577  10.527  -4.459  1.00 1.10 ? 1  LYS A H1   1 
+ATOM 11  H H2   . LYS A 1 1  ? -3.358  11.568  -3.897  1.00 1.13 ? 1  LYS A H2   1 
+ATOM 12  H H3   . LYS A 1 1  ? -3.683  10.115  -3.078  1.00 1.17 ? 1  LYS A H3   1 
+ATOM 13  H HA   . LYS A 1 1  ? -2.821  10.083  -5.908  1.00 0.51 ? 1  LYS A HA   1 
+ATOM 14  H HB2  . LYS A 1 1  ? -0.530  10.121  -5.145  1.00 0.39 ? 1  LYS A HB2  1 
+ATOM 15  H HB3  . LYS A 1 1  ? -1.337  11.512  -4.420  1.00 0.51 ? 1  LYS A HB3  1 
+ATOM 16  H HG2  . LYS A 1 1  ? -1.605  10.350  -2.319  1.00 0.77 ? 1  LYS A HG2  1 
+ATOM 17  H HG3  . LYS A 1 1  ? -1.028  8.840   -3.026  1.00 0.68 ? 1  LYS A HG3  1 
+ATOM 18  H HD2  . LYS A 1 1  ? 1.128   10.184  -3.583  1.00 0.72 ? 1  LYS A HD2  1 
+ATOM 19  H HD3  . LYS A 1 1  ? 0.536   11.333  -2.382  1.00 0.69 ? 1  LYS A HD3  1 
+ATOM 20  H HE2  . LYS A 1 1  ? 0.209   9.059   -0.969  1.00 0.76 ? 1  LYS A HE2  1 
+ATOM 21  H HE3  . LYS A 1 1  ? 1.572   8.566   -1.994  1.00 0.79 ? 1  LYS A HE3  1 
+ATOM 22  H HZ1  . LYS A 1 1  ? 2.830   10.412  -1.322  1.00 0.73 ? 1  LYS A HZ1  1 
+ATOM 23  H HZ2  . LYS A 1 1  ? 2.157   9.810   0.117   1.00 0.60 ? 1  LYS A HZ2  1 
+ATOM 24  H HZ3  . LYS A 1 1  ? 1.495   11.189  -0.622  1.00 0.62 ? 1  LYS A HZ3  1 
+ATOM 25  N N    . ASP A 1 2  ? -2.238  7.574   -5.547  1.00 0.36 ? 2  ASP A N    1 
+ATOM 26  C CA   . ASP A 1 2  ? -2.267  6.095   -5.358  1.00 0.34 ? 2  ASP A CA   1 
+ATOM 27  C C    . ASP A 1 2  ? -0.860  5.574   -5.049  1.00 0.34 ? 2  ASP A C    1 
+ATOM 28  O O    . ASP A 1 2  ? 0.129   6.193   -5.387  1.00 0.47 ? 2  ASP A O    1 
+ATOM 29  C CB   . ASP A 1 2  ? -2.766  5.535   -6.691  1.00 0.41 ? 2  ASP A CB   1 
+ATOM 30  C CG   . ASP A 1 2  ? -3.996  6.321   -7.146  1.00 0.44 ? 2  ASP A CG   1 
+ATOM 31  O OD1  . ASP A 1 2  ? -4.604  6.969   -6.310  1.00 1.28 ? 2  ASP A OD1  1 
+ATOM 32  O OD2  . ASP A 1 2  ? -4.310  6.262   -8.324  1.00 1.05 ? 2  ASP A OD2  1 
+ATOM 33  H H    . ASP A 1 2  ? -1.873  7.956   -6.372  1.00 0.43 ? 2  ASP A H    1 
+ATOM 34  H HA   . ASP A 1 2  ? -2.950  5.829   -4.567  1.00 0.34 ? 2  ASP A HA   1 
+ATOM 35  H HB2  . ASP A 1 2  ? -1.985  5.624   -7.433  1.00 0.45 ? 2  ASP A HB2  1 
+ATOM 36  H HB3  . ASP A 1 2  ? -3.030  4.496   -6.568  1.00 0.44 ? 2  ASP A HB3  1 
+ATOM 37  N N    . GLY A 1 3  ? -0.765  4.440   -4.410  1.00 0.27 ? 3  GLY A N    1 
+ATOM 38  C CA   . GLY A 1 3  ? 0.577   3.881   -4.081  1.00 0.32 ? 3  GLY A CA   1 
+ATOM 39  C C    . GLY A 1 3  ? 0.424   2.750   -3.063  1.00 0.30 ? 3  GLY A C    1 
+ATOM 40  O O    . GLY A 1 3  ? -0.671  2.327   -2.751  1.00 0.30 ? 3  GLY A O    1 
+ATOM 41  H H    . GLY A 1 3  ? -1.575  3.956   -4.147  1.00 0.29 ? 3  GLY A H    1 
+ATOM 42  H HA2  . GLY A 1 3  ? 1.038   3.498   -4.981  1.00 0.37 ? 3  GLY A HA2  1 
+ATOM 43  H HA3  . GLY A 1 3  ? 1.198   4.658   -3.661  1.00 0.36 ? 3  GLY A HA3  1 
+ATOM 44  N N    . TYR A 1 4  ? 1.514   2.257   -2.541  1.00 0.32 ? 4  TYR A N    1 
+ATOM 45  C CA   . TYR A 1 4  ? 1.429   1.153   -1.542  1.00 0.32 ? 4  TYR A CA   1 
+ATOM 46  C C    . TYR A 1 4  ? 1.784   1.674   -0.146  1.00 0.34 ? 4  TYR A C    1 
+ATOM 47  O O    . TYR A 1 4  ? 2.752   2.389   0.022   1.00 0.38 ? 4  TYR A O    1 
+ATOM 48  C CB   . TYR A 1 4  ? 2.457   0.120   -2.006  1.00 0.37 ? 4  TYR A CB   1 
+ATOM 49  C CG   . TYR A 1 4  ? 2.215   -0.215  -3.458  1.00 0.33 ? 4  TYR A CG   1 
+ATOM 50  C CD1  . TYR A 1 4  ? 2.632   0.671   -4.460  1.00 0.43 ? 4  TYR A CD1  1 
+ATOM 51  C CD2  . TYR A 1 4  ? 1.574   -1.410  -3.804  1.00 0.33 ? 4  TYR A CD2  1 
+ATOM 52  C CE1  . TYR A 1 4  ? 2.408   0.360   -5.806  1.00 0.46 ? 4  TYR A CE1  1 
+ATOM 53  C CE2  . TYR A 1 4  ? 1.349   -1.721  -5.150  1.00 0.37 ? 4  TYR A CE2  1 
+ATOM 54  C CZ   . TYR A 1 4  ? 1.767   -0.836  -6.151  1.00 0.41 ? 4  TYR A CZ   1 
+ATOM 55  O OH   . TYR A 1 4  ? 1.546   -1.142  -7.479  1.00 0.50 ? 4  TYR A OH   1 
+ATOM 56  H H    . TYR A 1 4  ? 2.388   2.613   -2.805  1.00 0.35 ? 4  TYR A H    1 
+ATOM 57  H HA   . TYR A 1 4  ? 0.443   0.718   -1.544  1.00 0.32 ? 4  TYR A HA   1 
+ATOM 58  H HB2  . TYR A 1 4  ? 3.451   0.525   -1.890  1.00 0.44 ? 4  TYR A HB2  1 
+ATOM 59  H HB3  . TYR A 1 4  ? 2.361   -0.775  -1.410  1.00 0.41 ? 4  TYR A HB3  1 
+ATOM 60  H HD1  . TYR A 1 4  ? 3.127   1.593   -4.193  1.00 0.53 ? 4  TYR A HD1  1 
+ATOM 61  H HD2  . TYR A 1 4  ? 1.252   -2.093  -3.031  1.00 0.39 ? 4  TYR A HD2  1 
+ATOM 62  H HE1  . TYR A 1 4  ? 2.729   1.043   -6.579  1.00 0.58 ? 4  TYR A HE1  1 
+ATOM 63  H HE2  . TYR A 1 4  ? 0.855   -2.643  -5.417  1.00 0.44 ? 4  TYR A HE2  1 
+ATOM 64  H HH   . TYR A 1 4  ? 1.570   -2.097  -7.571  1.00 1.04 ? 4  TYR A HH   1 
+ATOM 65  N N    . PRO A 1 5  ? 0.982   1.296   0.812   1.00 0.35 ? 5  PRO A N    1 
+ATOM 66  C CA   . PRO A 1 5  ? 1.210   1.728   2.212   1.00 0.38 ? 5  PRO A CA   1 
+ATOM 67  C C    . PRO A 1 5  ? 2.408   0.987   2.812   1.00 0.37 ? 5  PRO A C    1 
+ATOM 68  O O    . PRO A 1 5  ? 2.624   -0.179  2.548   1.00 0.40 ? 5  PRO A O    1 
+ATOM 69  C CB   . PRO A 1 5  ? -0.083  1.337   2.923   1.00 0.44 ? 5  PRO A CB   1 
+ATOM 70  C CG   . PRO A 1 5  ? -0.653  0.222   2.105   1.00 0.46 ? 5  PRO A CG   1 
+ATOM 71  C CD   . PRO A 1 5  ? -0.201  0.438   0.683   1.00 0.41 ? 5  PRO A CD   1 
+ATOM 72  H HA   . PRO A 1 5  ? 1.354   2.795   2.265   1.00 0.40 ? 5  PRO A HA   1 
+ATOM 73  H HB2  . PRO A 1 5  ? 0.130   0.999   3.928   1.00 0.46 ? 5  PRO A HB2  1 
+ATOM 74  H HB3  . PRO A 1 5  ? -0.769  2.169   2.941   1.00 0.48 ? 5  PRO A HB3  1 
+ATOM 75  H HG2  . PRO A 1 5  ? -0.287  -0.727  2.471   1.00 0.47 ? 5  PRO A HG2  1 
+ATOM 76  H HG3  . PRO A 1 5  ? -1.731  0.245   2.150   1.00 0.53 ? 5  PRO A HG3  1 
+ATOM 77  H HD2  . PRO A 1 5  ? 0.059   -0.505  0.222   1.00 0.41 ? 5  PRO A HD2  1 
+ATOM 78  H HD3  . PRO A 1 5  ? -0.966  0.943   0.114   1.00 0.46 ? 5  PRO A HD3  1 
+ATOM 79  N N    . VAL A 1 6  ? 3.188   1.655   3.618   1.00 0.38 ? 6  VAL A N    1 
+ATOM 80  C CA   . VAL A 1 6  ? 4.371   0.987   4.233   1.00 0.42 ? 6  VAL A CA   1 
+ATOM 81  C C    . VAL A 1 6  ? 4.227   0.956   5.757   1.00 0.46 ? 6  VAL A C    1 
+ATOM 82  O O    . VAL A 1 6  ? 3.389   1.628   6.325   1.00 0.49 ? 6  VAL A O    1 
+ATOM 83  C CB   . VAL A 1 6  ? 5.567   1.847   3.826   1.00 0.48 ? 6  VAL A CB   1 
+ATOM 84  C CG1  . VAL A 1 6  ? 5.864   1.638   2.339   1.00 0.53 ? 6  VAL A CG1  1 
+ATOM 85  C CG2  . VAL A 1 6  ? 5.244   3.321   4.077   1.00 0.54 ? 6  VAL A CG2  1 
+ATOM 86  H H    . VAL A 1 6  ? 2.997   2.595   3.818   1.00 0.39 ? 6  VAL A H    1 
+ATOM 87  H HA   . VAL A 1 6  ? 4.485   -0.012  3.844   1.00 0.46 ? 6  VAL A HA   1 
+ATOM 88  H HB   . VAL A 1 6  ? 6.431   1.561   4.408   1.00 0.55 ? 6  VAL A HB   1 
+ATOM 89  H HG11 . VAL A 1 6  ? 6.700   0.963   2.231   1.00 1.10 ? 6  VAL A HG11 1 
+ATOM 90  H HG12 . VAL A 1 6  ? 6.105   2.587   1.884   1.00 1.22 ? 6  VAL A HG12 1 
+ATOM 91  H HG13 . VAL A 1 6  ? 4.996   1.216   1.855   1.00 1.15 ? 6  VAL A HG13 1 
+ATOM 92  H HG21 . VAL A 1 6  ? 4.410   3.395   4.760   1.00 1.24 ? 6  VAL A HG21 1 
+ATOM 93  H HG22 . VAL A 1 6  ? 4.988   3.798   3.143   1.00 1.11 ? 6  VAL A HG22 1 
+ATOM 94  H HG23 . VAL A 1 6  ? 6.106   3.810   4.507   1.00 1.11 ? 6  VAL A HG23 1 
+ATOM 95  N N    . ASP A 1 7  ? 5.037   0.180   6.424   1.00 0.52 ? 7  ASP A N    1 
+ATOM 96  C CA   . ASP A 1 7  ? 4.945   0.106   7.910   1.00 0.61 ? 7  ASP A CA   1 
+ATOM 97  C C    . ASP A 1 7  ? 5.852   1.162   8.549   1.00 0.65 ? 7  ASP A C    1 
+ATOM 98  O O    . ASP A 1 7  ? 6.419   1.998   7.873   1.00 0.64 ? 7  ASP A O    1 
+ATOM 99  C CB   . ASP A 1 7  ? 5.426   -1.301  8.268   1.00 0.63 ? 7  ASP A CB   1 
+ATOM 100 C CG   . ASP A 1 7  ? 6.808   -1.539  7.657   1.00 0.61 ? 7  ASP A CG   1 
+ATOM 101 O OD1  . ASP A 1 7  ? 7.427   -0.571  7.245   1.00 0.56 ? 7  ASP A OD1  1 
+ATOM 102 O OD2  . ASP A 1 7  ? 7.225   -2.684  7.612   1.00 0.87 ? 7  ASP A OD2  1 
+ATOM 103 H H    . ASP A 1 7  ? 5.706   -0.355  5.947   1.00 0.53 ? 7  ASP A H    1 
+ATOM 104 H HA   . ASP A 1 7  ? 3.925   0.240   8.232   1.00 0.68 ? 7  ASP A HA   1 
+ATOM 105 H HB2  . ASP A 1 7  ? 5.484   -1.399  9.342   1.00 0.72 ? 7  ASP A HB2  1 
+ATOM 106 H HB3  . ASP A 1 7  ? 4.732   -2.029  7.876   1.00 0.69 ? 7  ASP A HB3  1 
+ATOM 107 N N    . SER A 1 8  ? 5.992   1.130   9.846   1.00 0.78 ? 8  SER A N    1 
+ATOM 108 C CA   . SER A 1 8  ? 6.862   2.133   10.526  1.00 0.87 ? 8  SER A CA   1 
+ATOM 109 C C    . SER A 1 8  ? 8.291   2.050   9.981   1.00 0.83 ? 8  SER A C    1 
+ATOM 110 O O    . SER A 1 8  ? 9.094   2.939   10.182  1.00 0.93 ? 8  SER A O    1 
+ATOM 111 C CB   . SER A 1 8  ? 6.829   1.747   12.004  1.00 1.01 ? 8  SER A CB   1 
+ATOM 112 O OG   . SER A 1 8  ? 7.293   0.411   12.151  1.00 1.10 ? 8  SER A OG   1 
+ATOM 113 H H    . SER A 1 8  ? 5.526   0.448   10.373  1.00 0.86 ? 8  SER A H    1 
+ATOM 114 H HA   . SER A 1 8  ? 6.465   3.127   10.396  1.00 0.93 ? 8  SER A HA   1 
+ATOM 115 H HB2  . SER A 1 8  ? 7.468   2.408   12.566  1.00 1.12 ? 8  SER A HB2  1 
+ATOM 116 H HB3  . SER A 1 8  ? 5.815   1.829   12.374  1.00 1.13 ? 8  SER A HB3  1 
+ATOM 117 H HG   . SER A 1 8  ? 7.345   0.217   13.090  1.00 1.65 ? 8  SER A HG   1 
+ATOM 118 N N    . LYS A 1 9  ? 8.612   0.989   9.293   1.00 0.73 ? 9  LYS A N    1 
+ATOM 119 C CA   . LYS A 1 9  ? 9.989   0.851   8.736   1.00 0.75 ? 9  LYS A CA   1 
+ATOM 120 C C    . LYS A 1 9  ? 10.037  1.392   7.305   1.00 0.70 ? 9  LYS A C    1 
+ATOM 121 O O    . LYS A 1 9  ? 11.086  1.734   6.796   1.00 0.83 ? 9  LYS A O    1 
+ATOM 122 C CB   . LYS A 1 9  ? 10.273  -0.652  8.752   1.00 0.74 ? 9  LYS A CB   1 
+ATOM 123 C CG   . LYS A 1 9  ? 11.766  -0.892  8.519   1.00 0.87 ? 9  LYS A CG   1 
+ATOM 124 C CD   . LYS A 1 9  ? 12.303  -1.847  9.587   1.00 1.35 ? 9  LYS A CD   1 
+ATOM 125 C CE   . LYS A 1 9  ? 13.563  -2.541  9.065   1.00 1.96 ? 9  LYS A CE   1 
+ATOM 126 N NZ   . LYS A 1 9  ? 13.684  -3.781  9.881   1.00 2.57 ? 9  LYS A NZ   1 
+ATOM 127 H H    . LYS A 1 9  ? 7.950   0.283   9.142   1.00 0.70 ? 9  LYS A H    1 
+ATOM 128 H HA   . LYS A 1 9  ? 10.701  1.367   9.360   1.00 0.87 ? 9  LYS A HA   1 
+ATOM 129 H HB2  . LYS A 1 9  ? 9.987   -1.062  9.710   1.00 0.78 ? 9  LYS A HB2  1 
+ATOM 130 H HB3  . LYS A 1 9  ? 9.707   -1.134  7.969   1.00 0.75 ? 9  LYS A HB3  1 
+ATOM 131 H HG2  . LYS A 1 9  ? 11.912  -1.325  7.540   1.00 1.25 ? 9  LYS A HG2  1 
+ATOM 132 H HG3  . LYS A 1 9  ? 12.296  0.047   8.580   1.00 1.22 ? 9  LYS A HG3  1 
+ATOM 133 H HD2  . LYS A 1 9  ? 12.543  -1.289  10.481  1.00 1.95 ? 9  LYS A HD2  1 
+ATOM 134 H HD3  . LYS A 1 9  ? 11.554  -2.589  9.816   1.00 1.83 ? 9  LYS A HD3  1 
+ATOM 135 H HE2  . LYS A 1 9  ? 13.448  -2.787  8.017   1.00 2.32 ? 9  LYS A HE2  1 
+ATOM 136 H HE3  . LYS A 1 9  ? 14.428  -1.914  9.213   1.00 2.44 ? 9  LYS A HE3  1 
+ATOM 137 H HZ1  . LYS A 1 9  ? 14.317  -4.452  9.402   1.00 2.99 ? 9  LYS A HZ1  1 
+ATOM 138 H HZ2  . LYS A 1 9  ? 12.744  -4.213  9.997   1.00 2.80 ? 9  LYS A HZ2  1 
+ATOM 139 H HZ3  . LYS A 1 9  ? 14.075  -3.545  10.815  1.00 2.96 ? 9  LYS A HZ3  1 
+ATOM 140 N N    . GLY A 1 10 ? 8.910   1.473   6.653   1.00 0.59 ? 10 GLY A N    1 
+ATOM 141 C CA   . GLY A 1 10 ? 8.893   1.992   5.256   1.00 0.60 ? 10 GLY A CA   1 
+ATOM 142 C C    . GLY A 1 10 ? 8.834   0.819   4.275   1.00 0.49 ? 10 GLY A C    1 
+ATOM 143 O O    . GLY A 1 10 ? 9.199   0.942   3.123   1.00 0.58 ? 10 GLY A O    1 
+ATOM 144 H H    . GLY A 1 10 ? 8.075   1.192   7.082   1.00 0.57 ? 10 GLY A H    1 
+ATOM 145 H HA2  . GLY A 1 10 ? 8.026   2.623   5.118   1.00 0.63 ? 10 GLY A HA2  1 
+ATOM 146 H HA3  . GLY A 1 10 ? 9.789   2.564   5.073   1.00 0.70 ? 10 GLY A HA3  1 
+ATOM 147 N N    . CYS A 1 11 ? 8.377   -0.318  4.723   1.00 0.42 ? 11 CYS A N    1 
+ATOM 148 C CA   . CYS A 1 11 ? 8.295   -1.498  3.814   1.00 0.39 ? 11 CYS A CA   1 
+ATOM 149 C C    . CYS A 1 11 ? 6.856   -1.693  3.329   1.00 0.37 ? 11 CYS A C    1 
+ATOM 150 O O    . CYS A 1 11 ? 5.912   -1.557  4.082   1.00 0.40 ? 11 CYS A O    1 
+ATOM 151 C CB   . CYS A 1 11 ? 8.738   -2.686  4.668   1.00 0.44 ? 11 CYS A CB   1 
+ATOM 152 S SG   . CYS A 1 11 ? 10.318  -2.301  5.464   1.00 0.62 ? 11 CYS A SG   1 
+ATOM 153 H H    . CYS A 1 11 ? 8.087   -0.397  5.656   1.00 0.50 ? 11 CYS A H    1 
+ATOM 154 H HA   . CYS A 1 11 ? 8.963   -1.376  2.977   1.00 0.45 ? 11 CYS A HA   1 
+ATOM 155 H HB2  . CYS A 1 11 ? 7.993   -2.885  5.424   1.00 0.50 ? 11 CYS A HB2  1 
+ATOM 156 H HB3  . CYS A 1 11 ? 8.855   -3.557  4.040   1.00 0.53 ? 11 CYS A HB3  1 
+ATOM 157 N N    . LYS A 1 12 ? 6.680   -2.011  2.075   1.00 0.42 ? 12 LYS A N    1 
+ATOM 158 C CA   . LYS A 1 12 ? 5.302   -2.214  1.543   1.00 0.45 ? 12 LYS A CA   1 
+ATOM 159 C C    . LYS A 1 12 ? 4.541   -3.217  2.415   1.00 0.42 ? 12 LYS A C    1 
+ATOM 160 O O    . LYS A 1 12 ? 5.096   -4.189  2.888   1.00 0.48 ? 12 LYS A O    1 
+ATOM 161 C CB   . LYS A 1 12 ? 5.500   -2.772  0.133   1.00 0.51 ? 12 LYS A CB   1 
+ATOM 162 C CG   . LYS A 1 12 ? 6.289   -1.766  -0.707  1.00 0.61 ? 12 LYS A CG   1 
+ATOM 163 C CD   . LYS A 1 12 ? 5.853   -1.869  -2.170  1.00 0.76 ? 12 LYS A CD   1 
+ATOM 164 C CE   . LYS A 1 12 ? 6.126   -3.283  -2.687  1.00 1.03 ? 12 LYS A CE   1 
+ATOM 165 N NZ   . LYS A 1 12 ? 6.228   -3.138  -4.166  1.00 1.29 ? 12 LYS A NZ   1 
+ATOM 166 H H    . LYS A 1 12 ? 7.455   -2.116  1.484   1.00 0.50 ? 12 LYS A H    1 
+ATOM 167 H HA   . LYS A 1 12 ? 4.773   -1.276  1.498   1.00 0.50 ? 12 LYS A HA   1 
+ATOM 168 H HB2  . LYS A 1 12 ? 6.045   -3.703  0.188   1.00 0.57 ? 12 LYS A HB2  1 
+ATOM 169 H HB3  . LYS A 1 12 ? 4.538   -2.944  -0.325  1.00 0.60 ? 12 LYS A HB3  1 
+ATOM 170 H HG2  . LYS A 1 12 ? 6.100   -0.766  -0.344  1.00 0.87 ? 12 LYS A HG2  1 
+ATOM 171 H HG3  . LYS A 1 12 ? 7.344   -1.983  -0.633  1.00 1.09 ? 12 LYS A HG3  1 
+ATOM 172 H HD2  . LYS A 1 12 ? 4.796   -1.654  -2.246  1.00 1.56 ? 12 LYS A HD2  1 
+ATOM 173 H HD3  . LYS A 1 12 ? 6.408   -1.158  -2.763  1.00 1.43 ? 12 LYS A HD3  1 
+ATOM 174 H HE2  . LYS A 1 12 ? 7.054   -3.658  -2.278  1.00 1.76 ? 12 LYS A HE2  1 
+ATOM 175 H HE3  . LYS A 1 12 ? 5.309   -3.941  -2.435  1.00 1.71 ? 12 LYS A HE3  1 
+ATOM 176 H HZ1  . LYS A 1 12 ? 6.577   -2.187  -4.398  1.00 1.77 ? 12 LYS A HZ1  1 
+ATOM 177 H HZ2  . LYS A 1 12 ? 5.289   -3.279  -4.593  1.00 1.84 ? 12 LYS A HZ2  1 
+ATOM 178 H HZ3  . LYS A 1 12 ? 6.889   -3.848  -4.539  1.00 1.65 ? 12 LYS A HZ3  1 
+ATOM 179 N N    . LEU A 1 13 ? 3.275   -2.987  2.632   1.00 0.42 ? 13 LEU A N    1 
+ATOM 180 C CA   . LEU A 1 13 ? 2.480   -3.928  3.473   1.00 0.43 ? 13 LEU A CA   1 
+ATOM 181 C C    . LEU A 1 13 ? 2.022   -5.127  2.639   1.00 0.41 ? 13 LEU A C    1 
+ATOM 182 O O    . LEU A 1 13 ? 1.188   -5.004  1.764   1.00 0.50 ? 13 LEU A O    1 
+ATOM 183 C CB   . LEU A 1 13 ? 1.276   -3.113  3.948   1.00 0.50 ? 13 LEU A CB   1 
+ATOM 184 C CG   . LEU A 1 13 ? 0.456   -3.942  4.937   1.00 0.65 ? 13 LEU A CG   1 
+ATOM 185 C CD1  . LEU A 1 13 ? 1.252   -4.128  6.230   1.00 0.96 ? 13 LEU A CD1  1 
+ATOM 186 C CD2  . LEU A 1 13 ? -0.854  -3.215  5.247   1.00 0.71 ? 13 LEU A CD2  1 
+ATOM 187 H H    . LEU A 1 13 ? 2.846   -2.197  2.241   1.00 0.46 ? 13 LEU A H    1 
+ATOM 188 H HA   . LEU A 1 13 ? 3.060   -4.257  4.321   1.00 0.47 ? 13 LEU A HA   1 
+ATOM 189 H HB2  . LEU A 1 13 ? 1.621   -2.210  4.431   1.00 0.63 ? 13 LEU A HB2  1 
+ATOM 190 H HB3  . LEU A 1 13 ? 0.659   -2.855  3.100   1.00 0.57 ? 13 LEU A HB3  1 
+ATOM 191 H HG   . LEU A 1 13 ? 0.241   -4.909  4.505   1.00 0.77 ? 13 LEU A HG   1 
+ATOM 192 H HD11 . LEU A 1 13 ? 1.630   -3.172  6.561   1.00 1.44 ? 13 LEU A HD11 1 
+ATOM 193 H HD12 . LEU A 1 13 ? 2.079   -4.800  6.050   1.00 1.38 ? 13 LEU A HD12 1 
+ATOM 194 H HD13 . LEU A 1 13 ? 0.610   -4.545  6.992   1.00 1.52 ? 13 LEU A HD13 1 
+ATOM 195 H HD21 . LEU A 1 13 ? -0.644  -2.185  5.494   1.00 1.30 ? 13 LEU A HD21 1 
+ATOM 196 H HD22 . LEU A 1 13 ? -1.342  -3.693  6.083   1.00 1.20 ? 13 LEU A HD22 1 
+ATOM 197 H HD23 . LEU A 1 13 ? -1.500  -3.253  4.383   1.00 1.21 ? 13 LEU A HD23 1 
+ATOM 198 N N    . SER A 1 14 ? 2.561   -6.286  2.903   1.00 0.46 ? 14 SER A N    1 
+ATOM 199 C CA   . SER A 1 14 ? 2.156   -7.491  2.124   1.00 0.47 ? 14 SER A CA   1 
+ATOM 200 C C    . SER A 1 14 ? 0.649   -7.725  2.258   1.00 0.46 ? 14 SER A C    1 
+ATOM 201 O O    . SER A 1 14 ? 0.078   -7.565  3.319   1.00 0.59 ? 14 SER A O    1 
+ATOM 202 C CB   . SER A 1 14 ? 2.936   -8.647  2.750   1.00 0.60 ? 14 SER A CB   1 
+ATOM 203 O OG   . SER A 1 14 ? 4.314   -8.306  2.808   1.00 0.79 ? 14 SER A OG   1 
+ATOM 204 H H    . SER A 1 14 ? 3.233   -6.364  3.613   1.00 0.59 ? 14 SER A H    1 
+ATOM 205 H HA   . SER A 1 14 ? 2.430   -7.380  1.087   1.00 0.46 ? 14 SER A HA   1 
+ATOM 206 H HB2  . SER A 1 14 ? 2.574   -8.829  3.748   1.00 0.65 ? 14 SER A HB2  1 
+ATOM 207 H HB3  . SER A 1 14 ? 2.799   -9.538  2.151   1.00 0.76 ? 14 SER A HB3  1 
+ATOM 208 H HG   . SER A 1 14 ? 4.824   -9.109  2.673   1.00 1.17 ? 14 SER A HG   1 
+ATOM 209 N N    . CYS A 1 15 ? 0.000   -8.102  1.191   1.00 0.47 ? 15 CYS A N    1 
+ATOM 210 C CA   . CYS A 1 15 ? -1.470  -8.345  1.258   1.00 0.54 ? 15 CYS A CA   1 
+ATOM 211 C C    . CYS A 1 15 ? -1.796  -9.756  0.763   1.00 0.46 ? 15 CYS A C    1 
+ATOM 212 O O    . CYS A 1 15 ? -1.196  -10.251 -0.171  1.00 0.50 ? 15 CYS A O    1 
+ATOM 213 C CB   . CYS A 1 15 ? -2.087  -7.296  0.334   1.00 0.63 ? 15 CYS A CB   1 
+ATOM 214 S SG   . CYS A 1 15 ? -1.542  -7.593  -1.366  1.00 0.62 ? 15 CYS A SG   1 
+ATOM 215 H H    . CYS A 1 15 ? 0.479   -8.225  0.345   1.00 0.55 ? 15 CYS A H    1 
+ATOM 216 H HA   . CYS A 1 15 ? -1.829  -8.206  2.266   1.00 0.69 ? 15 CYS A HA   1 
+ATOM 217 H HB2  . CYS A 1 15 ? -3.164  -7.361  0.384   1.00 0.68 ? 15 CYS A HB2  1 
+ATOM 218 H HB3  . CYS A 1 15 ? -1.772  -6.311  0.646   1.00 0.80 ? 15 CYS A HB3  1 
+ATOM 219 N N    . VAL A 1 16 ? -2.743  -10.408 1.380   1.00 0.49 ? 16 VAL A N    1 
+ATOM 220 C CA   . VAL A 1 16 ? -3.107  -11.786 0.944   1.00 0.57 ? 16 VAL A CA   1 
+ATOM 221 C C    . VAL A 1 16 ? -4.563  -11.823 0.469   1.00 0.51 ? 16 VAL A C    1 
+ATOM 222 O O    . VAL A 1 16 ? -5.000  -12.773 -0.150  1.00 0.69 ? 16 VAL A O    1 
+ATOM 223 C CB   . VAL A 1 16 ? -2.926  -12.656 2.187   1.00 0.76 ? 16 VAL A CB   1 
+ATOM 224 C CG1  . VAL A 1 16 ? -4.005  -12.309 3.215   1.00 0.78 ? 16 VAL A CG1  1 
+ATOM 225 C CG2  . VAL A 1 16 ? -3.049  -14.131 1.799   1.00 0.94 ? 16 VAL A CG2  1 
+ATOM 226 H H    . VAL A 1 16 ? -3.215  -9.991  2.131   1.00 0.55 ? 16 VAL A H    1 
+ATOM 227 H HA   . VAL A 1 16 ? -2.446  -12.121 0.160   1.00 0.62 ? 16 VAL A HA   1 
+ATOM 228 H HB   . VAL A 1 16 ? -1.951  -12.474 2.615   1.00 0.88 ? 16 VAL A HB   1 
+ATOM 229 H HG11 . VAL A 1 16 ? -3.625  -12.488 4.210   1.00 1.29 ? 16 VAL A HG11 1 
+ATOM 230 H HG12 . VAL A 1 16 ? -4.875  -12.927 3.046   1.00 1.24 ? 16 VAL A HG12 1 
+ATOM 231 H HG13 . VAL A 1 16 ? -4.276  -11.269 3.115   1.00 1.31 ? 16 VAL A HG13 1 
+ATOM 232 H HG21 . VAL A 1 16 ? -3.907  -14.563 2.293   1.00 1.46 ? 16 VAL A HG21 1 
+ATOM 233 H HG22 . VAL A 1 16 ? -2.157  -14.659 2.101   1.00 1.46 ? 16 VAL A HG22 1 
+ATOM 234 H HG23 . VAL A 1 16 ? -3.171  -14.213 0.729   1.00 1.30 ? 16 VAL A HG23 1 
+ATOM 235 N N    . ALA A 1 17 ? -5.315  -10.796 0.755   1.00 0.46 ? 17 ALA A N    1 
+ATOM 236 C CA   . ALA A 1 17 ? -6.742  -10.773 0.320   1.00 0.46 ? 17 ALA A CA   1 
+ATOM 237 C C    . ALA A 1 17 ? -7.156  -9.348  -0.058  1.00 0.42 ? 17 ALA A C    1 
+ATOM 238 O O    . ALA A 1 17 ? -6.606  -8.381  0.431   1.00 0.59 ? 17 ALA A O    1 
+ATOM 239 C CB   . ALA A 1 17 ? -7.534  -11.257 1.535   1.00 0.50 ? 17 ALA A CB   1 
+ATOM 240 H H    . ALA A 1 17 ? -4.943  -10.040 1.256   1.00 0.57 ? 17 ALA A H    1 
+ATOM 241 H HA   . ALA A 1 17 ? -6.894  -11.444 -0.510  1.00 0.52 ? 17 ALA A HA   1 
+ATOM 242 H HB1  . ALA A 1 17 ? -7.033  -12.106 1.977   1.00 1.21 ? 17 ALA A HB1  1 
+ATOM 243 H HB2  . ALA A 1 17 ? -8.527  -11.547 1.225   1.00 1.08 ? 17 ALA A HB2  1 
+ATOM 244 H HB3  . ALA A 1 17 ? -7.602  -10.461 2.261   1.00 1.09 ? 17 ALA A HB3  1 
+ATOM 245 N N    . ASN A 1 18 ? -8.121  -9.212  -0.926  1.00 0.36 ? 18 ASN A N    1 
+ATOM 246 C CA   . ASN A 1 18 ? -8.568  -7.849  -1.335  1.00 0.36 ? 18 ASN A CA   1 
+ATOM 247 C C    . ASN A 1 18 ? -9.299  -7.163  -0.177  1.00 0.34 ? 18 ASN A C    1 
+ATOM 248 O O    . ASN A 1 18 ? -9.055  -6.012  0.128   1.00 0.44 ? 18 ASN A O    1 
+ATOM 249 C CB   . ASN A 1 18 ? -9.521  -8.081  -2.508  1.00 0.42 ? 18 ASN A CB   1 
+ATOM 250 C CG   . ASN A 1 18 ? -8.714  -8.242  -3.797  1.00 0.49 ? 18 ASN A CG   1 
+ATOM 251 O OD1  . ASN A 1 18 ? -7.629  -7.710  -3.919  1.00 0.57 ? 18 ASN A OD1  1 
+ATOM 252 N ND2  . ASN A 1 18 ? -9.201  -8.961  -4.772  1.00 0.75 ? 18 ASN A ND2  1 
+ATOM 253 H H    . ASN A 1 18 ? -8.551  -10.004 -1.309  1.00 0.46 ? 18 ASN A H    1 
+ATOM 254 H HA   . ASN A 1 18 ? -7.727  -7.256  -1.655  1.00 0.38 ? 18 ASN A HA   1 
+ATOM 255 H HB2  . ASN A 1 18 ? -10.100 -8.976  -2.330  1.00 0.45 ? 18 ASN A HB2  1 
+ATOM 256 H HB3  . ASN A 1 18 ? -10.185 -7.235  -2.605  1.00 0.49 ? 18 ASN A HB3  1 
+ATOM 257 H HD21 . ASN A 1 18 ? -10.077 -9.390  -4.674  1.00 0.92 ? 18 ASN A HD21 1 
+ATOM 258 H HD22 . ASN A 1 18 ? -8.692  -9.070  -5.602  1.00 0.86 ? 18 ASN A HD22 1 
+ATOM 259 N N    . ASN A 1 19 ? -10.192 -7.860  0.470   1.00 0.32 ? 19 ASN A N    1 
+ATOM 260 C CA   . ASN A 1 19 ? -10.937 -7.247  1.607   1.00 0.36 ? 19 ASN A CA   1 
+ATOM 261 C C    . ASN A 1 19 ? -9.959  -6.604  2.594   1.00 0.33 ? 19 ASN A C    1 
+ATOM 262 O O    . ASN A 1 19 ? -10.169 -5.503  3.064   1.00 0.40 ? 19 ASN A O    1 
+ATOM 263 C CB   . ASN A 1 19 ? -11.679 -8.409  2.268   1.00 0.42 ? 19 ASN A CB   1 
+ATOM 264 C CG   . ASN A 1 19 ? -10.674 -9.482  2.692   1.00 0.54 ? 19 ASN A CG   1 
+ATOM 265 O OD1  . ASN A 1 19 ? -9.572  -9.535  2.181   1.00 0.98 ? 19 ASN A OD1  1 
+ATOM 266 N ND2  . ASN A 1 19 ? -11.009 -10.346 3.611   1.00 1.06 ? 19 ASN A ND2  1 
+ATOM 267 H H    . ASN A 1 19 ? -10.373 -8.787  0.209   1.00 0.37 ? 19 ASN A H    1 
+ATOM 268 H HA   . ASN A 1 19 ? -11.643 -6.517  1.245   1.00 0.41 ? 19 ASN A HA   1 
+ATOM 269 H HB2  . ASN A 1 19 ? -12.211 -8.049  3.136   1.00 0.49 ? 19 ASN A HB2  1 
+ATOM 270 H HB3  . ASN A 1 19 ? -12.380 -8.834  1.566   1.00 0.51 ? 19 ASN A HB3  1 
+ATOM 271 H HD21 . ASN A 1 19 ? -11.897 -10.303 4.022   1.00 1.58 ? 19 ASN A HD21 1 
+ATOM 272 H HD22 . ASN A 1 19 ? -10.372 -11.037 3.889   1.00 1.15 ? 19 ASN A HD22 1 
+ATOM 273 N N    . TYR A 1 20 ? -8.890  -7.282  2.913   1.00 0.30 ? 20 TYR A N    1 
+ATOM 274 C CA   . TYR A 1 20 ? -7.901  -6.709  3.870   1.00 0.33 ? 20 TYR A CA   1 
+ATOM 275 C C    . TYR A 1 20 ? -7.468  -5.314  3.411   1.00 0.31 ? 20 TYR A C    1 
+ATOM 276 O O    . TYR A 1 20 ? -7.556  -4.352  4.148   1.00 0.38 ? 20 TYR A O    1 
+ATOM 277 C CB   . TYR A 1 20 ? -6.716  -7.675  3.840   1.00 0.40 ? 20 TYR A CB   1 
+ATOM 278 C CG   . TYR A 1 20 ? -5.561  -7.080  4.609   1.00 0.42 ? 20 TYR A CG   1 
+ATOM 279 C CD1  . TYR A 1 20 ? -5.806  -6.221  5.687   1.00 1.17 ? 20 TYR A CD1  1 
+ATOM 280 C CD2  . TYR A 1 20 ? -4.245  -7.386  4.243   1.00 1.30 ? 20 TYR A CD2  1 
+ATOM 281 C CE1  . TYR A 1 20 ? -4.735  -5.669  6.400   1.00 1.17 ? 20 TYR A CE1  1 
+ATOM 282 C CE2  . TYR A 1 20 ? -3.174  -6.834  4.956   1.00 1.36 ? 20 TYR A CE2  1 
+ATOM 283 C CZ   . TYR A 1 20 ? -3.419  -5.976  6.034   1.00 0.58 ? 20 TYR A CZ   1 
+ATOM 284 O OH   . TYR A 1 20 ? -2.363  -5.431  6.737   1.00 0.68 ? 20 TYR A OH   1 
+ATOM 285 H H    . TYR A 1 20 ? -8.739  -8.169  2.523   1.00 0.33 ? 20 TYR A H    1 
+ATOM 286 H HA   . TYR A 1 20 ? -8.317  -6.668  4.863   1.00 0.37 ? 20 TYR A HA   1 
+ATOM 287 H HB2  . TYR A 1 20 ? -7.005  -8.613  4.292   1.00 0.47 ? 20 TYR A HB2  1 
+ATOM 288 H HB3  . TYR A 1 20 ? -6.416  -7.846  2.817   1.00 0.43 ? 20 TYR A HB3  1 
+ATOM 289 H HD1  . TYR A 1 20 ? -6.822  -5.984  5.969   1.00 2.03 ? 20 TYR A HD1  1 
+ATOM 290 H HD2  . TYR A 1 20 ? -4.055  -8.049  3.412   1.00 2.14 ? 20 TYR A HD2  1 
+ATOM 291 H HE1  . TYR A 1 20 ? -4.924  -5.006  7.231   1.00 2.00 ? 20 TYR A HE1  1 
+ATOM 292 H HE2  . TYR A 1 20 ? -2.158  -7.071  4.675   1.00 2.22 ? 20 TYR A HE2  1 
+ATOM 293 H HH   . TYR A 1 20 ? -2.198  -5.988  7.502   1.00 1.24 ? 20 TYR A HH   1 
+ATOM 294 N N    . CYS A 1 21 ? -7.000  -5.197  2.198   1.00 0.32 ? 21 CYS A N    1 
+ATOM 295 C CA   . CYS A 1 21 ? -6.562  -3.863  1.694   1.00 0.33 ? 21 CYS A CA   1 
+ATOM 296 C C    . CYS A 1 21 ? -7.755  -2.907  1.622   1.00 0.31 ? 21 CYS A C    1 
+ATOM 297 O O    . CYS A 1 21 ? -7.654  -1.746  1.966   1.00 0.36 ? 21 CYS A O    1 
+ATOM 298 C CB   . CYS A 1 21 ? -6.005  -4.133  0.295   1.00 0.38 ? 21 CYS A CB   1 
+ATOM 299 S SG   . CYS A 1 21 ? -4.283  -4.674  0.426   1.00 0.43 ? 21 CYS A SG   1 
+ATOM 300 H H    . CYS A 1 21 ? -6.937  -5.985  1.619   1.00 0.37 ? 21 CYS A H    1 
+ATOM 301 H HA   . CYS A 1 21 ? -5.789  -3.456  2.326   1.00 0.37 ? 21 CYS A HA   1 
+ATOM 302 H HB2  . CYS A 1 21 ? -6.590  -4.904  -0.182  1.00 0.42 ? 21 CYS A HB2  1 
+ATOM 303 H HB3  . CYS A 1 21 ? -6.055  -3.228  -0.292  1.00 0.40 ? 21 CYS A HB3  1 
+ATOM 304 N N    . ASP A 1 22 ? -8.885  -3.385  1.177   1.00 0.33 ? 22 ASP A N    1 
+ATOM 305 C CA   . ASP A 1 22 ? -10.083 -2.502  1.084   1.00 0.38 ? 22 ASP A CA   1 
+ATOM 306 C C    . ASP A 1 22 ? -10.264 -1.716  2.386   1.00 0.37 ? 22 ASP A C    1 
+ATOM 307 O O    . ASP A 1 22 ? -10.320 -0.503  2.388   1.00 0.40 ? 22 ASP A O    1 
+ATOM 308 C CB   . ASP A 1 22 ? -11.260 -3.453  0.863   1.00 0.43 ? 22 ASP A CB   1 
+ATOM 309 C CG   . ASP A 1 22 ? -12.506 -2.646  0.491   1.00 0.55 ? 22 ASP A CG   1 
+ATOM 310 O OD1  . ASP A 1 22 ? -12.397 -1.788  -0.369  1.00 1.25 ? 22 ASP A OD1  1 
+ATOM 311 O OD2  . ASP A 1 22 ? -13.547 -2.901  1.073   1.00 1.16 ? 22 ASP A OD2  1 
+ATOM 312 H H    . ASP A 1 22 ? -8.946  -4.324  0.904   1.00 0.37 ? 22 ASP A H    1 
+ATOM 313 H HA   . ASP A 1 22 ? -9.991  -1.828  0.247   1.00 0.42 ? 22 ASP A HA   1 
+ATOM 314 H HB2  . ASP A 1 22 ? -11.022 -4.139  0.063   1.00 0.52 ? 22 ASP A HB2  1 
+ATOM 315 H HB3  . ASP A 1 22 ? -11.450 -4.007  1.769   1.00 0.47 ? 22 ASP A HB3  1 
+ATOM 316 N N    . ASN A 1 23 ? -10.357 -2.400  3.494   1.00 0.44 ? 23 ASN A N    1 
+ATOM 317 C CA   . ASN A 1 23 ? -10.534 -1.692  4.794   1.00 0.51 ? 23 ASN A CA   1 
+ATOM 318 C C    . ASN A 1 23 ? -9.322  -0.802  5.082   1.00 0.50 ? 23 ASN A C    1 
+ATOM 319 O O    . ASN A 1 23 ? -9.446  0.393   5.261   1.00 0.55 ? 23 ASN A O    1 
+ATOM 320 C CB   . ASN A 1 23 ? -10.644 -2.804  5.838   1.00 0.60 ? 23 ASN A CB   1 
+ATOM 321 C CG   . ASN A 1 23 ? -11.190 -2.225  7.145   1.00 0.81 ? 23 ASN A CG   1 
+ATOM 322 O OD1  . ASN A 1 23 ? -11.458 -1.044  7.235   1.00 1.26 ? 23 ASN A OD1  1 
+ATOM 323 N ND2  . ASN A 1 23 ? -11.369 -3.014  8.169   1.00 1.37 ? 23 ASN A ND2  1 
+ATOM 324 H H    . ASN A 1 23 ? -10.309 -3.379  3.471   1.00 0.50 ? 23 ASN A H    1 
+ATOM 325 H HA   . ASN A 1 23 ? -11.439 -1.106  4.784   1.00 0.55 ? 23 ASN A HA   1 
+ATOM 326 H HB2  . ASN A 1 23 ? -11.311 -3.573  5.476   1.00 0.65 ? 23 ASN A HB2  1 
+ATOM 327 H HB3  . ASN A 1 23 ? -9.667  -3.228  6.016   1.00 0.67 ? 23 ASN A HB3  1 
+ATOM 328 H HD21 . ASN A 1 23 ? -11.153 -3.968  8.097   1.00 1.90 ? 23 ASN A HD21 1 
+ATOM 329 H HD22 . ASN A 1 23 ? -11.719 -2.654  9.010   1.00 1.54 ? 23 ASN A HD22 1 
+ATOM 330 N N    . GLN A 1 24 ? -8.151  -1.375  5.128   1.00 0.48 ? 24 GLN A N    1 
+ATOM 331 C CA   . GLN A 1 24 ? -6.932  -0.561  5.404   1.00 0.51 ? 24 GLN A CA   1 
+ATOM 332 C C    . GLN A 1 24 ? -6.942  0.712   4.553   1.00 0.45 ? 24 GLN A C    1 
+ATOM 333 O O    . GLN A 1 24 ? -6.995  1.812   5.066   1.00 0.54 ? 24 GLN A O    1 
+ATOM 334 C CB   . GLN A 1 24 ? -5.759  -1.459  5.012   1.00 0.53 ? 24 GLN A CB   1 
+ATOM 335 C CG   . GLN A 1 24 ? -4.455  -0.854  5.535   1.00 0.65 ? 24 GLN A CG   1 
+ATOM 336 C CD   . GLN A 1 24 ? -4.365  -1.065  7.048   1.00 0.86 ? 24 GLN A CD   1 
+ATOM 337 O OE1  . GLN A 1 24 ? -4.209  -2.178  7.509   1.00 1.52 ? 24 GLN A OE1  1 
+ATOM 338 N NE2  . GLN A 1 24 ? -4.456  -0.036  7.845   1.00 1.34 ? 24 GLN A NE2  1 
+ATOM 339 H H    . GLN A 1 24 ? -8.072  -2.341  4.980   1.00 0.50 ? 24 GLN A H    1 
+ATOM 340 H HA   . GLN A 1 24 ? -6.873  -0.315  6.452   1.00 0.59 ? 24 GLN A HA   1 
+ATOM 341 H HB2  . GLN A 1 24 ? -5.898  -2.441  5.440   1.00 0.55 ? 24 GLN A HB2  1 
+ATOM 342 H HB3  . GLN A 1 24 ? -5.710  -1.539  3.936   1.00 0.55 ? 24 GLN A HB3  1 
+ATOM 343 H HG2  . GLN A 1 24 ? -3.616  -1.335  5.053   1.00 0.76 ? 24 GLN A HG2  1 
+ATOM 344 H HG3  . GLN A 1 24 ? -4.436  0.204   5.320   1.00 0.74 ? 24 GLN A HG3  1 
+ATOM 345 H HE21 . GLN A 1 24 ? -4.582  0.862   7.473   1.00 1.97 ? 24 GLN A HE21 1 
+ATOM 346 H HE22 . GLN A 1 24 ? -4.400  -0.161  8.815   1.00 1.47 ? 24 GLN A HE22 1 
+ATOM 347 N N    . CYS A 1 25 ? -6.891  0.571   3.257   1.00 0.34 ? 25 CYS A N    1 
+ATOM 348 C CA   . CYS A 1 25 ? -6.898  1.774   2.375   1.00 0.30 ? 25 CYS A CA   1 
+ATOM 349 C C    . CYS A 1 25 ? -8.002  2.741   2.809   1.00 0.34 ? 25 CYS A C    1 
+ATOM 350 O O    . CYS A 1 25 ? -7.765  3.913   3.027   1.00 0.37 ? 25 CYS A O    1 
+ATOM 351 C CB   . CYS A 1 25 ? -7.176  1.235   0.972   1.00 0.26 ? 25 CYS A CB   1 
+ATOM 352 S SG   . CYS A 1 25 ? -5.806  0.173   0.450   1.00 0.25 ? 25 CYS A SG   1 
+ATOM 353 H H    . CYS A 1 25 ? -6.849  -0.325  2.863   1.00 0.32 ? 25 CYS A H    1 
+ATOM 354 H HA   . CYS A 1 25 ? -5.937  2.263   2.398   1.00 0.33 ? 25 CYS A HA   1 
+ATOM 355 H HB2  . CYS A 1 25 ? -8.092  0.662   0.982   1.00 0.30 ? 25 CYS A HB2  1 
+ATOM 356 H HB3  . CYS A 1 25 ? -7.275  2.060   0.283   1.00 0.26 ? 25 CYS A HB3  1 
+ATOM 357 N N    . LYS A 1 26 ? -9.209  2.261   2.934   1.00 0.39 ? 26 LYS A N    1 
+ATOM 358 C CA   . LYS A 1 26 ? -10.328 3.154   3.353   1.00 0.49 ? 26 LYS A CA   1 
+ATOM 359 C C    . LYS A 1 26 ? -9.903  4.008   4.550   1.00 0.54 ? 26 LYS A C    1 
+ATOM 360 O O    . LYS A 1 26 ? -10.035 5.216   4.542   1.00 0.61 ? 26 LYS A O    1 
+ATOM 361 C CB   . LYS A 1 26 ? -11.464 2.208   3.744   1.00 0.55 ? 26 LYS A CB   1 
+ATOM 362 C CG   . LYS A 1 26 ? -12.680 3.026   4.186   1.00 0.79 ? 26 LYS A CG   1 
+ATOM 363 C CD   . LYS A 1 26 ? -13.949 2.417   3.588   1.00 1.43 ? 26 LYS A CD   1 
+ATOM 364 C CE   . LYS A 1 26 ? -14.942 3.532   3.252   1.00 2.15 ? 26 LYS A CE   1 
+ATOM 365 N NZ   . LYS A 1 26 ? -16.044 2.855   2.513   1.00 2.88 ? 26 LYS A NZ   1 
+ATOM 366 H H    . LYS A 1 26 ? -9.380  1.313   2.753   1.00 0.40 ? 26 LYS A H    1 
+ATOM 367 H HA   . LYS A 1 26 ? -10.637 3.781   2.532   1.00 0.50 ? 26 LYS A HA   1 
+ATOM 368 H HB2  . LYS A 1 26 ? -11.730 1.595   2.895   1.00 0.51 ? 26 LYS A HB2  1 
+ATOM 369 H HB3  . LYS A 1 26 ? -11.143 1.577   4.558   1.00 0.58 ? 26 LYS A HB3  1 
+ATOM 370 H HG2  . LYS A 1 26 ? -12.747 3.015   5.264   1.00 1.23 ? 26 LYS A HG2  1 
+ATOM 371 H HG3  . LYS A 1 26 ? -12.574 4.043   3.841   1.00 0.98 ? 26 LYS A HG3  1 
+ATOM 372 H HD2  . LYS A 1 26 ? -13.698 1.874   2.688   1.00 1.84 ? 26 LYS A HD2  1 
+ATOM 373 H HD3  . LYS A 1 26 ? -14.397 1.742   4.302   1.00 1.95 ? 26 LYS A HD3  1 
+ATOM 374 H HE2  . LYS A 1 26 ? -15.317 3.985   4.160   1.00 2.41 ? 26 LYS A HE2  1 
+ATOM 375 H HE3  . LYS A 1 26 ? -14.476 4.274   2.623   1.00 2.68 ? 26 LYS A HE3  1 
+ATOM 376 H HZ1  . LYS A 1 26 ? -15.645 2.135   1.878   1.00 3.42 ? 26 LYS A HZ1  1 
+ATOM 377 H HZ2  . LYS A 1 26 ? -16.569 3.559   1.954   1.00 3.02 ? 26 LYS A HZ2  1 
+ATOM 378 H HZ3  . LYS A 1 26 ? -16.687 2.399   3.190   1.00 3.29 ? 26 LYS A HZ3  1 
+ATOM 379 N N    . MET A 1 27 ? -9.393  3.390   5.581   1.00 0.57 ? 27 MET A N    1 
+ATOM 380 C CA   . MET A 1 27 ? -8.961  4.168   6.777   1.00 0.66 ? 27 MET A CA   1 
+ATOM 381 C C    . MET A 1 27 ? -7.928  5.225   6.376   1.00 0.63 ? 27 MET A C    1 
+ATOM 382 O O    . MET A 1 27 ? -7.824  6.268   6.989   1.00 0.70 ? 27 MET A O    1 
+ATOM 383 C CB   . MET A 1 27 ? -8.335  3.135   7.716   1.00 0.72 ? 27 MET A CB   1 
+ATOM 384 C CG   . MET A 1 27 ? -9.424  2.201   8.246   1.00 0.88 ? 27 MET A CG   1 
+ATOM 385 S SD   . MET A 1 27 ? -9.038  1.730   9.950   1.00 1.36 ? 27 MET A SD   1 
+ATOM 386 C CE   . MET A 1 27 ? -7.571  0.736   9.585   1.00 1.35 ? 27 MET A CE   1 
+ATOM 387 H H    . MET A 1 27 ? -9.295  2.415   5.568   1.00 0.57 ? 27 MET A H    1 
+ATOM 388 H HA   . MET A 1 27 ? -9.810  4.631   7.253   1.00 0.74 ? 27 MET A HA   1 
+ATOM 389 H HB2  . MET A 1 27 ? -7.596  2.560   7.176   1.00 0.65 ? 27 MET A HB2  1 
+ATOM 390 H HB3  . MET A 1 27 ? -7.863  3.641   8.544   1.00 0.83 ? 27 MET A HB3  1 
+ATOM 391 H HG2  . MET A 1 27 ? -10.377 2.707   8.219   1.00 1.32 ? 27 MET A HG2  1 
+ATOM 392 H HG3  . MET A 1 27 ? -9.469  1.315   7.629   1.00 1.10 ? 27 MET A HG3  1 
+ATOM 393 H HE1  . MET A 1 27 ? -7.153  0.359   10.508  1.00 1.88 ? 27 MET A HE1  1 
+ATOM 394 H HE2  . MET A 1 27 ? -6.837  1.346   9.083   1.00 1.62 ? 27 MET A HE2  1 
+ATOM 395 H HE3  . MET A 1 27 ? -7.848  -0.090  8.944   1.00 1.84 ? 27 MET A HE3  1 
+ATOM 396 N N    . LYS A 1 28 ? -7.164  4.962   5.351   1.00 0.56 ? 28 LYS A N    1 
+ATOM 397 C CA   . LYS A 1 28 ? -6.139  5.953   4.913   1.00 0.57 ? 28 LYS A CA   1 
+ATOM 398 C C    . LYS A 1 28 ? -6.752  6.945   3.921   1.00 0.54 ? 28 LYS A C    1 
+ATOM 399 O O    . LYS A 1 28 ? -6.055  7.603   3.175   1.00 0.60 ? 28 LYS A O    1 
+ATOM 400 C CB   . LYS A 1 28 ? -5.049  5.121   4.235   1.00 0.54 ? 28 LYS A CB   1 
+ATOM 401 C CG   . LYS A 1 28 ? -4.312  4.290   5.286   1.00 0.69 ? 28 LYS A CG   1 
+ATOM 402 C CD   . LYS A 1 28 ? -2.817  4.612   5.236   1.00 1.02 ? 28 LYS A CD   1 
+ATOM 403 C CE   . LYS A 1 28 ? -2.089  3.832   6.333   1.00 1.51 ? 28 LYS A CE   1 
+ATOM 404 N NZ   . LYS A 1 28 ? -1.119  4.801   6.914   1.00 1.67 ? 28 LYS A NZ   1 
+ATOM 405 H H    . LYS A 1 28 ? -7.264  4.115   4.870   1.00 0.54 ? 28 LYS A H    1 
+ATOM 406 H HA   . LYS A 1 28 ? -5.729  6.473   5.764   1.00 0.64 ? 28 LYS A HA   1 
+ATOM 407 H HB2  . LYS A 1 28 ? -5.501  4.463   3.506   1.00 0.51 ? 28 LYS A HB2  1 
+ATOM 408 H HB3  . LYS A 1 28 ? -4.349  5.778   3.742   1.00 0.59 ? 28 LYS A HB3  1 
+ATOM 409 H HG2  . LYS A 1 28 ? -4.699  4.526   6.267   1.00 1.07 ? 28 LYS A HG2  1 
+ATOM 410 H HG3  . LYS A 1 28 ? -4.459  3.240   5.084   1.00 1.15 ? 28 LYS A HG3  1 
+ATOM 411 H HD2  . LYS A 1 28 ? -2.421  4.332   4.270   1.00 1.62 ? 28 LYS A HD2  1 
+ATOM 412 H HD3  . LYS A 1 28 ? -2.671  5.670   5.392   1.00 1.61 ? 28 LYS A HD3  1 
+ATOM 413 H HE2  . LYS A 1 28 ? -2.791  3.500   7.086   1.00 2.03 ? 28 LYS A HE2  1 
+ATOM 414 H HE3  . LYS A 1 28 ? -1.563  2.990   5.911   1.00 2.19 ? 28 LYS A HE3  1 
+ATOM 415 H HZ1  . LYS A 1 28 ? -0.284  4.867   6.299   1.00 2.06 ? 28 LYS A HZ1  1 
+ATOM 416 H HZ2  . LYS A 1 28 ? -0.830  4.477   7.860   1.00 1.91 ? 28 LYS A HZ2  1 
+ATOM 417 H HZ3  . LYS A 1 28 ? -1.566  5.737   6.990   1.00 2.17 ? 28 LYS A HZ3  1 
+ATOM 418 N N    . LYS A 1 29 ? -8.052  7.058   3.908   1.00 0.55 ? 29 LYS A N    1 
+ATOM 419 C CA   . LYS A 1 29 ? -8.708  8.009   2.965   1.00 0.57 ? 29 LYS A CA   1 
+ATOM 420 C C    . LYS A 1 29 ? -8.481  7.560   1.519   1.00 0.50 ? 29 LYS A C    1 
+ATOM 421 O O    . LYS A 1 29 ? -8.270  8.366   0.634   1.00 0.65 ? 29 LYS A O    1 
+ATOM 422 C CB   . LYS A 1 29 ? -8.030  9.354   3.222   1.00 0.65 ? 29 LYS A CB   1 
+ATOM 423 C CG   . LYS A 1 29 ? -8.993  10.489  2.868   1.00 0.77 ? 29 LYS A CG   1 
+ATOM 424 C CD   . LYS A 1 29 ? -8.301  11.835  3.090   1.00 1.34 ? 29 LYS A CD   1 
+ATOM 425 C CE   . LYS A 1 29 ? -9.273  12.804  3.766   1.00 1.77 ? 29 LYS A CE   1 
+ATOM 426 N NZ   . LYS A 1 29 ? -8.993  14.127  3.143   1.00 2.63 ? 29 LYS A NZ   1 
+ATOM 427 H H    . LYS A 1 29 ? -8.597  6.519   4.519   1.00 0.62 ? 29 LYS A H    1 
+ATOM 428 H HA   . LYS A 1 29 ? -9.763  8.082   3.176   1.00 0.63 ? 29 LYS A HA   1 
+ATOM 429 H HB2  . LYS A 1 29 ? -7.756  9.425   4.265   1.00 0.72 ? 29 LYS A HB2  1 
+ATOM 430 H HB3  . LYS A 1 29 ? -7.143  9.434   2.611   1.00 0.68 ? 29 LYS A HB3  1 
+ATOM 431 H HG2  . LYS A 1 29 ? -9.288  10.400  1.832   1.00 1.25 ? 29 LYS A HG2  1 
+ATOM 432 H HG3  . LYS A 1 29 ? -9.868  10.428  3.498   1.00 0.91 ? 29 LYS A HG3  1 
+ATOM 433 H HD2  . LYS A 1 29 ? -7.434  11.694  3.719   1.00 1.83 ? 29 LYS A HD2  1 
+ATOM 434 H HD3  . LYS A 1 29 ? -7.994  12.243  2.138   1.00 1.98 ? 29 LYS A HD3  1 
+ATOM 435 H HE2  . LYS A 1 29 ? -10.295 12.504  3.576   1.00 2.01 ? 29 LYS A HE2  1 
+ATOM 436 H HE3  . LYS A 1 29 ? -9.083  12.848  4.828   1.00 2.22 ? 29 LYS A HE3  1 
+ATOM 437 H HZ1  . LYS A 1 29 ? -9.275  14.885  3.796   1.00 3.22 ? 29 LYS A HZ1  1 
+ATOM 438 H HZ2  . LYS A 1 29 ? -9.531  14.213  2.256   1.00 2.97 ? 29 LYS A HZ2  1 
+ATOM 439 H HZ3  . LYS A 1 29 ? -7.976  14.207  2.941   1.00 2.91 ? 29 LYS A HZ3  1 
+ATOM 440 N N    . ALA A 1 30 ? -8.521  6.279   1.272   1.00 0.36 ? 30 ALA A N    1 
+ATOM 441 C CA   . ALA A 1 30 ? -8.306  5.781   -0.117  1.00 0.32 ? 30 ALA A CA   1 
+ATOM 442 C C    . ALA A 1 30 ? -9.622  5.261   -0.702  1.00 0.37 ? 30 ALA A C    1 
+ATOM 443 O O    . ALA A 1 30 ? -10.556 4.961   0.016   1.00 0.47 ? 30 ALA A O    1 
+ATOM 444 C CB   . ALA A 1 30 ? -7.294  4.643   0.022   1.00 0.27 ? 30 ALA A CB   1 
+ATOM 445 H H    . ALA A 1 30 ? -8.691  5.645   1.999   1.00 0.38 ? 30 ALA A H    1 
+ATOM 446 H HA   . ALA A 1 30 ? -7.899  6.562   -0.740  1.00 0.36 ? 30 ALA A HA   1 
+ATOM 447 H HB1  . ALA A 1 30 ? -7.396  3.967   -0.814  1.00 1.05 ? 30 ALA A HB1  1 
+ATOM 448 H HB2  . ALA A 1 30 ? -7.479  4.108   0.942   1.00 1.05 ? 30 ALA A HB2  1 
+ATOM 449 H HB3  . ALA A 1 30 ? -6.294  5.051   0.037   1.00 1.04 ? 30 ALA A HB3  1 
+ATOM 450 N N    . SER A 1 31 ? -9.704  5.152   -2.000  1.00 0.41 ? 31 SER A N    1 
+ATOM 451 C CA   . SER A 1 31 ? -10.960 4.652   -2.628  1.00 0.52 ? 31 SER A CA   1 
+ATOM 452 C C    . SER A 1 31 ? -10.709 3.306   -3.313  1.00 0.46 ? 31 SER A C    1 
+ATOM 453 O O    . SER A 1 31 ? -11.568 2.447   -3.350  1.00 0.58 ? 31 SER A O    1 
+ATOM 454 C CB   . SER A 1 31 ? -11.338 5.715   -3.659  1.00 0.66 ? 31 SER A CB   1 
+ATOM 455 O OG   . SER A 1 31 ? -11.863 5.080   -4.817  1.00 1.53 ? 31 SER A OG   1 
+ATOM 456 H H    . SER A 1 31 ? -8.940  5.400   -2.561  1.00 0.43 ? 31 SER A H    1 
+ATOM 457 H HA   . SER A 1 31 ? -11.741 4.560   -1.890  1.00 0.59 ? 31 SER A HA   1 
+ATOM 458 H HB2  . SER A 1 31 ? -12.085 6.371   -3.245  1.00 1.17 ? 31 SER A HB2  1 
+ATOM 459 H HB3  . SER A 1 31 ? -10.460 6.292   -3.917  1.00 1.27 ? 31 SER A HB3  1 
+ATOM 460 H HG   . SER A 1 31 ? -11.681 5.645   -5.572  1.00 1.99 ? 31 SER A HG   1 
+ATOM 461 N N    . GLY A 1 32 ? -9.538  3.115   -3.856  1.00 0.36 ? 32 GLY A N    1 
+ATOM 462 C CA   . GLY A 1 32 ? -9.233  1.825   -4.538  1.00 0.33 ? 32 GLY A CA   1 
+ATOM 463 C C    . GLY A 1 32 ? -8.247  1.019   -3.691  1.00 0.27 ? 32 GLY A C    1 
+ATOM 464 O O    . GLY A 1 32 ? -7.055  1.036   -3.925  1.00 0.25 ? 32 GLY A O    1 
+ATOM 465 H H    . GLY A 1 32 ? -8.858  3.820   -3.816  1.00 0.39 ? 32 GLY A H    1 
+ATOM 466 H HA2  . GLY A 1 32 ? -10.147 1.261   -4.664  1.00 0.37 ? 32 GLY A HA2  1 
+ATOM 467 H HA3  . GLY A 1 32 ? -8.795  2.022   -5.504  1.00 0.37 ? 32 GLY A HA3  1 
+ATOM 468 N N    . GLY A 1 33 ? -8.733  0.313   -2.707  1.00 0.28 ? 33 GLY A N    1 
+ATOM 469 C CA   . GLY A 1 33 ? -7.822  -0.493  -1.846  1.00 0.26 ? 33 GLY A CA   1 
+ATOM 470 C C    . GLY A 1 33 ? -7.948  -1.972  -2.213  1.00 0.30 ? 33 GLY A C    1 
+ATOM 471 O O    . GLY A 1 33 ? -9.006  -2.560  -2.110  1.00 0.39 ? 33 GLY A O    1 
+ATOM 472 H H    . GLY A 1 33 ? -9.698  0.313   -2.534  1.00 0.34 ? 33 GLY A H    1 
+ATOM 473 H HA2  . GLY A 1 33 ? -6.803  -0.168  -1.999  1.00 0.24 ? 33 GLY A HA2  1 
+ATOM 474 H HA3  . GLY A 1 33 ? -8.092  -0.358  -0.810  1.00 0.31 ? 33 GLY A HA3  1 
+ATOM 475 N N    . HIS A 1 34 ? -6.875  -2.581  -2.640  1.00 0.30 ? 34 HIS A N    1 
+ATOM 476 C CA   . HIS A 1 34 ? -6.934  -4.023  -3.013  1.00 0.38 ? 34 HIS A CA   1 
+ATOM 477 C C    . HIS A 1 34 ? -5.545  -4.657  -2.898  1.00 0.38 ? 34 HIS A C    1 
+ATOM 478 O O    . HIS A 1 34 ? -4.557  -3.978  -2.698  1.00 0.46 ? 34 HIS A O    1 
+ATOM 479 C CB   . HIS A 1 34 ? -7.413  -4.038  -4.465  1.00 0.45 ? 34 HIS A CB   1 
+ATOM 480 C CG   . HIS A 1 34 ? -6.379  -3.384  -5.340  1.00 0.46 ? 34 HIS A CG   1 
+ATOM 481 N ND1  . HIS A 1 34 ? -6.529  -2.094  -5.825  1.00 0.94 ? 34 HIS A ND1  1 
+ATOM 482 C CD2  . HIS A 1 34 ? -5.174  -3.829  -5.826  1.00 0.95 ? 34 HIS A CD2  1 
+ATOM 483 C CE1  . HIS A 1 34 ? -5.443  -1.810  -6.566  1.00 0.90 ? 34 HIS A CE1  1 
+ATOM 484 N NE2  . HIS A 1 34 ? -4.585  -2.834  -6.600  1.00 0.87 ? 34 HIS A NE2  1 
+ATOM 485 H H    . HIS A 1 34 ? -6.030  -2.089  -2.715  1.00 0.29 ? 34 HIS A H    1 
+ATOM 486 H HA   . HIS A 1 34 ? -7.640  -4.546  -2.387  1.00 0.43 ? 34 HIS A HA   1 
+ATOM 487 H HB2  . HIS A 1 34 ? -7.562  -5.059  -4.784  1.00 0.58 ? 34 HIS A HB2  1 
+ATOM 488 H HB3  . HIS A 1 34 ? -8.343  -3.496  -4.543  1.00 0.51 ? 34 HIS A HB3  1 
+ATOM 489 H HD1  . HIS A 1 34 ? -7.289  -1.498  -5.658  1.00 1.49 ? 34 HIS A HD1  1 
+ATOM 490 H HD2  . HIS A 1 34 ? -4.749  -4.803  -5.636  1.00 1.58 ? 34 HIS A HD2  1 
+ATOM 491 H HE1  . HIS A 1 34 ? -5.284  -0.870  -7.072  1.00 1.33 ? 34 HIS A HE1  1 
+ATOM 492 N N    . CYS A 1 35 ? -5.461  -5.953  -3.024  1.00 0.35 ? 35 CYS A N    1 
+ATOM 493 C CA   . CYS A 1 35 ? -4.136  -6.628  -2.922  1.00 0.35 ? 35 CYS A CA   1 
+ATOM 494 C C    . CYS A 1 35 ? -3.557  -6.870  -4.319  1.00 0.39 ? 35 CYS A C    1 
+ATOM 495 O O    . CYS A 1 35 ? -4.205  -7.428  -5.182  1.00 0.52 ? 35 CYS A O    1 
+ATOM 496 C CB   . CYS A 1 35 ? -4.420  -7.957  -2.222  1.00 0.38 ? 35 CYS A CB   1 
+ATOM 497 S SG   . CYS A 1 35 ? -2.888  -8.912  -2.094  1.00 0.53 ? 35 CYS A SG   1 
+ATOM 498 H H    . CYS A 1 35 ? -6.270  -6.483  -3.185  1.00 0.38 ? 35 CYS A H    1 
+ATOM 499 H HA   . CYS A 1 35 ? -3.456  -6.037  -2.329  1.00 0.34 ? 35 CYS A HA   1 
+ATOM 500 H HB2  . CYS A 1 35 ? -4.810  -7.766  -1.233  1.00 0.37 ? 35 CYS A HB2  1 
+ATOM 501 H HB3  . CYS A 1 35 ? -5.147  -8.516  -2.793  1.00 0.45 ? 35 CYS A HB3  1 
+ATOM 502 N N    . TYR A 1 36 ? -2.342  -6.453  -4.548  1.00 0.39 ? 36 TYR A N    1 
+ATOM 503 C CA   . TYR A 1 36 ? -1.723  -6.660  -5.890  1.00 0.46 ? 36 TYR A CA   1 
+ATOM 504 C C    . TYR A 1 36 ? -0.217  -6.896  -5.747  1.00 0.43 ? 36 TYR A C    1 
+ATOM 505 O O    . TYR A 1 36 ? 0.443   -6.280  -4.933  1.00 0.45 ? 36 TYR A O    1 
+ATOM 506 C CB   . TYR A 1 36 ? -1.993  -5.364  -6.654  1.00 0.55 ? 36 TYR A CB   1 
+ATOM 507 C CG   . TYR A 1 36 ? -2.333  -5.687  -8.089  1.00 0.79 ? 36 TYR A CG   1 
+ATOM 508 C CD1  . TYR A 1 36 ? -1.327  -6.100  -8.971  1.00 1.58 ? 36 TYR A CD1  1 
+ATOM 509 C CD2  . TYR A 1 36 ? -3.654  -5.574  -8.538  1.00 1.40 ? 36 TYR A CD2  1 
+ATOM 510 C CE1  . TYR A 1 36 ? -1.642  -6.399  -10.302 1.00 1.78 ? 36 TYR A CE1  1 
+ATOM 511 C CE2  . TYR A 1 36 ? -3.969  -5.874  -9.869  1.00 1.59 ? 36 TYR A CE2  1 
+ATOM 512 C CZ   . TYR A 1 36 ? -2.963  -6.286  -10.751 1.00 1.37 ? 36 TYR A CZ   1 
+ATOM 513 O OH   . TYR A 1 36 ? -3.273  -6.582  -12.063 1.00 1.67 ? 36 TYR A OH   1 
+ATOM 514 H H    . TYR A 1 36 ? -1.835  -6.005  -3.839  1.00 0.43 ? 36 TYR A H    1 
+ATOM 515 H HA   . TYR A 1 36 ? -2.189  -7.490  -6.396  1.00 0.51 ? 36 TYR A HA   1 
+ATOM 516 H HB2  . TYR A 1 36 ? -2.821  -4.842  -6.196  1.00 0.55 ? 36 TYR A HB2  1 
+ATOM 517 H HB3  . TYR A 1 36 ? -1.113  -4.739  -6.625  1.00 0.58 ? 36 TYR A HB3  1 
+ATOM 518 H HD1  . TYR A 1 36 ? -0.308  -6.187  -8.624  1.00 2.32 ? 36 TYR A HD1  1 
+ATOM 519 H HD2  . TYR A 1 36 ? -4.430  -5.256  -7.858  1.00 2.12 ? 36 TYR A HD2  1 
+ATOM 520 H HE1  . TYR A 1 36 ? -0.865  -6.718  -10.982 1.00 2.58 ? 36 TYR A HE1  1 
+ATOM 521 H HE2  . TYR A 1 36 ? -4.988  -5.787  -10.216 1.00 2.34 ? 36 TYR A HE2  1 
+ATOM 522 H HH   . TYR A 1 36 ? -3.345  -5.754  -12.544 1.00 1.95 ? 36 TYR A HH   1 
+ATOM 523 N N    . ALA A 1 37 ? 0.331   -7.782  -6.532  1.00 0.47 ? 37 ALA A N    1 
+ATOM 524 C CA   . ALA A 1 37 ? 1.794   -8.056  -6.440  1.00 0.50 ? 37 ALA A CA   1 
+ATOM 525 C C    . ALA A 1 37 ? 2.177   -8.407  -5.000  1.00 0.45 ? 37 ALA A C    1 
+ATOM 526 O O    . ALA A 1 37 ? 3.220   -8.016  -4.513  1.00 0.48 ? 37 ALA A O    1 
+ATOM 527 C CB   . ALA A 1 37 ? 2.468   -6.754  -6.874  1.00 0.54 ? 37 ALA A CB   1 
+ATOM 528 H H    . ALA A 1 37 ? -0.219  -8.268  -7.182  1.00 0.54 ? 37 ALA A H    1 
+ATOM 529 H HA   . ALA A 1 37 ? 2.071   -8.855  -7.110  1.00 0.58 ? 37 ALA A HA   1 
+ATOM 530 H HB1  . ALA A 1 37 ? 3.389   -6.626  -6.324  1.00 1.24 ? 37 ALA A HB1  1 
+ATOM 531 H HB2  . ALA A 1 37 ? 1.809   -5.923  -6.672  1.00 1.10 ? 37 ALA A HB2  1 
+ATOM 532 H HB3  . ALA A 1 37 ? 2.683   -6.795  -7.931  1.00 1.12 ? 37 ALA A HB3  1 
+ATOM 533 N N    . MET A 1 38 ? 1.343   -9.140  -4.316  1.00 0.42 ? 38 MET A N    1 
+ATOM 534 C CA   . MET A 1 38 ? 1.661   -9.515  -2.908  1.00 0.42 ? 38 MET A CA   1 
+ATOM 535 C C    . MET A 1 38 ? 1.837   -8.256  -2.053  1.00 0.37 ? 38 MET A C    1 
+ATOM 536 O O    . MET A 1 38 ? 2.349   -8.309  -0.953  1.00 0.41 ? 38 MET A O    1 
+ATOM 537 C CB   . MET A 1 38 ? 2.973   -10.294 -2.992  1.00 0.48 ? 38 MET A CB   1 
+ATOM 538 C CG   . MET A 1 38 ? 2.676   -11.794 -3.021  1.00 1.01 ? 38 MET A CG   1 
+ATOM 539 S SD   . MET A 1 38 ? 3.876   -12.668 -1.986  1.00 1.58 ? 38 MET A SD   1 
+ATOM 540 C CE   . MET A 1 38 ? 3.384   -14.350 -2.437  1.00 2.04 ? 38 MET A CE   1 
+ATOM 541 H H    . MET A 1 38 ? 0.507   -9.445  -4.727  1.00 0.45 ? 38 MET A H    1 
+ATOM 542 H HA   . MET A 1 38 ? 0.885   -10.143 -2.500  1.00 0.45 ? 38 MET A HA   1 
+ATOM 543 H HB2  . MET A 1 38 ? 3.502   -10.013 -3.892  1.00 0.79 ? 38 MET A HB2  1 
+ATOM 544 H HB3  . MET A 1 38 ? 3.583   -10.067 -2.130  1.00 0.71 ? 38 MET A HB3  1 
+ATOM 545 H HG2  . MET A 1 38 ? 1.679   -11.971 -2.645  1.00 1.72 ? 38 MET A HG2  1 
+ATOM 546 H HG3  . MET A 1 38 ? 2.747   -12.155 -4.037  1.00 1.67 ? 38 MET A HG3  1 
+ATOM 547 H HE1  . MET A 1 38 ? 2.916   -14.337 -3.412  1.00 2.47 ? 38 MET A HE1  1 
+ATOM 548 H HE2  . MET A 1 38 ? 2.685   -14.729 -1.709  1.00 2.37 ? 38 MET A HE2  1 
+ATOM 549 H HE3  . MET A 1 38 ? 4.258   -14.986 -2.460  1.00 2.49 ? 38 MET A HE3  1 
+ATOM 550 N N    . SER A 1 39 ? 1.416   -7.126  -2.552  1.00 0.36 ? 39 SER A N    1 
+ATOM 551 C CA   . SER A 1 39 ? 1.560   -5.866  -1.767  1.00 0.38 ? 39 SER A CA   1 
+ATOM 552 C C    . SER A 1 39 ? 0.237   -5.095  -1.759  1.00 0.34 ? 39 SER A C    1 
+ATOM 553 O O    . SER A 1 39 ? -0.470  -5.045  -2.745  1.00 0.37 ? 39 SER A O    1 
+ATOM 554 C CB   . SER A 1 39 ? 2.641   -5.068  -2.495  1.00 0.44 ? 39 SER A CB   1 
+ATOM 555 O OG   . SER A 1 39 ? 3.774   -5.899  -2.708  1.00 0.56 ? 39 SER A OG   1 
+ATOM 556 H H    . SER A 1 39 ? 1.006   -7.105  -3.441  1.00 0.38 ? 39 SER A H    1 
+ATOM 557 H HA   . SER A 1 39 ? 1.877   -6.083  -0.760  1.00 0.42 ? 39 SER A HA   1 
+ATOM 558 H HB2  . SER A 1 39 ? 2.264   -4.732  -3.446  1.00 0.51 ? 39 SER A HB2  1 
+ATOM 559 H HB3  . SER A 1 39 ? 2.918   -4.210  -1.896  1.00 0.57 ? 39 SER A HB3  1 
+ATOM 560 H HG   . SER A 1 39 ? 4.112   -6.167  -1.850  1.00 1.23 ? 39 SER A HG   1 
+ATOM 561 N N    . CYS A 1 40 ? -0.102  -4.492  -0.652  1.00 0.33 ? 40 CYS A N    1 
+ATOM 562 C CA   . CYS A 1 40 ? -1.379  -3.725  -0.582  1.00 0.31 ? 40 CYS A CA   1 
+ATOM 563 C C    . CYS A 1 40 ? -1.262  -2.429  -1.389  1.00 0.30 ? 40 CYS A C    1 
+ATOM 564 O O    . CYS A 1 40 ? -0.226  -1.795  -1.417  1.00 0.37 ? 40 CYS A O    1 
+ATOM 565 C CB   . CYS A 1 40 ? -1.574  -3.416  0.903   1.00 0.35 ? 40 CYS A CB   1 
+ATOM 566 S SG   . CYS A 1 40 ? -3.324  -3.086  1.226   1.00 0.35 ? 40 CYS A SG   1 
+ATOM 567 H H    . CYS A 1 40 ? 0.483   -4.544  0.133   1.00 0.37 ? 40 CYS A H    1 
+ATOM 568 H HA   . CYS A 1 40 ? -2.199  -4.324  -0.945  1.00 0.31 ? 40 CYS A HA   1 
+ATOM 569 H HB2  . CYS A 1 40 ? -1.253  -4.263  1.492   1.00 0.41 ? 40 CYS A HB2  1 
+ATOM 570 H HB3  . CYS A 1 40 ? -0.989  -2.549  1.170   1.00 0.37 ? 40 CYS A HB3  1 
+ATOM 571 N N    . TYR A 1 41 ? -2.317  -2.032  -2.046  1.00 0.30 ? 41 TYR A N    1 
+ATOM 572 C CA   . TYR A 1 41 ? -2.266  -0.777  -2.851  1.00 0.30 ? 41 TYR A CA   1 
+ATOM 573 C C    . TYR A 1 41 ? -3.579  -0.003  -2.707  1.00 0.27 ? 41 TYR A C    1 
+ATOM 574 O O    . TYR A 1 41 ? -4.649  -0.528  -2.940  1.00 0.39 ? 41 TYR A O    1 
+ATOM 575 C CB   . TYR A 1 41 ? -2.071  -1.241  -4.295  1.00 0.35 ? 41 TYR A CB   1 
+ATOM 576 C CG   . TYR A 1 41 ? -1.925  -0.037  -5.195  1.00 0.36 ? 41 TYR A CG   1 
+ATOM 577 C CD1  . TYR A 1 41 ? -0.689  0.614   -5.298  1.00 0.39 ? 41 TYR A CD1  1 
+ATOM 578 C CD2  . TYR A 1 41 ? -3.024  0.429   -5.926  1.00 0.55 ? 41 TYR A CD2  1 
+ATOM 579 C CE1  . TYR A 1 41 ? -0.553  1.729   -6.132  1.00 0.46 ? 41 TYR A CE1  1 
+ATOM 580 C CE2  . TYR A 1 41 ? -2.887  1.545   -6.760  1.00 0.64 ? 41 TYR A CE2  1 
+ATOM 581 C CZ   . TYR A 1 41 ? -1.652  2.195   -6.863  1.00 0.55 ? 41 TYR A CZ   1 
+ATOM 582 O OH   . TYR A 1 41 ? -1.518  3.295   -7.686  1.00 0.67 ? 41 TYR A OH   1 
+ATOM 583 H H    . TYR A 1 41 ? -3.143  -2.558  -2.011  1.00 0.36 ? 41 TYR A H    1 
+ATOM 584 H HA   . TYR A 1 41 ? -1.431  -0.167  -2.544  1.00 0.32 ? 41 TYR A HA   1 
+ATOM 585 H HB2  . TYR A 1 41 ? -1.182  -1.850  -4.361  1.00 0.41 ? 41 TYR A HB2  1 
+ATOM 586 H HB3  . TYR A 1 41 ? -2.929  -1.819  -4.606  1.00 0.39 ? 41 TYR A HB3  1 
+ATOM 587 H HD1  . TYR A 1 41 ? 0.159   0.254   -4.733  1.00 0.49 ? 41 TYR A HD1  1 
+ATOM 588 H HD2  . TYR A 1 41 ? -3.977  -0.073  -5.847  1.00 0.68 ? 41 TYR A HD2  1 
+ATOM 589 H HE1  . TYR A 1 41 ? 0.400   2.231   -6.211  1.00 0.56 ? 41 TYR A HE1  1 
+ATOM 590 H HE2  . TYR A 1 41 ? -3.735  1.904   -7.325  1.00 0.83 ? 41 TYR A HE2  1 
+ATOM 591 H HH   . TYR A 1 41 ? -0.682  3.216   -8.152  1.00 0.99 ? 41 TYR A HH   1 
+ATOM 592 N N    . CYS A 1 42 ? -3.505  1.243   -2.324  1.00 0.19 ? 42 CYS A N    1 
+ATOM 593 C CA   . CYS A 1 42 ? -4.749  2.049   -2.166  1.00 0.19 ? 42 CYS A CA   1 
+ATOM 594 C C    . CYS A 1 42 ? -4.818  3.133   -3.245  1.00 0.22 ? 42 CYS A C    1 
+ATOM 595 O O    . CYS A 1 42 ? -3.816  3.697   -3.636  1.00 0.27 ? 42 CYS A O    1 
+ATOM 596 C CB   . CYS A 1 42 ? -4.639  2.679   -0.778  1.00 0.20 ? 42 CYS A CB   1 
+ATOM 597 S SG   . CYS A 1 42 ? -4.205  1.404   0.432   1.00 0.24 ? 42 CYS A SG   1 
+ATOM 598 H H    . CYS A 1 42 ? -2.632  1.648   -2.141  1.00 0.26 ? 42 CYS A H    1 
+ATOM 599 H HA   . CYS A 1 42 ? -5.619  1.413   -2.214  1.00 0.19 ? 42 CYS A HA   1 
+ATOM 600 H HB2  . CYS A 1 42 ? -3.873  3.441   -0.788  1.00 0.23 ? 42 CYS A HB2  1 
+ATOM 601 H HB3  . CYS A 1 42 ? -5.585  3.124   -0.508  1.00 0.23 ? 42 CYS A HB3  1 
+ATOM 602 N N    . GLU A 1 43 ? -5.994  3.429   -3.727  1.00 0.25 ? 43 GLU A N    1 
+ATOM 603 C CA   . GLU A 1 43 ? -6.125  4.477   -4.780  1.00 0.31 ? 43 GLU A CA   1 
+ATOM 604 C C    . GLU A 1 43 ? -6.877  5.691   -4.227  1.00 0.33 ? 43 GLU A C    1 
+ATOM 605 O O    . GLU A 1 43 ? -8.068  5.639   -3.988  1.00 0.40 ? 43 GLU A O    1 
+ATOM 606 C CB   . GLU A 1 43 ? -6.927  3.814   -5.901  1.00 0.38 ? 43 GLU A CB   1 
+ATOM 607 C CG   . GLU A 1 43 ? -6.870  4.688   -7.155  1.00 0.60 ? 43 GLU A CG   1 
+ATOM 608 C CD   . GLU A 1 43 ? -7.611  3.991   -8.297  1.00 1.10 ? 43 GLU A CD   1 
+ATOM 609 O OE1  . GLU A 1 43 ? -8.812  3.813   -8.176  1.00 1.73 ? 43 GLU A OE1  1 
+ATOM 610 O OE2  . GLU A 1 43 ? -6.966  3.646   -9.274  1.00 1.76 ? 43 GLU A OE2  1 
+ATOM 611 H H    . GLU A 1 43 ? -6.790  2.963   -3.398  1.00 0.28 ? 43 GLU A H    1 
+ATOM 612 H HA   . GLU A 1 43 ? -5.153  4.769   -5.145  1.00 0.32 ? 43 GLU A HA   1 
+ATOM 613 H HB2  . GLU A 1 43 ? -6.506  2.843   -6.117  1.00 0.47 ? 43 GLU A HB2  1 
+ATOM 614 H HB3  . GLU A 1 43 ? -7.954  3.701   -5.590  1.00 0.47 ? 43 GLU A HB3  1 
+ATOM 615 H HG2  . GLU A 1 43 ? -7.335  5.641   -6.951  1.00 1.00 ? 43 GLU A HG2  1 
+ATOM 616 H HG3  . GLU A 1 43 ? -5.840  4.843   -7.440  1.00 0.99 ? 43 GLU A HG3  1 
+ATOM 617 N N    . GLY A 1 44 ? -6.192  6.782   -4.020  1.00 0.33 ? 44 GLY A N    1 
+ATOM 618 C CA   . GLY A 1 44 ? -6.868  7.996   -3.483  1.00 0.38 ? 44 GLY A CA   1 
+ATOM 619 C C    . GLY A 1 44 ? -6.202  8.413   -2.170  1.00 0.37 ? 44 GLY A C    1 
+ATOM 620 O O    . GLY A 1 44 ? -6.706  9.246   -1.444  1.00 0.49 ? 44 GLY A O    1 
+ATOM 621 H H    . GLY A 1 44 ? -5.232  6.802   -4.219  1.00 0.34 ? 44 GLY A H    1 
+ATOM 622 H HA2  . GLY A 1 44 ? -6.787  8.800   -4.201  1.00 0.45 ? 44 GLY A HA2  1 
+ATOM 623 H HA3  . GLY A 1 44 ? -7.909  7.778   -3.300  1.00 0.42 ? 44 GLY A HA3  1 
+ATOM 624 N N    . LEU A 1 45 ? -5.071  7.839   -1.860  1.00 0.31 ? 45 LEU A N    1 
+ATOM 625 C CA   . LEU A 1 45 ? -4.373  8.203   -0.594  1.00 0.35 ? 45 LEU A CA   1 
+ATOM 626 C C    . LEU A 1 45 ? -4.076  9.705   -0.566  1.00 0.42 ? 45 LEU A C    1 
+ATOM 627 O O    . LEU A 1 45 ? -4.157  10.373  -1.578  1.00 0.45 ? 45 LEU A O    1 
+ATOM 628 C CB   . LEU A 1 45 ? -3.073  7.399   -0.613  1.00 0.31 ? 45 LEU A CB   1 
+ATOM 629 C CG   . LEU A 1 45 ? -3.374  5.934   -0.295  1.00 0.37 ? 45 LEU A CG   1 
+ATOM 630 C CD1  . LEU A 1 45 ? -2.155  5.075   -0.638  1.00 0.45 ? 45 LEU A CD1  1 
+ATOM 631 C CD2  . LEU A 1 45 ? -3.694  5.792   1.194   1.00 0.59 ? 45 LEU A CD2  1 
+ATOM 632 H H    . LEU A 1 45 ? -4.681  7.170   -2.460  1.00 0.33 ? 45 LEU A H    1 
+ATOM 633 H HA   . LEU A 1 45 ? -4.969  7.921   0.260   1.00 0.41 ? 45 LEU A HA   1 
+ATOM 634 H HB2  . LEU A 1 45 ? -2.621  7.471   -1.592  1.00 0.31 ? 45 LEU A HB2  1 
+ATOM 635 H HB3  . LEU A 1 45 ? -2.394  7.794   0.128   1.00 0.36 ? 45 LEU A HB3  1 
+ATOM 636 H HG   . LEU A 1 45 ? -4.221  5.605   -0.881  1.00 0.42 ? 45 LEU A HG   1 
+ATOM 637 H HD11 . LEU A 1 45 ? -2.380  4.456   -1.494  1.00 1.01 ? 45 LEU A HD11 1 
+ATOM 638 H HD12 . LEU A 1 45 ? -1.909  4.448   0.206   1.00 0.99 ? 45 LEU A HD12 1 
+ATOM 639 H HD13 . LEU A 1 45 ? -1.317  5.716   -0.867  1.00 1.21 ? 45 LEU A HD13 1 
+ATOM 640 H HD21 . LEU A 1 45 ? -4.736  5.534   1.316   1.00 1.17 ? 45 LEU A HD21 1 
+ATOM 641 H HD22 . LEU A 1 45 ? -3.494  6.727   1.696   1.00 1.26 ? 45 LEU A HD22 1 
+ATOM 642 H HD23 . LEU A 1 45 ? -3.079  5.014   1.622   1.00 1.15 ? 45 LEU A HD23 1 
+ATOM 643 N N    . PRO A 1 46 ? -3.739  10.184  0.600   1.00 0.51 ? 46 PRO A N    1 
+ATOM 644 C CA   . PRO A 1 46 ? -3.423  11.623  0.772   1.00 0.62 ? 46 PRO A CA   1 
+ATOM 645 C C    . PRO A 1 46 ? -2.061  11.949  0.151   1.00 0.62 ? 46 PRO A C    1 
+ATOM 646 O O    . PRO A 1 46 ? -1.172  11.122  0.112   1.00 0.64 ? 46 PRO A O    1 
+ATOM 647 C CB   . PRO A 1 46 ? -3.388  11.803  2.287   1.00 0.72 ? 46 PRO A CB   1 
+ATOM 648 C CG   . PRO A 1 46 ? -3.070  10.446  2.831   1.00 0.68 ? 46 PRO A CG   1 
+ATOM 649 C CD   . PRO A 1 46 ? -3.622  9.437   1.857   1.00 0.56 ? 46 PRO A CD   1 
+ATOM 650 H HA   . PRO A 1 46 ? -4.197  12.238  0.343   1.00 0.66 ? 46 PRO A HA   1 
+ATOM 651 H HB2  . PRO A 1 46 ? -2.618  12.511  2.562   1.00 0.79 ? 46 PRO A HB2  1 
+ATOM 652 H HB3  . PRO A 1 46 ? -4.350  12.130  2.649   1.00 0.79 ? 46 PRO A HB3  1 
+ATOM 653 H HG2  . PRO A 1 46 ? -1.999  10.328  2.922   1.00 0.68 ? 46 PRO A HG2  1 
+ATOM 654 H HG3  . PRO A 1 46 ? -3.540  10.315  3.794   1.00 0.77 ? 46 PRO A HG3  1 
+ATOM 655 H HD2  . PRO A 1 46 ? -2.938  8.606   1.746   1.00 0.51 ? 46 PRO A HD2  1 
+ATOM 656 H HD3  . PRO A 1 46 ? -4.593  9.092   2.176   1.00 0.60 ? 46 PRO A HD3  1 
+ATOM 657 N N    . GLU A 1 47 ? -1.892  13.149  -0.333  1.00 0.69 ? 47 GLU A N    1 
+ATOM 658 C CA   . GLU A 1 47 ? -0.588  13.526  -0.951  1.00 0.75 ? 47 GLU A CA   1 
+ATOM 659 C C    . GLU A 1 47 ? 0.542   13.390  0.074   1.00 0.78 ? 47 GLU A C    1 
+ATOM 660 O O    . GLU A 1 47 ? 1.707   13.392  -0.269  1.00 0.87 ? 47 GLU A O    1 
+ATOM 661 C CB   . GLU A 1 47 ? -0.757  14.986  -1.372  1.00 0.82 ? 47 GLU A CB   1 
+ATOM 662 C CG   . GLU A 1 47 ? 0.512   15.465  -2.078  1.00 0.92 ? 47 GLU A CG   1 
+ATOM 663 C CD   . GLU A 1 47 ? 0.506   16.993  -2.161  1.00 1.58 ? 47 GLU A CD   1 
+ATOM 664 O OE1  . GLU A 1 47 ? -0.558  17.550  -2.373  1.00 2.15 ? 47 GLU A OE1  1 
+ATOM 665 O OE2  . GLU A 1 47 ? 1.565   17.579  -2.012  1.00 2.30 ? 47 GLU A OE2  1 
+ATOM 666 H H    . GLU A 1 47 ? -2.622  13.801  -0.292  1.00 0.74 ? 47 GLU A H    1 
+ATOM 667 H HA   . GLU A 1 47 ? -0.389  12.914  -1.816  1.00 0.76 ? 47 GLU A HA   1 
+ATOM 668 H HB2  . GLU A 1 47 ? -1.599  15.071  -2.045  1.00 0.86 ? 47 GLU A HB2  1 
+ATOM 669 H HB3  . GLU A 1 47 ? -0.932  15.596  -0.498  1.00 0.88 ? 47 GLU A HB3  1 
+ATOM 670 H HG2  . GLU A 1 47 ? 1.379   15.137  -1.522  1.00 1.31 ? 47 GLU A HG2  1 
+ATOM 671 H HG3  . GLU A 1 47 ? 0.547   15.053  -3.075  1.00 1.31 ? 47 GLU A HG3  1 
+ATOM 672 N N    . ASN A 1 48 ? 0.206   13.273  1.329   1.00 0.77 ? 48 ASN A N    1 
+ATOM 673 C CA   . ASN A 1 48 ? 1.262   13.137  2.374   1.00 0.85 ? 48 ASN A CA   1 
+ATOM 674 C C    . ASN A 1 48 ? 1.218   11.737  2.992   1.00 0.72 ? 48 ASN A C    1 
+ATOM 675 O O    . ASN A 1 48 ? 1.671   11.522  4.098   1.00 0.74 ? 48 ASN A O    1 
+ATOM 676 C CB   . ASN A 1 48 ? 0.921   14.197  3.422   1.00 1.02 ? 48 ASN A CB   1 
+ATOM 677 C CG   . ASN A 1 48 ? -0.398  13.835  4.106   1.00 1.05 ? 48 ASN A CG   1 
+ATOM 678 O OD1  . ASN A 1 48 ? -0.969  12.796  3.839   1.00 1.42 ? 48 ASN A OD1  1 
+ATOM 679 N ND2  . ASN A 1 48 ? -0.910  14.653  4.984   1.00 1.63 ? 48 ASN A ND2  1 
+ATOM 680 H H    . ASN A 1 48 ? -0.740  13.274  1.586   1.00 0.76 ? 48 ASN A H    1 
+ATOM 681 H HA   . ASN A 1 48 ? 2.235   13.334  1.954   1.00 0.94 ? 48 ASN A HA   1 
+ATOM 682 H HB2  . ASN A 1 48 ? 1.710   14.241  4.159   1.00 1.18 ? 48 ASN A HB2  1 
+ATOM 683 H HB3  . ASN A 1 48 ? 0.823   15.159  2.942   1.00 1.12 ? 48 ASN A HB3  1 
+ATOM 684 H HD21 . ASN A 1 48 ? -0.449  15.491  5.200   1.00 2.29 ? 48 ASN A HD21 1 
+ATOM 685 H HD22 . ASN A 1 48 ? -1.755  14.430  5.428   1.00 1.70 ? 48 ASN A HD22 1 
+ATOM 686 N N    . ALA A 1 49 ? 0.675   10.783  2.285   1.00 0.61 ? 49 ALA A N    1 
+ATOM 687 C CA   . ALA A 1 49 ? 0.603   9.398   2.833   1.00 0.56 ? 49 ALA A CA   1 
+ATOM 688 C C    . ALA A 1 49 ? 1.988   8.746   2.805   1.00 0.44 ? 49 ALA A C    1 
+ATOM 689 O O    . ALA A 1 49 ? 2.860   9.150   2.063   1.00 0.41 ? 49 ALA A O    1 
+ATOM 690 C CB   . ALA A 1 49 ? -0.359  8.655   1.905   1.00 0.57 ? 49 ALA A CB   1 
+ATOM 691 H H    . ALA A 1 49 ? 0.315   10.977  1.394   1.00 0.62 ? 49 ALA A H    1 
+ATOM 692 H HA   . ALA A 1 49 ? 0.210   9.410   3.837   1.00 0.69 ? 49 ALA A HA   1 
+ATOM 693 H HB1  . ALA A 1 49 ? 0.205   8.133   1.146   1.00 1.14 ? 49 ALA A HB1  1 
+ATOM 694 H HB2  . ALA A 1 49 ? -1.025  9.363   1.435   1.00 1.15 ? 49 ALA A HB2  1 
+ATOM 695 H HB3  . ALA A 1 49 ? -0.935  7.944   2.478   1.00 1.13 ? 49 ALA A HB3  1 
+ATOM 696 N N    . LYS A 1 50 ? 2.195   7.739   3.609   1.00 0.54 ? 50 LYS A N    1 
+ATOM 697 C CA   . LYS A 1 50 ? 3.524   7.062   3.629   1.00 0.60 ? 50 LYS A CA   1 
+ATOM 698 C C    . LYS A 1 50 ? 3.495   5.815   2.740   1.00 0.53 ? 50 LYS A C    1 
+ATOM 699 O O    . LYS A 1 50 ? 3.106   4.746   3.167   1.00 0.55 ? 50 LYS A O    1 
+ATOM 700 C CB   . LYS A 1 50 ? 3.750   6.674   5.090   1.00 0.84 ? 50 LYS A CB   1 
+ATOM 701 C CG   . LYS A 1 50 ? 5.193   6.201   5.276   1.00 1.05 ? 50 LYS A CG   1 
+ATOM 702 C CD   . LYS A 1 50 ? 5.946   7.194   6.164   1.00 1.53 ? 50 LYS A CD   1 
+ATOM 703 C CE   . LYS A 1 50 ? 7.260   6.566   6.633   1.00 2.10 ? 50 LYS A CE   1 
+ATOM 704 N NZ   . LYS A 1 50 ? 7.503   7.149   7.982   1.00 2.59 ? 50 LYS A NZ   1 
+ATOM 705 H H    . LYS A 1 50 ? 1.478   7.428   4.200   1.00 0.64 ? 50 LYS A H    1 
+ATOM 706 H HA   . LYS A 1 50 ? 4.297   7.740   3.303   1.00 0.62 ? 50 LYS A HA   1 
+ATOM 707 H HB2  . LYS A 1 50 ? 3.566   7.532   5.722   1.00 0.87 ? 50 LYS A HB2  1 
+ATOM 708 H HB3  . LYS A 1 50 ? 3.074   5.877   5.360   1.00 0.94 ? 50 LYS A HB3  1 
+ATOM 709 H HG2  . LYS A 1 50 ? 5.194   5.227   5.743   1.00 1.43 ? 50 LYS A HG2  1 
+ATOM 710 H HG3  . LYS A 1 50 ? 5.679   6.141   4.314   1.00 1.32 ? 50 LYS A HG3  1 
+ATOM 711 H HD2  . LYS A 1 50 ? 6.156   8.092   5.600   1.00 2.06 ? 50 LYS A HD2  1 
+ATOM 712 H HD3  . LYS A 1 50 ? 5.340   7.441   7.022   1.00 1.88 ? 50 LYS A HD3  1 
+ATOM 713 H HE2  . LYS A 1 50 ? 7.159   5.491   6.697   1.00 2.51 ? 50 LYS A HE2  1 
+ATOM 714 H HE3  . LYS A 1 50 ? 8.064   6.831   5.965   1.00 2.59 ? 50 LYS A HE3  1 
+ATOM 715 H HZ1  . LYS A 1 50 ? 8.074   6.489   8.547   1.00 2.97 ? 50 LYS A HZ1  1 
+ATOM 716 H HZ2  . LYS A 1 50 ? 6.592   7.315   8.457   1.00 3.07 ? 50 LYS A HZ2  1 
+ATOM 717 H HZ3  . LYS A 1 50 ? 8.014   8.049   7.884   1.00 2.82 ? 50 LYS A HZ3  1 
+ATOM 718 N N    . VAL A 1 51 ? 3.904   5.944   1.508   1.00 0.51 ? 51 VAL A N    1 
+ATOM 719 C CA   . VAL A 1 51 ? 3.900   4.765   0.594   1.00 0.45 ? 51 VAL A CA   1 
+ATOM 720 C C    . VAL A 1 51 ? 5.196   4.722   -0.220  1.00 0.49 ? 51 VAL A C    1 
+ATOM 721 O O    . VAL A 1 51 ? 5.975   5.655   -0.214  1.00 0.56 ? 51 VAL A O    1 
+ATOM 722 C CB   . VAL A 1 51 ? 2.697   4.981   -0.324  1.00 0.42 ? 51 VAL A CB   1 
+ATOM 723 C CG1  . VAL A 1 51 ? 1.411   4.960   0.504   1.00 0.42 ? 51 VAL A CG1  1 
+ATOM 724 C CG2  . VAL A 1 51 ? 2.829   6.335   -1.025  1.00 0.47 ? 51 VAL A CG2  1 
+ATOM 725 H H    . VAL A 1 51 ? 4.215   6.815   1.183   1.00 0.57 ? 51 VAL A H    1 
+ATOM 726 H HA   . VAL A 1 51 ? 3.776   3.853   1.155   1.00 0.45 ? 51 VAL A HA   1 
+ATOM 727 H HB   . VAL A 1 51 ? 2.663   4.193   -1.063  1.00 0.41 ? 51 VAL A HB   1 
+ATOM 728 H HG11 . VAL A 1 51 ? 1.577   5.474   1.439   1.00 1.01 ? 51 VAL A HG11 1 
+ATOM 729 H HG12 . VAL A 1 51 ? 1.127   3.937   0.700   1.00 1.06 ? 51 VAL A HG12 1 
+ATOM 730 H HG13 . VAL A 1 51 ? 0.622   5.454   -0.044  1.00 1.01 ? 51 VAL A HG13 1 
+ATOM 731 H HG21 . VAL A 1 51 ? 1.928   6.910   -0.870  1.00 1.15 ? 51 VAL A HG21 1 
+ATOM 732 H HG22 . VAL A 1 51 ? 2.980   6.180   -2.083  1.00 1.17 ? 51 VAL A HG22 1 
+ATOM 733 H HG23 . VAL A 1 51 ? 3.672   6.872   -0.616  1.00 0.98 ? 51 VAL A HG23 1 
+ATOM 734 N N    . SER A 1 52 ? 5.434   3.646   -0.919  1.00 0.47 ? 52 SER A N    1 
+ATOM 735 C CA   . SER A 1 52 ? 6.680   3.546   -1.732  1.00 0.54 ? 52 SER A CA   1 
+ATOM 736 C C    . SER A 1 52 ? 6.428   4.060   -3.152  1.00 0.55 ? 52 SER A C    1 
+ATOM 737 O O    . SER A 1 52 ? 5.438   3.732   -3.775  1.00 0.62 ? 52 SER A O    1 
+ATOM 738 C CB   . SER A 1 52 ? 7.019   2.056   -1.753  1.00 0.54 ? 52 SER A CB   1 
+ATOM 739 O OG   . SER A 1 52 ? 8.082   1.830   -2.670  1.00 0.79 ? 52 SER A OG   1 
+ATOM 740 H H    . SER A 1 52 ? 4.793   2.905   -0.910  1.00 0.44 ? 52 SER A H    1 
+ATOM 741 H HA   . SER A 1 52 ? 7.480   4.099   -1.266  1.00 0.63 ? 52 SER A HA   1 
+ATOM 742 H HB2  . SER A 1 52 ? 7.326   1.740   -0.770  1.00 0.64 ? 52 SER A HB2  1 
+ATOM 743 H HB3  . SER A 1 52 ? 6.145   1.493   -2.053  1.00 0.50 ? 52 SER A HB3  1 
+ATOM 744 H HG   . SER A 1 52 ? 8.772   1.346   -2.210  1.00 1.19 ? 52 SER A HG   1 
+ATOM 745 N N    . ASP A 1 53 ? 7.317   4.863   -3.668  1.00 0.67 ? 53 ASP A N    1 
+ATOM 746 C CA   . ASP A 1 53 ? 7.128   5.397   -5.047  1.00 0.72 ? 53 ASP A CA   1 
+ATOM 747 C C    . ASP A 1 53 ? 7.814   4.484   -6.067  1.00 0.76 ? 53 ASP A C    1 
+ATOM 748 O O    . ASP A 1 53 ? 8.271   4.926   -7.102  1.00 0.83 ? 53 ASP A O    1 
+ATOM 749 C CB   . ASP A 1 53 ? 7.789   6.776   -5.032  1.00 0.91 ? 53 ASP A CB   1 
+ATOM 750 C CG   . ASP A 1 53 ? 9.278   6.625   -4.714  1.00 1.04 ? 53 ASP A CG   1 
+ATOM 751 O OD1  . ASP A 1 53 ? 9.600   5.830   -3.847  1.00 1.61 ? 53 ASP A OD1  1 
+ATOM 752 O OD2  . ASP A 1 53 ? 10.070  7.308   -5.342  1.00 1.46 ? 53 ASP A OD2  1 
+ATOM 753 H H    . ASP A 1 53 ? 8.109   5.116   -3.149  1.00 0.83 ? 53 ASP A H    1 
+ATOM 754 H HA   . ASP A 1 53 ? 6.078   5.495   -5.273  1.00 0.68 ? 53 ASP A HA   1 
+ATOM 755 H HB2  . ASP A 1 53 ? 7.672   7.241   -6.001  1.00 0.96 ? 53 ASP A HB2  1 
+ATOM 756 H HB3  . ASP A 1 53 ? 7.322   7.391   -4.278  1.00 1.00 ? 53 ASP A HB3  1 
+ATOM 757 N N    . SER A 1 54 ? 7.888   3.212   -5.782  1.00 0.78 ? 54 SER A N    1 
+ATOM 758 C CA   . SER A 1 54 ? 8.544   2.272   -6.735  1.00 0.89 ? 54 SER A CA   1 
+ATOM 759 C C    . SER A 1 54 ? 7.929   0.876   -6.609  1.00 0.81 ? 54 SER A C    1 
+ATOM 760 O O    . SER A 1 54 ? 7.781   0.348   -5.524  1.00 0.78 ? 54 SER A O    1 
+ATOM 761 C CB   . SER A 1 54 ? 10.014  2.249   -6.320  1.00 1.01 ? 54 SER A CB   1 
+ATOM 762 O OG   . SER A 1 54 ? 10.190  1.311   -5.267  1.00 1.02 ? 54 SER A OG   1 
+ATOM 763 H H    . SER A 1 54 ? 7.513   2.876   -4.942  1.00 0.78 ? 54 SER A H    1 
+ATOM 764 H HA   . SER A 1 54 ? 8.452   2.635   -7.747  1.00 1.04 ? 54 SER A HA   1 
+ATOM 765 H HB2  . SER A 1 54 ? 10.623  1.958   -7.159  1.00 1.19 ? 54 SER A HB2  1 
+ATOM 766 H HB3  . SER A 1 54 ? 10.309  3.237   -5.990  1.00 1.07 ? 54 SER A HB3  1 
+ATOM 767 H HG   . SER A 1 54 ? 11.010  1.524   -4.814  1.00 1.55 ? 54 SER A HG   1 
+ATOM 768 N N    . ALA A 1 55 ? 7.568   0.274   -7.709  1.00 0.96 ? 55 ALA A N    1 
+ATOM 769 C CA   . ALA A 1 55 ? 6.962   -1.087  -7.651  1.00 1.02 ? 55 ALA A CA   1 
+ATOM 770 C C    . ALA A 1 55 ? 8.054   -2.145  -7.466  1.00 1.16 ? 55 ALA A C    1 
+ATOM 771 O O    . ALA A 1 55 ? 7.790   -3.331  -7.477  1.00 1.43 ? 55 ALA A O    1 
+ATOM 772 C CB   . ALA A 1 55 ? 6.263   -1.268  -8.998  1.00 1.28 ? 55 ALA A CB   1 
+ATOM 773 H H    . ALA A 1 55 ? 7.695   0.717   -8.574  1.00 1.13 ? 55 ALA A H    1 
+ATOM 774 H HA   . ALA A 1 55 ? 6.241   -1.145  -6.851  1.00 0.96 ? 55 ALA A HA   1 
+ATOM 775 H HB1  . ALA A 1 55 ? 6.991   -1.538  -9.748  1.00 1.69 ? 55 ALA A HB1  1 
+ATOM 776 H HB2  . ALA A 1 55 ? 5.782   -0.343  -9.281  1.00 1.45 ? 55 ALA A HB2  1 
+ATOM 777 H HB3  . ALA A 1 55 ? 5.522   -2.049  -8.918  1.00 1.88 ? 55 ALA A HB3  1 
+ATOM 778 N N    . THR A 1 56 ? 9.278   -1.725  -7.297  1.00 1.13 ? 56 THR A N    1 
+ATOM 779 C CA   . THR A 1 56 ? 10.384  -2.707  -7.112  1.00 1.42 ? 56 THR A CA   1 
+ATOM 780 C C    . THR A 1 56 ? 11.286  -2.275  -5.952  1.00 1.49 ? 56 THR A C    1 
+ATOM 781 O O    . THR A 1 56 ? 12.435  -1.930  -6.143  1.00 1.95 ? 56 THR A O    1 
+ATOM 782 C CB   . THR A 1 56 ? 11.158  -2.685  -8.431  1.00 1.79 ? 56 THR A CB   1 
+ATOM 783 O OG1  . THR A 1 56 ? 10.332  -2.146  -9.454  1.00 2.12 ? 56 THR A OG1  1 
+ATOM 784 C CG2  . THR A 1 56 ? 11.575  -4.108  -8.805  1.00 2.26 ? 56 THR A CG2  1 
+ATOM 785 H H    . THR A 1 56 ? 9.469   -0.764  -7.292  1.00 1.03 ? 56 THR A H    1 
+ATOM 786 H HA   . THR A 1 56 ? 9.987   -3.694  -6.935  1.00 1.52 ? 56 THR A HA   1 
+ATOM 787 H HB   . THR A 1 56 ? 12.040  -2.073  -8.321  1.00 2.38 ? 56 THR A HB   1 
+ATOM 788 H HG1  . THR A 1 56 ? 10.808  -1.424  -9.870  1.00 2.36 ? 56 THR A HG1  1 
+ATOM 789 H HG21 . THR A 1 56 ? 10.753  -4.784  -8.619  1.00 2.61 ? 56 THR A HG21 1 
+ATOM 790 H HG22 . THR A 1 56 ? 12.425  -4.402  -8.208  1.00 2.84 ? 56 THR A HG22 1 
+ATOM 791 H HG23 . THR A 1 56 ? 11.840  -4.142  -9.851  1.00 2.50 ? 56 THR A HG23 1 
+ATOM 792 N N    . ASN A 1 57 ? 10.774  -2.293  -4.752  1.00 1.38 ? 57 ASN A N    1 
+ATOM 793 C CA   . ASN A 1 57 ? 11.603  -1.884  -3.582  1.00 1.56 ? 57 ASN A CA   1 
+ATOM 794 C C    . ASN A 1 57 ? 12.021  -3.115  -2.773  1.00 1.01 ? 57 ASN A C    1 
+ATOM 795 O O    . ASN A 1 57 ? 11.484  -4.192  -2.942  1.00 1.28 ? 57 ASN A O    1 
+ATOM 796 C CB   . ASN A 1 57 ? 10.695  -0.979  -2.750  1.00 2.31 ? 57 ASN A CB   1 
+ATOM 797 C CG   . ASN A 1 57 ? 9.621   -1.824  -2.064  1.00 2.44 ? 57 ASN A CG   1 
+ATOM 798 O OD1  . ASN A 1 57 ? 8.652   -2.218  -2.684  1.00 2.75 ? 57 ASN A OD1  1 
+ATOM 799 N ND2  . ASN A 1 57 ? 9.752   -2.123  -0.800  1.00 2.89 ? 57 ASN A ND2  1 
+ATOM 800 H H    . ASN A 1 57 ? 9.845   -2.575  -4.620  1.00 1.46 ? 57 ASN A H    1 
+ATOM 801 H HA   . ASN A 1 57 ? 12.472  -1.334  -3.909  1.00 2.12 ? 57 ASN A HA   1 
+ATOM 802 H HB2  . ASN A 1 57 ? 11.284  -0.467  -2.003  1.00 2.56 ? 57 ASN A HB2  1 
+ATOM 803 H HB3  . ASN A 1 57 ? 10.221  -0.253  -3.395  1.00 2.92 ? 57 ASN A HB3  1 
+ATOM 804 H HD21 . ASN A 1 57 ? 10.532  -1.806  -0.300  1.00 3.08 ? 57 ASN A HD21 1 
+ATOM 805 H HD22 . ASN A 1 57 ? 9.069   -2.665  -0.351  1.00 3.35 ? 57 ASN A HD22 1 
+ATOM 806 N N    . ILE A 1 58 ? 12.975  -2.964  -1.896  1.00 1.34 ? 58 ILE A N    1 
+ATOM 807 C CA   . ILE A 1 58 ? 13.426  -4.127  -1.077  1.00 1.65 ? 58 ILE A CA   1 
+ATOM 808 C C    . ILE A 1 58 ? 13.587  -3.712  0.388   1.00 1.49 ? 58 ILE A C    1 
+ATOM 809 O O    . ILE A 1 58 ? 14.493  -2.984  0.741   1.00 2.01 ? 58 ILE A O    1 
+ATOM 810 C CB   . ILE A 1 58 ? 14.775  -4.530  -1.672  1.00 2.76 ? 58 ILE A CB   1 
+ATOM 811 C CG1  . ILE A 1 58 ? 14.551  -5.232  -3.013  1.00 3.48 ? 58 ILE A CG1  1 
+ATOM 812 C CG2  . ILE A 1 58 ? 15.492  -5.482  -0.713  1.00 3.41 ? 58 ILE A CG2  1 
+ATOM 813 C CD1  . ILE A 1 58 ? 15.174  -4.399  -4.135  1.00 4.22 ? 58 ILE A CD1  1 
+ATOM 814 H H    . ILE A 1 58 ? 13.395  -2.088  -1.774  1.00 1.88 ? 58 ILE A H    1 
+ATOM 815 H HA   . ILE A 1 58 ? 12.726  -4.943  -1.164  1.00 1.80 ? 58 ILE A HA   1 
+ATOM 816 H HB   . ILE A 1 58 ? 15.380  -3.647  -1.821  1.00 3.14 ? 58 ILE A HB   1 
+ATOM 817 H HG12 . ILE A 1 58 ? 15.013  -6.208  -2.989  1.00 3.90 ? 58 ILE A HG12 1 
+ATOM 818 H HG13 . ILE A 1 58 ? 13.492  -5.338  -3.192  1.00 3.58 ? 58 ILE A HG13 1 
+ATOM 819 H HG21 . ILE A 1 58 ? 16.258  -4.943  -0.176  1.00 3.63 ? 58 ILE A HG21 1 
+ATOM 820 H HG22 . ILE A 1 58 ? 15.944  -6.286  -1.275  1.00 3.77 ? 58 ILE A HG22 1 
+ATOM 821 H HG23 . ILE A 1 58 ? 14.780  -5.890  -0.011  1.00 3.86 ? 58 ILE A HG23 1 
+ATOM 822 H HD11 . ILE A 1 58 ? 16.223  -4.247  -3.931  1.00 4.44 ? 58 ILE A HD11 1 
+ATOM 823 H HD12 . ILE A 1 58 ? 14.676  -3.442  -4.193  1.00 4.49 ? 58 ILE A HD12 1 
+ATOM 824 H HD13 . ILE A 1 58 ? 15.062  -4.920  -5.075  1.00 4.69 ? 58 ILE A HD13 1 
+ATOM 825 N N    . CYS A 1 59 ? 12.713  -4.169  1.243   1.00 1.09 ? 59 CYS A N    1 
+ATOM 826 C CA   . CYS A 1 59 ? 12.817  -3.800  2.684   1.00 1.20 ? 59 CYS A CA   1 
+ATOM 827 C C    . CYS A 1 59 ? 13.855  -4.683  3.382   1.00 1.56 ? 59 CYS A C    1 
+ATOM 828 O O    . CYS A 1 59 ? 13.835  -5.892  3.265   1.00 2.00 ? 59 CYS A O    1 
+ATOM 829 C CB   . CYS A 1 59 ? 11.423  -4.052  3.259   1.00 1.31 ? 59 CYS A CB   1 
+ATOM 830 S SG   . CYS A 1 59 ? 11.479  -3.904  5.062   1.00 1.52 ? 59 CYS A SG   1 
+ATOM 831 H H    . CYS A 1 59 ? 11.989  -4.755  0.938   1.00 1.10 ? 59 CYS A H    1 
+ATOM 832 H HA   . CYS A 1 59 ? 13.076  -2.758  2.789   1.00 1.60 ? 59 CYS A HA   1 
+ATOM 833 H HB2  . CYS A 1 59 ? 10.732  -3.325  2.859   1.00 1.83 ? 59 CYS A HB2  1 
+ATOM 834 H HB3  . CYS A 1 59 ? 11.097  -5.046  2.989   1.00 1.92 ? 59 CYS A HB3  1 
+ATOM 835 N N    . GLY A 1 60 ? 14.761  -4.088  4.108   1.00 1.98 ? 60 GLY A N    1 
+ATOM 836 C CA   . GLY A 1 60 ? 15.798  -4.894  4.813   1.00 2.52 ? 60 GLY A CA   1 
+ATOM 837 C C    . GLY A 1 60 ? 17.094  -4.086  4.912   1.00 3.08 ? 60 GLY A C    1 
+ATOM 838 O O    . GLY A 1 60 ? 17.067  -2.917  4.566   1.00 3.49 ? 60 GLY A O    1 
+ATOM 839 O OXT  . GLY A 1 60 ? 18.090  -4.651  5.333   1.00 3.64 ? 60 GLY A OXT  1 
+ATOM 840 H H    . GLY A 1 60 ? 14.760  -3.111  4.190   1.00 2.23 ? 60 GLY A H    1 
+ATOM 841 H HA2  . GLY A 1 60 ? 15.449  -5.140  5.806   1.00 2.75 ? 60 GLY A HA2  1 
+ATOM 842 H HA3  . GLY A 1 60 ? 15.986  -5.802  4.261   1.00 2.89 ? 60 GLY A HA3  1 
+# 
