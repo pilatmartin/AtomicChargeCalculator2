@@ -46,6 +46,7 @@ class ChargeFW2Service:
         mmcif_service: MmCIFService,
         calculation_storage: CalculationStorageService,
         max_workers: int = 4,
+        max_concurrent_calculations: int = 4,
     ):
         self.chargefw2 = chargefw2
         self.logger = logger
@@ -53,7 +54,7 @@ class ChargeFW2Service:
         self.mmcif_service = mmcif_service
         self.calculation_storage = calculation_storage
         self.executor = ThreadPoolExecutor(max_workers)
-        self.semaphore = asyncio.Semaphore(4)  # used to limit to 4 concurrent calculations
+        self.semaphore = asyncio.Semaphore(max_concurrent_calculations)
 
     async def _run_in_executor(self, func, *args, executor=None):
         loop = asyncio.get_event_loop()

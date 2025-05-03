@@ -96,7 +96,7 @@ async def upload(
     if len(files) == 0:
         raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
 
-    if any(file.size > io.max_file_size for file in files):
+    if any((file.size or 0) > io.max_file_size for file in files):
         max_file_size_mb = io.max_file_size / 1024 / 1024
         raise BadRequestError(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -108,7 +108,7 @@ async def upload(
 
     if user_id is not None:
         _, available_b, quota_b = io.get_quota(user_id)
-        upload_size_b = sum(file.size for file in files)
+        upload_size_b = sum((file.size or 0) for file in files)
         if upload_size_b > available_b:
             quota_mb = quota_b / 1024 / 1024
             raise BadRequestError(
@@ -118,11 +118,11 @@ async def upload(
             )
     else:
         _, available, _ = io.get_quota()
-        upload_size_b = sum(file.size for file in files)
+        upload_size_b = sum((file.size or 0) for file in files)
         if upload_size_b > available:
             io.free_guest_file_space(upload_size_b)
 
-    if not all(is_ext_valid(file.filename) for file in files):
+    if not all(is_ext_valid(file.filename or "") for file in files):
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
@@ -270,10 +270,10 @@ async def download_file(
 
     try:
         file_path = io.get_filepath(file_hash, user_id)
-        if not io.path_exists(file_path):
+        if not io.path_exists(file_path or ""):
             raise FileNotFoundError()
 
-        return FileResponse(path=file_path, media_type="application/octet-stream")
+        return FileResponse(path=file_path or "", media_type="application/octet-stream")
     except FileNotFoundError as e:
         raise NotFoundError(detail=f"File '{file_hash}' not found.") from e
     except Exception as e:

@@ -278,7 +278,7 @@ async def calculate_charges(
             max_file_size_mb = io_service.max_file_size / 1024 / 1024
             raise BadRequestError(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                detail="Unable to calculate charges. Calculation is too large."
+                detail="Unable to calculate charges. Calculation is too large. "
                 + f"Maximum allowed size is {max_file_size_mb} MB.",
             )
 
@@ -329,6 +329,8 @@ async def calculate_charges(
             return Response(data=computation_id)
 
         return Response(data={"computationId": computation_id, "results": calculations})
+    except BadRequestError as e:
+        raise e
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error calculating charges."
