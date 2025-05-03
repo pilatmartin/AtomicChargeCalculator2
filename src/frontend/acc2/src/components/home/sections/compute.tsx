@@ -126,7 +126,7 @@ export const Compute = () => {
               <span className="font-bold"> pdb</span>,
               <span className="font-bold"> mmcif</span>. You can upload one or
               multiple files at the same time. Maximum allowed upload size is
-              <span className="font-bold"> 50MB</span>.
+              <span className="font-bold"> 250MB</span>.
             </p>
           </div>
           <div className="flex gap-4 flex-col sm:flex-row">

@@ -104,11 +104,21 @@ async def upload(
             + f"Maximum allowed size is {max_file_size_mb} MB.",
         )
 
+    upload_size_b = sum((file.size or 0) for file in files)
+
+    if upload_size_b > io.max_upload_size:
+        max_upload_size_mb = io.max_upload_size / 1024 / 1024
+        raise BadRequestError(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Unable to upload files. Maximum upload size exceeded. "
+            + f"Maximum upload size is {max_upload_size_mb} MB.",
+        )
+
     user_id = str(request.state.user.id) if request.state.user is not None else None
 
     if user_id is not None:
         _, available_b, quota_b = io.get_quota(user_id)
-        upload_size_b = sum((file.size or 0) for file in files)
+
         if upload_size_b > available_b:
             quota_mb = quota_b / 1024 / 1024
             raise BadRequestError(
@@ -118,7 +128,6 @@ async def upload(
             )
     else:
         _, available, _ = io.get_quota()
-        upload_size_b = sum((file.size or 0) for file in files)
         if upload_size_b > available:
             io.free_guest_file_space(upload_size_b)
 
@@ -146,6 +155,8 @@ async def upload(
         ]
 
         return Response(data=data)
+    except BadRequestError as e:
+        raise e
     except Exception as e:
         traceback.print_exc()
         raise BadRequestError(

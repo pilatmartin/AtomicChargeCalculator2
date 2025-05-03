@@ -29,6 +29,7 @@ class IOService:
     guest_compute_quota = int(os.environ.get("ACC2_GUEST_COMPUTE_STORAGE_QUOTA_BYTES"))
 
     max_file_size = int(os.environ.get("ACC2_MAX_FILE_SIZE_BYTES"))
+    max_upload_size = int(os.environ.get("ACC2_MAX_UPLOAD_SIZE_BYTES"))
 
     def __init__(self, io: IOBase, logger: LoggerBase):
         self.io = io

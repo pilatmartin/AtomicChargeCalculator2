@@ -1,5 +1,8 @@
 """Main module for the application."""
 
+import os
+import shutil
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 
@@ -20,17 +23,17 @@ def move_example_files() -> None:
         raise EnvironmentError("Could not load environment variables.")
 
     # Move example files to example directory
-    # if not (examples_dir := os.environ.get("ACC2_EXAMPLES_DIR")):
-    #     raise EnvironmentError("ACC2_EXAMPLES_DIR environment variable is not set.")
+    if not (examples_dir := os.environ.get("ACC2_EXAMPLES_DIR")):
+        raise EnvironmentError("ACC2_EXAMPLES_DIR environment variable is not set.")
 
-    # if os.path.exists(examples_dir):
-    #     shutil.rmtree(examples_dir, ignore_errors=True)
+    if os.path.exists(examples_dir):
+        shutil.rmtree(examples_dir, ignore_errors=True)
 
-    # try:
-    #     os.makedirs(examples_dir, exist_ok=True)
-    #     shutil.copytree("examples", examples_dir, dirs_exist_ok=True)
-    # except Exception as e:
-    #     raise EnvironmentError(f"Could not copy example files. {str(e)}") from e
+    try:
+        os.makedirs(examples_dir, exist_ok=True)
+        shutil.copytree("examples", examples_dir, dirs_exist_ok=True)
+    except Exception as e:
+        raise EnvironmentError(f"Could not copy example files. {str(e)}") from e
 
 
 def create_app() -> FastAPI:
@@ -42,7 +45,6 @@ def create_app() -> FastAPI:
     container = Container()
 
     app = FastAPI(root_path="/api", swagger_ui_parameters={"syntaxHighlight": False})
-    # app = FastAPI()
 
     container.wire()
 
