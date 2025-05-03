@@ -38,7 +38,7 @@ services:
   web:
     container_name: acc2-web
     build: 
-      context: ../frontend/acc2
+      context: ../frontend
       args:
         - VITE_BASE_API_URL
     networks:
