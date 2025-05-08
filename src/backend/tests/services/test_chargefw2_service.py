@@ -1,5 +1,5 @@
 from typing import Literal
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 import pytest
 
 from app.models.method import Method
@@ -52,16 +52,15 @@ def calculation_storage_mock():
 
 @pytest.fixture
 def service(chargefw2_mock, logger_mock, io_mock, mmcif_service_mock, calculation_storage_mock):
-    with patch.dict("sys.modules", {"chargefw2": chargefw2_mock}):
-        yield ChargeFW2Service(
-            chargefw2=chargefw2_mock,
-            logger=logger_mock,
-            io=io_mock,
-            mmcif_service=mmcif_service_mock,
-            calculation_storage=calculation_storage_mock,
-            max_workers=2,
-            max_concurrent_calculations=2,
-        )
+    return ChargeFW2Service(
+        chargefw2=chargefw2_mock,
+        logger=logger_mock,
+        io=io_mock,
+        mmcif_service=mmcif_service_mock,
+        calculation_storage=calculation_storage_mock,
+        max_workers=2,
+        max_concurrent_calculations=2,
+    )
 
 
 def get_method(
