@@ -12,13 +12,12 @@ from fastapi.routing import APIRouter
 from dependency_injector.wiring import inject, Provide
 
 from api.v1.constants import ALLOWED_FILE_TYPES
-from api.v1.schemas.response import Response
+from api.v1.container import Container
+from api.v1.schemas.response import Response, ResponseError
 from api.v1.schemas.file import QuotaResponse, UploadResponse, FileResponse as FileResponseModel
 from api.v1.exceptions import BadRequestError, NotFoundError
 
 from models.paging import PagedList
-
-from api.v1.container import Container
 
 
 from services.file_storage import FileStorageService
@@ -28,53 +27,39 @@ from services.io import IOService
 
 files_router = APIRouter(prefix="/files", tags=["files"])
 
-
-@files_router.get(path="", include_in_schema=False)
-@inject
-async def get_files(
-    request: Request,
-    page: Annotated[int, Query(description="Page number", ge=1)] = 1,
-    page_size: Annotated[int, Query(description="Number of items per page", ge=1)] = 10,
-    order_by: Annotated[
-        Literal["name", "uploaded_at", "size"], Query(description="Order by")
-    ] = "uploaded_at",
-    search: Annotated[str, Query(description="Search term")] = "",
-    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
-    storage_service: FileStorageService = Depends(Provide[Container.file_storage_service]),
-) -> Response[PagedList[FileResponseModel]]:
-    """Returns the list of files uploaded by the user.."""
-
-    user_id = str(request.state.user.id) if request.state.user is not None else None
-
-    if user_id is None:
-        raise BadRequestError(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be logged in to get files.",
-        )
-
-    try:
-        data = storage_service.get_files(
-            order_by=order_by,
-            order=order,
-            page=page,
-            page_size=page_size,
-            search=search,
-            user_id=user_id,
-        )
-
-        return Response(data=data)
-    except Exception as e:
-        traceback.print_exc()
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error getting files.",
-        ) from e
+# --- Public API handlers ---
 
 
 @files_router.post(
     "/upload",
-    description="Stores the provided files on disk and returns their ids. "
+    description="Stores the provided files on disk and returns their hashes that can be used for further operations. "
     + f"Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}.",
+    responses={
+        413: {
+            "description": "File too large.",
+            "model": ResponseError,
+            "content": {
+                "application/json": {
+                    "example": {
+                        "success": False,
+                        "message": "Unable to upload files. One or more files are too large.",
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid file type.",
+            "model": ResponseError,
+            "content": {
+                "application/json": {
+                    "example": {
+                        "success": False,
+                        "message": f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
+                    }
+                }
+            },
+        },
+    },
 )
 @inject
 async def upload(
@@ -165,7 +150,30 @@ async def upload(
         ) from e
 
 
-@files_router.get("/download/computation/{computation_id}")
+@files_router.get(
+    "/download/computation/{computation_id}",
+    responses={
+        200: {"description": "Successful response.", "content": {"application/zip": {}}},
+        404: {
+            "description": "Computation not found",
+            "model": ResponseError,
+            "content": {
+                "application/json": {
+                    "example": {"success": False, "message": "Computation not found."}
+                }
+            },
+        },
+        400: {
+            "description": "Error downloading charges.",
+            "model": ResponseError,
+            "content": {
+                "application/json": {
+                    "example": {"success": False, "message": "Error downloading charges."}
+                }
+            },
+        },
+    },
+)
 @inject
 async def download_charges(
     request: Request,
@@ -189,6 +197,96 @@ async def download_charges(
     except Exception as e:
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading charges."
+        ) from e
+
+
+@files_router.get(
+    "/download/file/{file_hash}",
+    responses={
+        404: {
+            "description": "File not found.",
+            "model": ResponseError,
+            "content": {
+                "application/json": {"example": {"success": False, "message": "File not found."}}
+            },
+        },
+        400: {
+            "description": "Error downloading file.",
+            "model": ResponseError,
+            "content": {
+                "application/json": {
+                    "example": {"success": False, "message": "Error downloading file."}
+                }
+            },
+        },
+    },
+)
+@inject
+async def download_file(
+    request: Request,
+    file_hash: Annotated[str, Path(description="Hash of the file to download.")],
+    io: IOService = Depends(Provide[Container.io_service]),
+) -> FileResponse:
+    """Returns a zip file with all charges for the provided computation."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    try:
+        file_path = io.get_filepath(file_hash, user_id)
+        if not io.path_exists(file_path or ""):
+            raise FileNotFoundError()
+
+        return FileResponse(path=file_path or "", media_type="application/octet-stream")
+    except FileNotFoundError as e:
+        raise NotFoundError(detail=f"File '{file_hash}' not found.") from e
+    except Exception as e:
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading file."
+        ) from e
+
+
+# --- Route handlers used by ACC II Web ---
+
+
+@files_router.get(path="", include_in_schema=False)
+@inject
+async def get_files(
+    request: Request,
+    page: Annotated[int, Query(description="Page number", ge=1)] = 1,
+    page_size: Annotated[int, Query(description="Number of items per page", ge=1)] = 10,
+    order_by: Annotated[
+        Literal["name", "uploaded_at", "size"], Query(description="Order by")
+    ] = "uploaded_at",
+    search: Annotated[str, Query(description="Search term")] = "",
+    order: Annotated[Literal["asc", "desc"], Query(description="Order direction.")] = "desc",
+    storage_service: FileStorageService = Depends(Provide[Container.file_storage_service]),
+) -> Response[PagedList[FileResponseModel]]:
+    """Returns the list of files uploaded by the user.."""
+
+    user_id = str(request.state.user.id) if request.state.user is not None else None
+
+    if user_id is None:
+        raise BadRequestError(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be logged in to get files.",
+        )
+
+    try:
+        data = storage_service.get_files(
+            order_by=order_by,
+            order=order,
+            page=page,
+            page_size=page_size,
+            search=search,
+            user_id=user_id,
+        )
+
+        return Response(data=data)
+    except Exception as e:
+        traceback.print_exc()
+        raise BadRequestError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error getting files.",
         ) from e
 
 
@@ -265,29 +363,4 @@ async def delete_file(
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error deleting files.",
-        ) from e
-
-
-@files_router.get("/download/file/{file_hash}")
-@inject
-async def download_file(
-    request: Request,
-    file_hash: Annotated[str, Path(description="Hash of the file to download.")],
-    io: IOService = Depends(Provide[Container.io_service]),
-) -> FileResponse:
-    """Returns a zip file with all charges for the provided computation."""
-
-    user_id = str(request.state.user.id) if request.state.user is not None else None
-
-    try:
-        file_path = io.get_filepath(file_hash, user_id)
-        if not io.path_exists(file_path or ""):
-            raise FileNotFoundError()
-
-        return FileResponse(path=file_path or "", media_type="application/octet-stream")
-    except FileNotFoundError as e:
-        raise NotFoundError(detail=f"File '{file_hash}' not found.") from e
-    except Exception as e:
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error downloading file."
         ) from e
