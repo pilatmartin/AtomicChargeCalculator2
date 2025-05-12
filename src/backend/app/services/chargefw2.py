@@ -246,7 +246,6 @@ class ChargeFW2Service:
                 return
 
             async with self.semaphore:
-                print("Calculating charges for file", file_name, config.method)
                 charges_dir = self.io.get_charges_path(computation_id, user_id)
                 self.io.create_dir(charges_dir)
 
