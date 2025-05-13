@@ -6,24 +6,14 @@ import urllib.parse
 import httpx
 from api.v1.container import Container
 from api.v1.schemas.response import Response
+from api.v1.schemas.auth import TokenResponse
 from db.schemas.user import User
 from db.repositories.user_repository import UserRepository
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
-from pydantic import BaseModel
 from services.oidc import OIDCService
-
-
-class TokenResponse(BaseModel):
-    """JWT Token response."""
-
-    access_token: str
-    token_type: str
-    expires_in: int
-    scope: str
-    id_token: str
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"], include_in_schema=False)
@@ -130,7 +120,7 @@ async def auth_callback(
             user_repository.store(user)
 
         # set session cookie
-        response = RedirectResponse(url="https://acc2-dev.biodata.ceitec.cz/")
+        response = RedirectResponse(url=oidc_service.base_url)
         response.set_cookie("access_token", tokens.access_token, secure=True, httponly=True)
 
         return response
