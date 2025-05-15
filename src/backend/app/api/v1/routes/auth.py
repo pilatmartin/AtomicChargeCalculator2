@@ -1,4 +1,4 @@
-"""Auth routes."""
+"""Life Science auth routes implementing the OpenID Connect protocol."""
 
 import urllib
 import urllib.parse
@@ -31,7 +31,7 @@ async def login(oidc_service: OIDCService = Depends(Provide[Container.oidc_servi
         "response_type": "code",
         "client_id": oidc_service.client_id,
         "scope": "openid",
-        "redirect_uri": oidc_service.redirect_uri,
+        "redirect_uri": oidc_service.redirect_url,
     }
     query = urllib.parse.urlencode(params)
 
@@ -47,10 +47,11 @@ async def logout(
 
     config = await oidc_service.get_oidc_config()
     token = request.cookies.get("access_token")
-    redirect_uri = "https://acc2-dev.biodata.ceitec.cz/"  # TODO get from config
+    redirect_uri = oidc_service.base_url
 
     response = RedirectResponse(redirect_uri)
 
+    # end_session_endpoint prompts user to end the session on the LS side
     if "end_session_endpoint" in config:
         end_session_endpoint = config["end_session_endpoint"]
         params = {
@@ -76,7 +77,7 @@ async def auth_callback(
     oidc_service: OIDCService = Depends(Provide[Container.oidc_service]),
     user_repository: UserRepository = Depends(Provide[Container.user_repository]),
 ):
-    """Handle the callback from the OIDC provider."""
+    """Handle the callback from the OIDC provider. This function is triggered after succcessful LS login."""
 
     config = await oidc_service.get_oidc_config()
     token_endpoint = config["token_endpoint"]
@@ -87,7 +88,7 @@ async def auth_callback(
             data={
                 "grant_type": "authorization_code",
                 "code": code,
-                "redirect_uri": oidc_service.redirect_uri,
+                "redirect_uri": oidc_service.redirect_url,
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             auth=httpx.BasicAuth(

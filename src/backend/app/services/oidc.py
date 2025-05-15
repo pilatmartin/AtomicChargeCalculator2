@@ -25,6 +25,7 @@ class OIDCService:
 
         self.base_url = os.environ.get("OIDC_BASE_URL", "")
         self.discovery_url = os.environ.get("OIDC_DISCOVERY_URL", "")
+        self.redirect_url = os.environ.get("OIDC_REDIRECT_URL", "")
         self.client_id = os.environ.get("OIDC_CLIENT_ID", "")
         self.client_secret = os.environ.get("OIDC_CLIENT_SECRET", "")
         self.audience = os.environ.get("OIDC_REDIRECT_URL", "")
@@ -120,6 +121,9 @@ class OIDCService:
 
         if not self.discovery_url:
             raise EnvironmentError("OIDC_DISCOVERY_URL environment variable is not set")
+
+        if not self.redirect_url:
+            raise EnvironmentError("OIDC_REDIRECT_URL environment variable is not set")
 
         if not self.client_id:
             raise EnvironmentError("OIDC_CLIENT_ID environment variable is not set")
