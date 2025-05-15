@@ -20,14 +20,7 @@ $ cmake .. -DCMAKE_INSTALL_PREFIX=<WHERE-TO-INSTALL> -DPYTHON_MODULE=ON
 *Note:* `PYTHONPATH` environment variable is set in the [.env file](./app/.env). Overwrite it if you wish to install ChargeFW2 somewhere else.
 
 #### Required environment variables
-All required environment variables are located in the [.env file](./app/.env) except `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET` (required for Life Science auth). All used environment variables are described in [docs](../../docs/backend/README.md).
-
-### Startup script
-The remaining startup steps can be simplified using the `startup.sh` script:
-
-```bash
-$ ./startup.sh
-```
+All required environment variables are located in the [.env file](./app/.env) except `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET` (required for Life Science auth, can be ignored for local setup). All used environment variables are described in [docs](../../docs/backend/README.md). How to obtain the abovementioned environment variables is also mentioned [here](../../docs/backend/life-science/README.md). 
 
 ### Installing dependencies
 ACC II uses [Poetry](https://python-poetry.org/) for depencency management.
@@ -67,3 +60,10 @@ $ poetry run gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker m
 ```
 
 API runs by default on `--bind 127.0.0.1:8000`. Documentation (Swagger) is available on `/docs`. Alternatively you can use Redoc available on `/redoc`.
+
+### Startup script
+You can also use the `startup.sh` script:
+
+```bash
+$ ./startup.sh
+```
