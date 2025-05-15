@@ -1,3 +1,6 @@
+# Deployment
+How to use GitHub Action to deploy new ACC II version is described [here](../../docs/deployment/README.md).
+
 ## Nginx
 
 `nginx.conf` provides a configuration that can be used to deploy ACCII using nginx. Reusable declarations are located in `./snippets` to avoid unnecessary duplicity.
