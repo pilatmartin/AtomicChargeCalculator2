@@ -5,6 +5,7 @@ import shutil
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1.container import Container
 from api.v1.routes.charges import charges_router
@@ -50,6 +51,17 @@ def create_app() -> FastAPI:
 
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(UserLoaderMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            os.environ.get("ACC2_BASE_URL", ""),
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     app.add_exception_handler(HTTPException, http_exception_handler)
 
