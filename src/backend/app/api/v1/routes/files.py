@@ -71,58 +71,20 @@ async def upload(
 ) -> Response[list[UploadResponse]]:
     """Stores the provided files on disk and returns the computation id."""
 
-    def is_ext_valid(filename: str) -> bool:
-        parts = filename.rsplit(".", 1)
-        ext = parts[-1]
-
-        # has extension and is extension allowed
-        return len(parts) == 2 and ext in ALLOWED_FILE_TYPES
-
-    if len(files) == 0:
-        raise BadRequestError(status_code=status.HTTP_400_BAD_REQUEST, detail="No files provided.")
-
-    if any((file.size or 0) > io.max_file_size for file in files):
-        max_file_size_mb = io.max_file_size / 1024 / 1024
-        raise BadRequestError(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="Unable to upload files. One or more files are too large. "
-            + f"Maximum allowed size is {max_file_size_mb} MB.",
-        )
-
-    upload_size_b = sum((file.size or 0) for file in files)
-
-    if upload_size_b > io.max_upload_size:
-        max_upload_size_mb = io.max_upload_size / 1024 / 1024
-        raise BadRequestError(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="Unable to upload files. Maximum upload size exceeded. "
-            + f"Maximum upload size is {max_upload_size_mb} MB.",
-        )
-
-    user_id = str(request.state.user.id) if request.state.user is not None else None
-
-    if user_id is not None:
-        _, available_b, quota_b = io.get_quota(user_id)
-
-        if upload_size_b > available_b:
-            quota_mb = quota_b / 1024 / 1024
-            raise BadRequestError(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Unable to upload files. Quota exceeded. "
-                + f"Maximum storage space is {quota_mb} MB.",
-            )
-    else:
-        _, available, _ = io.get_quota()
-        if upload_size_b > available:
-            io.free_guest_file_space(upload_size_b)
-
-    if not all(is_ext_valid(file.filename or "") for file in files):
-        raise BadRequestError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed file types are {', '.join(ALLOWED_FILE_TYPES)}",
-        )
+    def clear_stored_files(files: list[str]) -> None:
+        for file in files:
+            io.remove_file(file)
 
     try:
+        io.ensure_upload_files_provided(files)
+        io.ensure_upload_files_sizes_valid(files)
+        io.ensure_uploaded_file_types_valid(files)
+
+        upload_size_b = sum((file.size or 0) for file in files)
+        user_id = str(request.state.user.id) if request.state.user is not None else None
+
+        io.ensure_quota_not_exceeded(upload_size_b, user_id)
+
         workdir = io.get_file_storage_path(user_id)
         io.create_dir(workdir)
 
@@ -131,7 +93,17 @@ async def upload(
         )
 
         for [path, file_hash] in stored_files:
-            info = await chargefw2.info(path)
+            try:
+                info = await chargefw2.info(path)
+            except RuntimeError:
+                # Remove files that were uploaded if an error occurs
+                clear_stored_files([path for [path, _] in stored_files])
+                _, filename = io.parse_filename(pathlib.Path(path).name)
+                raise BadRequestError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Unable to load molecules from file '{filename}'.",
+                )
+
             storage_service.store_file_info(file_hash, info)
 
         data = [
@@ -283,7 +255,6 @@ async def get_files(
 
         return Response(data=data)
     except Exception as e:
-        traceback.print_exc()
         raise BadRequestError(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error getting files.",
