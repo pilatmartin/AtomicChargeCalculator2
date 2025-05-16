@@ -1,5 +1,5 @@
 # Deployment
-How to use GitHub Action to deploy new ACC II version is described [here](../../docs/deployment/README.md).
+How to use the *Deploy to Production* GitHub Action to deploy new ACC II version is described [here](../../docs/deployment/README.md).
 
 ## Nginx
 

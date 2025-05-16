@@ -55,7 +55,9 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=[
             "http://localhost:5173",
+            "http://localhost",
             "http://127.0.0.1:5173",
+            "http://127.0.0.1",
             os.environ.get("ACC2_BASE_URL", ""),
         ],
         allow_credentials=True,
