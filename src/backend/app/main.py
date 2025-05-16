@@ -45,7 +45,11 @@ def create_app() -> FastAPI:
     # Create DI container
     container = Container()
 
-    app = FastAPI(root_path="/api", swagger_ui_parameters={"syntaxHighlight": False})
+    app = FastAPI(
+        title="Atomic Charge Calculator II API",
+        root_path="/api",
+        swagger_ui_parameters={"syntaxHighlight": False},
+    )
 
     container.wire()
 

@@ -73,8 +73,8 @@ async def suitable_methods(
     """
     Returns suitable methods for the provided computation.
 
-    fileHashes: List of file hashes to get suitable methods for.
-    permissiveTypes: Use similar parameters for similar atom/bond types if no exact match is found.
+        fileHashes: List of file hashes to get suitable methods for.
+        permissiveTypes: Use similar parameters for similar atom/bond types if no exact match is found.
     """
     user_id = str(request.state.user.id) if request.state.user is not None else None
 
@@ -172,9 +172,9 @@ async def best_parameters(
     """
     Returns the best parameters for the provided method and file.
 
-    methodName: Method name to get the best parameters for.
-    fileHash: File hashes to get suitable methods for.
-    permissiveTypes: Use similar parameters for similar atom/bond types if no exact match is found.
+        methodName: Method name to get the best parameters for.
+        fileHash: File hashes to get suitable methods for.
+        permissiveTypes: Use similar parameters for similar atom/bond types if no exact match is found.
     """
 
     methods = chargefw2.get_available_methods()
@@ -236,7 +236,7 @@ async def info(
     Returns information about the provided file.
     Number of molecules, total atoms and individual atoms.
 
-    fileHash: File hashes to get suitable methods for.
+        fileHash: File hashes to get suitable methods for.
     """
 
     user_id = str(request.state.user.id) if request.state.user is not None else None
@@ -331,7 +331,6 @@ async def calculate_charges(
     If no config is provided, the most suitable method and its parameters will be used.
 
         configs: List of combinations of suitable methods and parameters.
-
         fileHashes: List of file hashes to calculate charges for.
 
     settings:
