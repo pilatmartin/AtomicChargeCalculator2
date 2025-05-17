@@ -42,6 +42,9 @@ class IOService:
     def create_dir(self, path: str) -> None:
         """Create directory based on path."""
 
+        if self.io.path_exists(path):
+            return
+
         self.logger.info(f"Creating directory {path}")
 
         try:
