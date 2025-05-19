@@ -1,9 +1,6 @@
 import { handleApiError } from "@acc2/api/base";
-import { MolstarColoringType } from "@acc2/components/results/controls/coloring-controls";
-import { MolstarViewType } from "@acc2/components/results/controls/view-controls";
 import { MolStarWrapper } from "@acc2/components/results/molstar";
 import { ScrollArea } from "@acc2/components/ui/scroll-area";
-import { ControlsContextProvider } from "@acc2/lib/contexts/controls-context";
 import { useComputationMutations } from "@acc2/lib/hooks/mutations/use-calculations";
 import MolstarPartialCharges from "molstar-partial-charges";
 import { useEffect, useState } from "react";
