@@ -1,5 +1,5 @@
 # Logging to Life Science Test Environment
-First-time Life Science Login requires a few additional steps to go through.
+First-time Life Science Login (test environment) requires a few additional steps to go through.
 
 1. After clicking on *Log in* on ACC II page, choose your institution.
 ![login 1](./images/login1.png)
