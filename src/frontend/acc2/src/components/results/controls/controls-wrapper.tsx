@@ -14,6 +14,19 @@ export type ControlsWrapperProps = {
   molecules: string[];
 } & HTMLAttributes<HTMLElement>;
 
+// Overriding the default view type for specific examples
+const exampleOverrides: Record<string, { viewType: MolstarViewType }> = {
+  "examples/receptor": {
+    viewType: "surface",
+  },
+  "examples/1f16": {
+    viewType: "cartoon",
+  },
+  "examples/2k7w": {
+    viewType: "cartoon",
+  },
+};
+
 export const ControlsWrapper = ({
   computationId,
   molstar,
@@ -24,14 +37,12 @@ export const ControlsWrapper = ({
   const [coloringType, setColoringType] =
     useState<MolstarColoringType>("charges-relative");
   const [maxValue, setMaxValue] = useState<number>(0);
-  const [viewType, setViewType] = useState<MolstarViewType>(
-    // use surface view for receptor example
-    computationId === "examples/receptor"
-      ? "surface"
-      : molstar.type.isDefaultApplicable()
-        ? "cartoon"
-        : "balls-and-sticks"
-  );
+  const [viewType, setViewType] = useState<MolstarViewType>(() => {
+    if (exampleOverrides?.[computationId]?.viewType) {
+      return exampleOverrides[computationId].viewType;
+    }
+    return molstar.type.isDefaultApplicable() ? "cartoon" : "balls-and-sticks";
+  });
   const [methodNames, setMethodNames] = useState<(string | undefined)[]>([]);
 
   return (
