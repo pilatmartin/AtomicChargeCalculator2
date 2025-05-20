@@ -1,3 +1,6 @@
+// The following code is modified from the original molstar-partial-charges library,
+// available here: https://github.com/MergunFrimen/molstar-partial-charges/blob/master/src/viewer.ts
+
 import { PluginUIContext } from "molstar/lib/commonjs/mol-plugin-ui/context";
 import {
   DefaultPluginUISpec,

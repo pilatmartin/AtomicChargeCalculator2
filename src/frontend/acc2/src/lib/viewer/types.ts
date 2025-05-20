@@ -1,3 +1,6 @@
+// The following code is modified from the original molstar-partial-charges library,
+// available here: https://github.com/MergunFrimen/molstar-partial-charges/blob/master/src/types.ts
+
 import { StructureRepresentationRegistry } from "molstar/lib/commonjs/mol-repr/structure/registry";
 import { ColorTheme } from "molstar/lib/commonjs/mol-theme/color";
 import { SizeTheme } from "molstar/lib/commonjs/mol-theme/size";
