@@ -4,7 +4,7 @@ import { compute, getMolecules, setup } from "@acc2/api/compute/compute";
 import { AdvancedSettings, ComputationConfig } from "@acc2/api/compute/types";
 import { downloadCalculation } from "@acc2/api/files/files";
 import { useMutation } from "@tanstack/react-query";
-import MolstarPartialCharges from "molstar-partial-charges";
+import MolstarPartialCharges from "@acc2/lib/viewer/viewer";
 
 type SetupMutationData = {
   fileHashes: string[];
