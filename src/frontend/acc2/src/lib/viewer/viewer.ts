@@ -1,24 +1,31 @@
 // The following code is modified from the original molstar-partial-charges library,
 // available here: https://github.com/MergunFrimen/molstar-partial-charges/blob/master/src/viewer.ts
 
+import merge from "lodash.merge";
+import { PLDDTConfidenceColorThemeProvider } from "molstar/lib/commonjs/extensions/model-archive/quality-assessment/color/plddt";
+import { SbNcbrPartialCharges } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/behavior";
+import { SbNcbrPartialChargesColorThemeProvider } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/color";
+import { SbNcbrPartialChargesPropertyProvider } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/property";
+import { MmcifFormat } from "molstar/lib/commonjs/mol-model-formats/structure/mmcif";
+import {
+  Model,
+  StructureSelection,
+} from "molstar/lib/commonjs/mol-model/structure";
+import { BuiltInTrajectoryFormat } from "molstar/lib/commonjs/mol-plugin-state/formats/trajectory";
 import { PluginUIContext } from "molstar/lib/commonjs/mol-plugin-ui/context";
 import {
   DefaultPluginUISpec,
   PluginUISpec,
 } from "molstar/lib/commonjs/mol-plugin-ui/spec";
 import { StructureFocusRepresentation } from "molstar/lib/commonjs/mol-plugin/behavior/dynamic/selection/structure-focus-representation";
+import { PluginConfig } from "molstar/lib/commonjs/mol-plugin/config";
 import { PluginSpec } from "molstar/lib/commonjs/mol-plugin/spec";
-import { MmcifFormat } from "molstar/lib/commonjs/mol-model-formats/structure/mmcif";
-import {
-  Model,
-  StructureSelection,
-} from "molstar/lib/commonjs/mol-model/structure";
 import { BallAndStickRepresentationProvider } from "molstar/lib/commonjs/mol-repr/structure/representation/ball-and-stick";
 import { GaussianSurfaceRepresentationProvider } from "molstar/lib/commonjs/mol-repr/structure/representation/gaussian-surface";
+import { Script } from "molstar/lib/commonjs/mol-script/script";
 import { ElementSymbolColorThemeProvider } from "molstar/lib/commonjs/mol-theme/color/element-symbol";
 import { PhysicalSizeThemeProvider } from "molstar/lib/commonjs/mol-theme/size/physical";
-import { PluginConfig } from "molstar/lib/commonjs/mol-plugin/config";
-import { BuiltInTrajectoryFormat } from "molstar/lib/commonjs/mol-plugin-state/formats/trajectory";
+
 import {
   AtomKey,
   Color,
@@ -27,12 +34,7 @@ import {
   TargetWebApp,
   Type,
 } from "./types";
-import { SbNcbrPartialCharges } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/behavior";
-import { SbNcbrPartialChargesPropertyProvider } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/property";
-import { SbNcbrPartialChargesColorThemeProvider } from "molstar/lib/commonjs/extensions/sb-ncbr/partial-charges/color";
-import { PLDDTConfidenceColorThemeProvider } from "molstar/lib/commonjs/extensions/model-archive/quality-assessment/color/plddt";
-import { Script } from "molstar/lib/commonjs/mol-script/script";
-import merge from "lodash.merge";
+
 import "molstar/lib/mol-plugin-ui/skin/light.scss";
 
 export default class MolstarPartialCharges {

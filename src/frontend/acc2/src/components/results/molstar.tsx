@@ -1,11 +1,11 @@
 import { cn } from "@acc2/lib/utils";
-import { HTMLAttributes, useEffect, useState } from "react";
-
-import { Card } from "../ui/card";
-import { Plugin } from "molstar/lib/commonjs/mol-plugin-ui/plugin";
 import { PluginUIContext } from "molstar/lib/commonjs/mol-plugin-ui/context";
-import { Busy, BusySize } from "../shared/busy";
+import { Plugin } from "molstar/lib/commonjs/mol-plugin-ui/plugin";
+import { HTMLAttributes, useEffect, useState } from "react";
 import { combineLatest } from "rxjs";
+
+import { Busy, BusySize } from "../shared/busy";
+import { Card } from "../ui/card";
 
 export type MolstarViewerProps = {
   plugin: PluginUIContext;

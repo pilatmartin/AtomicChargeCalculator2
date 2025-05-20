@@ -1,8 +1,9 @@
 import MolstarPartialCharges from "@acc2/lib/viewer/viewer";
 import { PluginUIContext } from "molstar/lib/commonjs/mol-plugin-ui/context";
 import { HTMLAttributes, useEffect, useState } from "react";
-import { MolstarViewer } from "./molstar";
+
 import { Busy, BusySize } from "../shared/busy";
+import { MolstarViewer } from "./molstar";
 
 export type MolstarWrapperProps = {
   setMolstar: React.Dispatch<
